@@ -1,0 +1,178 @@
+use super::*;
+use ItemClass::*;
+
+#[test]
+fn entering_external_inventory_state() {
+    let (update_tx, update_rx) = mpsc::channel();
+    let (command_tx, _command_rx) = mpsc::channel();
+
+    let mut subject = UIState::new(update_rx, command_tx);
+
+    let exp_inventory = vec![Item::new(
+        907,
+        ItemClass::Gloves,
+        "a pair of nylon gloves",
+        1,
+    )];
+    update_tx
+        .send(GameUpdate::ExternalInventoryOpened(
+            exp_inventory.clone(),
+            5,
+        ))
+        .unwrap();
+
+    subject.perform_tick(None);
+    assert_eq!(subject.external_inventory, Some(exp_inventory));
+    assert_eq!(subject.input_state, InputState::ExternalInventoryOpen);
+}
+
+#[test]
+fn leaving_external_inventory_state() {
+    let (update_tx, update_rx) = mpsc::channel();
+    let (command_tx, _command_rx) = mpsc::channel();
+
+    let mut subject = UIState::new(update_rx, command_tx);
+
+    {
+        let exp_inventory = vec![Item::new(
+            907,
+            ItemClass::Gloves,
+            "a pair of nylon gloves",
+            1,
+        )];
+        update_tx
+            .send(GameUpdate::ExternalInventoryOpened(
+                exp_inventory.clone(),
+                5,
+            ))
+            .unwrap();
+        subject.perform_tick(None);
+    }
+
+    update_tx.send(GameUpdate::ExternalInventoryClosed).unwrap();
+    subject.perform_tick(None);
+
+    assert_eq!(subject.external_inventory, None);
+    assert_eq!(subject.input_state, InputState::Normal);
+}
+
+#[test]
+fn escape_ends_external_inventory_mode() {
+    let (update_tx, update_rx) = mpsc::channel();
+    let (command_tx, _command_rx) = mpsc::channel();
+    let mut subject = UIState::new(update_rx, command_tx);
+
+    let exp_inventory = vec![Item::new(
+        907,
+        ItemClass::Gloves,
+        "a pair of nylon gloves",
+        1,
+    )];
+    update_tx
+        .send(GameUpdate::ExternalInventoryOpened(
+            exp_inventory.clone(),
+            5,
+        ))
+        .unwrap();
+
+    subject.perform_tick(None);
+
+    let input = input::Input {
+        key: Some(VirtualKeyCode::Escape),
+        shift: false,
+        control: false,
+        alt: false,
+    };
+
+    let command = subject.get_command_from_keyboard_input(&input);
+
+    if let Command::CloseExternalInventory = command {
+        // Will still be in external inventory mode until update::ExternalInventoryClosed occurs.
+        assert_eq!(subject.input_state, InputState::ExternalInventoryOpen);
+    } else {
+        panic!("command mismatch error: {:?}", command)
+    }
+}
+
+#[test]
+fn game_state_opening_external_inventory() {
+    let (update_tx, update_rx) = std::sync::mpsc::channel();
+
+    let mut subject: game::GameState;
+
+    {
+        subject = game::GameState::new("maps/test.map");
+        game::Level::new(&mut subject, None);
+        subject.teleport_player(8, 7, None, None);
+    }
+
+    subject.game_loop_iteration(
+        &Command::Move(Direction::Left, MoveCommandMode::Use),
+        Some(&update_tx),
+        None,
+    );
+
+    let update = update_rx.try_recv().expect("did not receive update");
+
+    let exp_inventory = vec![
+        Item {
+            id: 38,
+            description: "Old Leather Cap".to_string(),
+            class: Headwear,
+            quantity: 1,
+        },
+        Item {
+            id: 35,
+            description: "Shiny Dagger".to_string(),
+            class: Dagger,
+            quantity: 1,
+        },
+        Item {
+            id: 36,
+            description: "Sharp Short Sword".to_string(),
+            class: BladeWeapon,
+            quantity: 1,
+        },
+        Item {
+            id: 37,
+            description: "Pink Potion".to_string(),
+            class: Potion,
+            quantity: 1,
+        },
+    ];
+    if let ExternalInventoryOpened(inventory, 9) = update {
+        // assert given inventory is the appropriate external inventory
+        assert_eq!(inventory.clone().sort(), exp_inventory.clone().sort());
+
+        // assert player's external inventory is also appropriately set
+        assert_eq!(
+            subject
+                .game_data
+                .player
+                .external_inventory
+                .map(|i| i.clone().sort()),
+            Some(exp_inventory.clone().sort())
+        );
+    } else {
+        panic!("unexpected update found: {:?}", update);
+    }
+}
+
+#[test]
+#[ignore = "finish alias implementation"]
+fn game_state_closing_external_inventory() {
+    let mut subject = game::GameState::new("maps/test.map");
+
+    let (update_tx, update_rx) = std::sync::mpsc::channel();
+    game::Level::new(&mut subject, None);
+
+    subject.game_loop_iteration(&Command::CloseExternalInventory, Some(&update_tx), None);
+
+    let update = update_rx.try_recv().unwrap();
+
+    if let ExternalInventoryClosed = update {
+        //passes
+    } else {
+        panic!("unexpected update found");
+    }
+}

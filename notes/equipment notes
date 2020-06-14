@@ -1,0 +1,73 @@
+BODY PARTS
+==========
+head
+face
+neck
+chest
+arms
+Left wrist
+Right wrist
+On hand
+Off hand
+Waist
+Legs
+Feet
+
+     ^      head
+     |      face
+     -      neck
+            shoulders
+  /  |  \   chest
+  |  =  |   waist
+  | / \ |   legs 
+   |   |    feet
+                     
+   /    \   arms
+  |      |  left wrist
+  |      |  right wrist
+            on hand
+            off hand
+
+
+
+MountingPoints empty
+MountingPoint has an item
+
+^ player "Amber Leather Cap"
+↓ chest1 "Shiny Dagger" // a dagger
+! chest1 "Sharp Short Sword"
+^ chest1 "Old Leather Cap"
+↓ 25,23 "Crusty Dagger" // a dagger
+^ 27,7 "Very Old Leather Cap"
+! 27,7 "Warped Short Sword"
+^ 28,7 "baseball cap"
+¡ chest1 "Pink Potion"
+¡ 52,32 "Yellow Potion"
+? chest1 "Apple"
+
+// This dagger can be repaired to become a higher-level dagger.
+crusty_dagger "Crusty Dagger" {
+     type: Bladeweapon
+     weight: 2
+     durability: 300
+     esteem: 30000
+     mounting_points: [OnHand]
+     required_skill: Combat
+     required_level: 5
+     attack: +1
+     speed: +1
+     degrade_path: broken_bronze_dagger
+     properties: [:repairable_discovery]
+     endorsements: [:parry]
+}
+basket "light-weight reed basket" {
+     type: Tool
+     weight: 1
+     esteem: 100000
+     durability: 200
+     required_skill: Harvesting
+     required_level: 0
+     degrade_path: basket_with_holes
+     endorsements: [:can_pick_apples]
+}
+

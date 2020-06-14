@@ -1,0 +1,32 @@
+previous command aborts when player moves or changes facing
+
+
+
+
+Chest
+    Open
+
+
+Apple Tree
+    Pick apple: 60 sec timer starts
+
+
+
+
+InventoryOpen(Vec<Item>)
+InventoryClosed()
+
+TimerStart(60)
+TimerComplete()
+AbortTimer()
+
+MovementBegins(0.1)
+TimerComplete()
+AbortTimer()
+
+player may have a activiity.
+Movement is an activity.
+
+That activity may have a timer like picking an apple or it may be ongoing, like opening a chest.
+
+You can only have one chest open at a time.
