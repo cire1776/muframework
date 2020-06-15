@@ -260,7 +260,7 @@ impl ItemClassSpecifier {
         item: &Item,
         item_class_specifiers: &'a ItemClassSpecifierList,
     ) -> Vec<&'a MountingPoint> {
-        item_class_specifiers[&item.class].to_vec()
+        item_class_specifiers[&item.class()].to_vec()
     }
 }
 
@@ -274,10 +274,9 @@ mod mounting_point_map {
         let mut items = ItemList::new();
         let item_class_specifiers = ItemClassSpecifier::initialize();
         let item = Item {
-            description: "A hat".to_string(),
-            class: ItemClass::Headwear,
             id: 1,
             quantity: 1,
+            item_type: ItemType::new(ItemClass::Headwear, "hat"),
         };
         items[1] = ItemState::Stored(item.clone(), 1);
 
@@ -295,18 +294,16 @@ mod mounting_point_map {
         let mut items = ItemList::new();
 
         let item = Item {
-            description: "A hat".to_string(),
-            class: ItemClass::Headwear,
             id: 1,
             quantity: 1,
+            item_type: ItemType::new(ItemClass::Headwear, "hat"),
         };
         items[1] = ItemState::Stored(item.clone(), 1);
 
         let old_item = Item {
-            description: "An old hat".to_string(),
-            class: ItemClass::Headwear,
             id: 2,
             quantity: 1,
+            item_type: ItemType::new(ItemClass::Headwear, "old hat"),
         };
         items[2] = ItemState::Stored(old_item.clone(), 1);
 
@@ -338,19 +335,17 @@ mod mounting_point_map {
         let item_class_specifiers = ItemClassSpecifier::initialize();
 
         let mut item = Item {
-            description: "A hat".to_string(),
-            class: ItemClass::Headwear,
             id: 1,
             quantity: 1,
+            item_type: ItemType::new(ItemClass::Headwear, "hat"),
         };
         items[1] = ItemState::Stored(item.clone(), 1);
         inventory.accept_stack(&mut item, &mut items);
 
         let mut old_item = Item {
-            description: "An old hat".to_string(),
-            class: ItemClass::Headwear,
             id: 2,
             quantity: 1,
+            item_type: ItemType::new(ItemClass::Headwear, "old hat"),
         };
         items[2] = ItemState::Stored(old_item.clone(), 1);
         inventory.accept_stack(&mut old_item, &mut items);
@@ -425,10 +420,9 @@ mod mounting_point_map {
         inventory: &mut Inventory,
     ) -> Item {
         let mut item = Item {
-            description: description.into(),
-            class,
             id,
             quantity: 1,
+            item_type: ItemType::new(class, description),
         };
         items[id] = ItemState::Stored(item.clone(), inventory.id());
         inventory.accept_stack(&mut item, items);
@@ -486,10 +480,9 @@ mod mounting_point_map_unmount {
         inventory: &mut Inventory,
     ) -> Item {
         let mut item = Item {
-            description: description.into(),
-            class,
             id,
             quantity: 1,
+            item_type: ItemType::new(class, description),
         };
         items[id] = ItemState::Stored(item.clone(), inventory.id());
         inventory.accept_stack(&mut item, items);
@@ -502,7 +495,7 @@ mod mounting_point_map_unmount {
         let mut inventory = Inventory::new(1);
         let mut items = ItemList::new();
 
-        let item = Item::new(232, ItemClass::Headwear, "An Amazon Cap", 1);
+        let item = Item::new(232, ItemType::new(ItemClass::Headwear, "An Amazon Cap"), 1);
         subject.perform_mount(&item, &vec![&MountingPoint::Head]);
 
         subject.unmount(&vec![], &mut inventory, &mut items);
@@ -517,7 +510,7 @@ mod mounting_point_map_unmount {
         let mut inventory = Inventory::new(1);
         let mut items = ItemList::new();
 
-        let item = Item::new(232, ItemClass::Headwear, "An Amazon Cap", 1);
+        let item = Item::new(232, ItemType::new(ItemClass::Headwear, "An Amazon Cap"), 1);
         subject.perform_mount(&item, &vec![&MountingPoint::Head]);
 
         subject.unmount(&vec![&MountingPoint::OnHand], &mut inventory, &mut items);

@@ -17,7 +17,7 @@ pub mod level;
 pub use level::Level;
 
 pub mod items;
-pub use items::{Item, ItemClass, ItemList, ItemState};
+pub use items::{Item, ItemClass, ItemList, ItemState, ItemType};
 
 pub mod inventory;
 pub use inventory::{AliasList, Inventory, InventoryList};
@@ -362,3 +362,6 @@ impl GameState {
 }
 #[cfg(test)]
 mod test_external_inventories;
+
+#[cfg(test)]
+mod test_item_type;

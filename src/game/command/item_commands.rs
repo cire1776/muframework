@@ -1,4 +1,5 @@
 use super::*;
+
 pub struct PickupCommand<'a> {
     item_id: u64,
     inventory: &'a mut Inventory,
@@ -80,8 +81,8 @@ impl<'a> CommandHandler for DropCommand<'a> {
                 id: self.item.id,
                 x: self.x,
                 y: self.y,
-                description: self.item.description.to_owned(),
-                class: self.item.class,
+                description: self.item.description(),
+                class: self.item.class(),
             },
         );
         GameUpdate::send(
@@ -410,9 +411,8 @@ mod pickup_command {
             Some(ItemState::Stored(
                 Item {
                     id: 1776,
-                    class: ItemClass::Potion,
-                    description: "A Red Bubbling Potion".into(),
                     quantity: 1,
+                    item_type: ItemType::new(ItemClass::Potion, "A Red Bubbling Potion"),
                 },
                 1
             ))
@@ -428,7 +428,11 @@ mod drop_command {
     fn execute_sends_two_messages() {
         let mut inventory = Inventory::new(1);
         let mut items = ItemList::new();
-        let mut item = Item::new(1776, ItemClass::Potion, "A Red Bubbling Potion", 1);
+        let mut item = Item::new(
+            1776,
+            ItemType::new(ItemClass::Potion, "A Red Bubbling Potion"),
+            1,
+        );
         inventory.accept_stack(&mut item, &mut items);
 
         let mut command = DropCommand::new(&item, 10, 15, &mut inventory, &mut items);
@@ -449,8 +453,8 @@ mod drop_command {
             assert_eq! {1776, item_id}
             assert_eq!(x, 10);
             assert_eq!(y, 15);
-            assert_eq!(description, item.description);
-            assert_eq!(class, item.class);
+            assert_eq!(description, item.description());
+            assert_eq!(class, item.class());
         } else {
             panic!(format!("response not appropriate: {:?}", response));
         }
@@ -466,7 +470,11 @@ mod drop_command {
     fn execute_adds_a_bundle_at_location() {
         let mut inventory = Inventory::new(1);
         let mut items = ItemList::new();
-        let mut item = Item::new(1776, ItemClass::Potion, "A Red Bubbling Potion", 1);
+        let mut item = Item::new(
+            1776,
+            ItemType::new(ItemClass::Potion, "A Red Bubbling Potion"),
+            1,
+        );
         inventory.accept_stack(&mut item, &mut items);
 
         let mut command = DropCommand::new(&item, 10, 15, &mut inventory, &mut items);
@@ -484,7 +492,11 @@ mod drop_command {
     fn execute_adds_removes_item_from_the_inventory() {
         let mut inventory = Inventory::new(1);
         let mut items = ItemList::new();
-        let mut item = Item::new(1776, ItemClass::Potion, "A Red Bubbling Potion", 1);
+        let mut item = Item::new(
+            1776,
+            ItemType::new(ItemClass::Potion, "A Red Bubbling Potion"),
+            1,
+        );
         inventory.accept_stack(&mut item, &mut items);
 
         let mut command = DropCommand::new(&item, 10, 15, &mut inventory, &mut items);
@@ -508,10 +520,9 @@ mod support {
         items: &mut ItemList,
     ) -> Item {
         let mut item = Item {
-            description: description.into(),
-            class,
             id,
             quantity: 1,
+            item_type: ItemType::new(class, description),
         };
         items[id] = ItemState::Stored(item.clone(), inventory.id());
         inventory.accept_stack(&mut item, items);

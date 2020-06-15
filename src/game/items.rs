@@ -2,6 +2,8 @@ pub use super::*;
 use regex::Regex;
 use std::collections::HashMap;
 use std::ops::{Index, IndexMut};
+use ItemClass::*;
+
 #[derive(Debug, Hash, Eq, PartialEq, Copy, Clone, Ord, PartialOrd)]
 pub enum ItemClass {
     BladeWeapon,
@@ -20,11 +22,11 @@ pub enum ItemClass {
 impl ItemClass {
     pub fn from_symbol<S: ToString>(symbol: S) -> ItemClass {
         match &symbol.to_string()[..] {
-            "↓" => ItemClass::Dagger,
-            "^" => ItemClass::Headwear,
-            "!" => ItemClass::BladeWeapon,
-            "¡" => ItemClass::Potion,
-            "♠" => ItemClass::Tool,
+            "↓" => Dagger,
+            "^" => Headwear,
+            "!" => BladeWeapon,
+            "¡" => Potion,
+            "♠" => Tool,
             _ => panic!("unknown item class"),
         }
     }
@@ -67,28 +69,48 @@ impl ItemState {
         }
     }
 }
+pub trait StaticData: 'static {}
+
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
+pub struct ItemType {
+    class: ItemClass,
+    description: String,
+}
+
+impl ItemType {
+    pub fn new<S: ToString>(class: ItemClass, description: S) -> Self {
+        Self {
+            class,
+            description: description.to_string(),
+        }
+    }
+}
+
+impl StaticData for ItemType {}
+
+pub type ItemTypeList = HashMap<String, ItemType>;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub struct Item {
     pub id: u64,
-    pub description: String,
-    pub class: ItemClass,
     pub quantity: u8,
+    pub item_type: ItemType,
 }
 
 impl Item {
-    pub fn new<S: ToString, N: TryInto<u8>>(
-        id: u64,
-        class: ItemClass,
-        description: S,
-        quantity: N,
-    ) -> Item {
+    pub fn new<N: TryInto<u8>>(id: u64, item_type: ItemType, quantity: N) -> Item {
         Item {
             id,
-            class,
-            description: description.to_string(),
             quantity: quantity.try_into().ok().expect("must be convertible to u8"),
+            item_type,
         }
+    }
+    pub fn class(&self) -> ItemClass {
+        self.item_type.class
+    }
+
+    pub fn raw_description(&self) -> String {
+        self.item_type.description.clone()
     }
 
     pub fn description(&self) -> String {
@@ -98,7 +120,7 @@ impl Item {
         let vowels = ["A", "E", "I", "O", "U"];
 
         let prefix = if self.quantity == 1 {
-            if vowels.contains(&&self.description.to_uppercase()[0..1]) {
+            if vowels.contains(&&self.raw_description().to_uppercase()[0..1]) {
                 "An".to_string()
             } else {
                 "A".to_string()
@@ -108,9 +130,9 @@ impl Item {
         };
 
         let inflected_description = if self.quantity == 1 {
-            to_singular(&self.description[..])
+            to_singular(&self.raw_description()[..])
         } else {
-            to_plural(&self.description[..])
+            to_plural(&self.raw_description()[..])
         };
 
         format!("{} {}", prefix, inflected_description).clone()
@@ -126,10 +148,10 @@ impl Item {
         description: S,
         quantity: N,
     ) -> Item {
+        let description = description.to_string();
         Self::new(
             NEXT_ITEM_ID(),
-            class,
-            description,
+            ItemType::new(class, description),
             quantity.try_into().ok().expect("must be convertible to u8"),
         )
     }
@@ -203,7 +225,7 @@ impl Item {
     /// assert!(item.is_stackable());
     /// ```
     pub fn is_stackable(&self) -> bool {
-        ItemClass::stack_limits(self.class) > 1
+        ItemClass::stack_limits(self.class()) > 1
     }
 
     /// returns true if the two items are the same type.
@@ -222,19 +244,21 @@ impl Item {
 
     // use description field and not method to avoid quantity inflections
     pub fn is_same_type_as(&self, other: &Item) -> bool {
-        self.class == other.class && self.description == other.description
+        self.item_type == other.item_type
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct ItemList {
     items: HashMap<u64, ItemState>,
+    item_types: ItemTypeList,
 }
 
 impl ItemList {
     pub fn new() -> ItemList {
         ItemList {
             items: HashMap::new(),
+            item_types: ItemTypeList::new(),
         }
     }
 
@@ -253,7 +277,7 @@ impl ItemList {
     /// ```
     /// # use muframework::game::items::*;
     /// let mut subject = ItemList::new();
-    /// let item = Item::new(208, ItemClass::Potion, "A green, odorous potion",1);
+    /// let item = Item::new(208, ItemType::new(ItemClass::Potion, "A green, odorous potion"),1);
     /// subject.store(&item, 1);
     /// assert!(!subject.is_empty());
     /// ```
@@ -305,7 +329,7 @@ impl ItemList {
     /// ```
     /// # use muframework::game::items::*;
     /// let mut subject = ItemList::new();
-    /// let mut item = Item::new(600, ItemClass::BladeWeapon, "A rusty sword",1);
+    /// let mut item = Item::new(600, ItemType::new(ItemClass::BladeWeapon, "A rusty sword"),1);
     /// subject.add_item_to_bundle_at(10,15, &item);
     /// ```
 
@@ -335,7 +359,7 @@ impl ItemList {
         class: ItemClass,
         description: &str,
     ) {
-        let item = Item::new(id, class, description, 1);
+        let item = Item::new(id, ItemType::new(class, description), 1);
         self.add_item_to_bundle_at(x, y, &item);
     }
 
@@ -397,10 +421,9 @@ impl IndexMut<u64> for ItemList {
                 index,
                 ItemState::Stored(
                     Item {
-                        description: "bogus item".to_string(),
-                        class: ItemClass::Gloves,
                         id: index,
                         quantity: 1,
+                        item_type: ItemType::new(ItemClass::Gloves, "description"),
                     },
                     1,
                 ),
@@ -419,10 +442,9 @@ mod item_list_index_mut {
         let mut subject = ItemList::new();
 
         let item = Item {
-            description: "blah".to_string(),
-            class: ItemClass::Headwear,
             id: 1776,
             quantity: 1,
+            item_type: ItemType::new(Headwear, "blah"),
         };
         subject[1776] = ItemState::Equipped(item.clone(), 1);
 
@@ -433,13 +455,12 @@ mod item_list_index_mut {
 #[cfg(test)]
 mod update_item {
     use super::*;
-    use items::ItemClass::*;
 
     #[test]
     fn it_updates_a_stored_item() {
         let item = Item::spawn(Potion, "Coca-Cola");
         let item_id = item.id;
-        let new_item = Item::new(item.id, item.class, item.description.clone(), 8);
+        let new_item = Item::new(item.id, ItemType::new(item.class(), item.description()), 8);
         let mut subject = ItemList::new();
 
         subject.add(ItemState::Stored(item, item_id));
@@ -453,7 +474,7 @@ mod update_item {
     fn it_updates_a_bundle_item() {
         let item = Item::spawn(Potion, "Coca-Cola");
         let item_id = item.id;
-        let new_item = Item::new(item.id, item.class, item.description.clone(), 8);
+        let new_item = Item::new(item.id, ItemType::new(item.class(), item.description()), 8);
 
         let mut subject = ItemList::new();
 

@@ -169,7 +169,7 @@ impl UIState {
             Ok(InventoryUpdated(items)) => {
                 self.inventory = items;
                 self.inventory
-                    .sort_by(|a, b| a.description.cmp(&b.description));
+                    .sort_by(|a, b| a.description().cmp(&b.description()));
 
                 self.inventory_window
                     .set_max_item_selection(self.inventory.len() as u8);

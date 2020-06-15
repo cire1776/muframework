@@ -51,8 +51,8 @@ impl Level {
                             id: *index,
                             x: *x,
                             y: *y,
-                            class: item.class,
-                            description: item.description.clone(),
+                            class: item.class(),
+                            description: item.description(),
                         },
                     );
                 }

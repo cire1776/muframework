@@ -107,7 +107,7 @@ impl Inventory {
     /// # use muframework::game::inventory::*;
     /// # use muframework::game::items::*;
     /// let mut subject = Inventory::new(1);
-    /// let item = Item::new(208, ItemClass::Potion, "A green, odorous potion",1);
+    /// let item = Item::new(208, ItemType::new(ItemClass::Potion, "A green, odorous potion"),1);
     /// subject.force_accept(&item);
     /// assert!(!subject.is_empty());
     /// ```
@@ -129,7 +129,7 @@ impl Inventory {
     /// # use muframework::game::items::*;
     /// let mut subject = Inventory::new(1);
     /// let mut items = ItemList::new();
-    /// let item = Item::new(601, ItemClass::Headwear,"baseball cap",1);
+    /// let item = Item::new(601, ItemType::new(ItemClass::Headwear,"baseball cap"),1);
     /// subject.accept(&item, &mut items);
     /// assert_eq!(subject.count(), 1);
     /// ```
@@ -162,7 +162,7 @@ impl Inventory {
     /// # use muframework::game::items::*;
     /// let mut subject = Inventory::new(1);
     /// let mut items = ItemList::new();
-    /// let item = Item::new(1146, ItemClass::Shoes, "Prada red papal shoes",1);
+    /// let item = Item::new(1146, ItemType::new(ItemClass::Shoes, "Prada red papal shoes"),1);
     ///
     /// subject.accept(& item, &mut items);
     ///
@@ -193,7 +193,7 @@ impl Inventory {
                 if !item.is_same_type_as(current_item) {
                     continue;
                 }
-                let limit = ItemClass::stack_limits(current_item.class);
+                let limit = ItemClass::stack_limits(current_item.class());
                 let quantity_to_move = min(limit - current_item.quantity, item.quantity);
                 item.quantity -= quantity_to_move;
                 current_item.quantity += quantity_to_move;
@@ -221,7 +221,7 @@ impl Inventory {
     /// # use muframework::game::items::*;
     /// let mut subject = Inventory::new(1);
     /// let mut items = ItemList::new();
-    /// let item = Item::new(1146, ItemClass::Shoes, "Prada red papal shoes",1);
+    /// let item = Item::new(1146, ItemType::new(ItemClass::Shoes, "Prada red papal shoes"),1);
     /// items.store(&item,subject.id());
     ///
     /// subject.accept_by_id(item.id, &mut items);
@@ -326,7 +326,7 @@ mod test_inventory {
     #[test]
     fn index() {
         let mut subject = Inventory::new(1);
-        let item = Item::new(1, ItemClass::Gloves, "some item", 1);
+        let item = Item::new(1, ItemType::new(ItemClass::Gloves, "some item"), 1);
         let mut items = ItemList::new();
         subject.accept(&item, &mut items);
 
@@ -337,7 +337,7 @@ mod test_inventory {
     #[should_panic(expected = "index not found")]
     fn index_should_panic_when_index_not_found() {
         let mut subject = Inventory::new(1);
-        let item = Item::new(1, ItemClass::Gloves, "some item", 1);
+        let item = Item::new(1, ItemType::new(ItemClass::Gloves, "some item"), 1);
         let mut items = ItemList::new();
         subject.accept(&item, &mut items);
 
@@ -348,7 +348,7 @@ mod test_inventory {
     #[should_panic(expected = "index not found")]
     fn remove_item_removes_the_item() {
         let mut subject = Inventory::new(1);
-        let item = Item::new(1777, ItemClass::Gloves, "some item", 1);
+        let item = Item::new(1777, ItemType::new(ItemClass::Gloves, "some item"), 1);
         let mut items = ItemList::new();
         subject.accept(&item, &mut items);
 

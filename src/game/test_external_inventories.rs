@@ -13,8 +13,7 @@ fn entering_external_inventory_state() {
 
     let exp_inventory = vec![Item::new(
         907,
-        ItemClass::Gloves,
-        "a pair of nylon gloves",
+        ItemType::new(ItemClass::Gloves, "a pair of nylon gloves"),
         1,
     )];
     update_tx
@@ -39,8 +38,7 @@ fn leaving_external_inventory_state() {
     {
         let exp_inventory = vec![Item::new(
             907,
-            ItemClass::Gloves,
-            "a pair of nylon gloves",
+            ItemType::new(ItemClass::Gloves, "a pair of nylon gloves"),
             1,
         )];
         update_tx
@@ -67,8 +65,7 @@ fn escape_ends_external_inventory_mode() {
 
     let exp_inventory = vec![Item::new(
         907,
-        ItemClass::Gloves,
-        "a pair of nylon gloves",
+        ItemType::new(ItemClass::Gloves, "a pair of nylon gloves"),
         1,
     )];
     update_tx
@@ -133,27 +130,23 @@ fn opening_external_inventory() {
     let exp_inventory = vec![
         Item {
             id: 38,
-            description: "Old Leather Cap".to_string(),
-            class: Headwear,
             quantity: 1,
+            item_type: ItemType::new(Headwear, "Old leather cap"),
         },
         Item {
             id: 35,
-            description: "Shiny Dagger".to_string(),
-            class: Dagger,
             quantity: 1,
+            item_type: ItemType::new(Dagger, "Shiny Dagger"),
         },
         Item {
             id: 36,
-            description: "Sharp Short Sword".to_string(),
-            class: BladeWeapon,
             quantity: 1,
+            item_type: ItemType::new(BladeWeapon, "Sharp Short Sword"),
         },
         Item {
             id: 37,
-            description: "Pink Potion".to_string(),
-            class: Potion,
             quantity: 1,
+            item_type: ItemType::new(Potion, "pink potion"),
         },
     ];
     if let ExternalInventoryOpened(inventory, 9) = update {
