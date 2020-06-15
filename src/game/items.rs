@@ -239,14 +239,12 @@ impl Item {
 
 #[derive(Debug, Clone)]
 pub struct ItemList {
-    next_id: u64,
     items: HashMap<u64, ItemState>,
 }
 
 impl ItemList {
     pub fn new() -> ItemList {
         ItemList {
-            next_id: NEXT_ITEM_ID(),
             items: HashMap::new(),
         }
     }
