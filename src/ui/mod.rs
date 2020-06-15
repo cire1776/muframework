@@ -35,14 +35,14 @@ pub struct Map {}
 /// The player info for UIState.  Hopefully not to be confused ith game::Player.
 
 #[derive(Debug, Copy, Clone)]
-pub struct Player {
+pub struct UIPlayer {
     facing: Direction,
     inventory_id: u64,
     x: i32,
     y: i32,
 }
 
-impl Player {
+impl UIPlayer {
     pub fn new() -> Self {
         Self {
             facing: Direction::Up,
@@ -71,7 +71,7 @@ pub struct UIState {
     pub items: SparseMap,
     pub facilities: SparseMap,
 
-    pub player: Player,
+    pub player: UIPlayer,
 
     pub inventory: Vec<Item>,
     pub equipment: Vec<Item>,
@@ -93,7 +93,8 @@ impl GameState for UIState {
 }
 
 impl UIState {
-    fn perform_tick(&mut self, context: Option<&mut BTerm>) {
+    /// public for testing purposes
+    pub fn perform_tick(&mut self, context: Option<&mut BTerm>) {
         let received = self.update_rx.try_recv();
 
         match received {
@@ -235,7 +236,7 @@ impl UIState {
             facilities: SparseMap::new(),
             background: BackgroundMap::empty(),
 
-            player: Player::new(),
+            player: UIPlayer::new(),
 
             inventory: vec![],
             equipment: vec![],
@@ -569,6 +570,3 @@ pub fn time_in_millis() -> u64 {
         .expect("No time")
         .as_millis() as u64
 }
-
-#[cfg(test)]
-mod test_external_inventories;

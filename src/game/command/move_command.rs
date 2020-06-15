@@ -1,6 +1,5 @@
 use super::*;
 
-#[derive(Debug)]
 pub struct MoveCommand<'a> {
     character: &'a mut Player,
     facing: Direction,

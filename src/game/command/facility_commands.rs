@@ -4,7 +4,8 @@ extern crate timer;
 pub use super::*;
 pub use std::sync::mpsc::channel;
 
-#[derive(Debug)]
+#[allow(dead_code)]
+// TODO: change facility to reflect open chest status.
 pub struct OpenChestCommand<'a> {
     x: i32,
     y: i32,
@@ -56,21 +57,18 @@ impl<'a> CommandHandler for OpenChestCommand<'a> {
 }
 
 pub struct ActivateAppleTreeCommand<'a> {
-    pub game_state: &'a mut game::GameState,
+    player: &'a mut Player,
 }
 
 impl<'a> ActivateAppleTreeCommand<'a> {
-    pub fn new(game_state: &'a mut game::GameState) -> Self {
-        Self { game_state }
+    pub fn new(player: &'a mut Player) -> Self {
+        Self { player }
     }
 }
 
 impl<'a> CommandHandler for ActivateAppleTreeCommand<'a> {
-    fn can_perform(&self, game_state: &game::GameState) -> bool {
-        game_state
-            .game_data
-            .player
-            .is_endorsed_with(":can_pick_apples")
+    fn can_perform(&self) -> bool {
+        self.player.is_endorsed_with(":can_pick_apples")
     }
     fn perform_execute(
         &mut self,
@@ -83,14 +81,14 @@ impl<'a> CommandHandler for ActivateAppleTreeCommand<'a> {
         let command_sender = command_tx.unwrap().clone();
         let update_sender = update_tx.unwrap().clone();
 
-        let player_inventory_id = self.game_state.get_player_inventory().id();
+        let player_inventory_id = self.player.inventory_id();
 
-        self.game_state.activity_guard = Some(
+        self.player.activity_guard = Some(
             timer.schedule_repeating(chrono::Duration::seconds(60), move || {
                 Self::complete_activity(player_inventory_id, &update_sender, &command_sender)
             }),
         );
-        self.game_state.activity_timer = Some(timer);
+        self.player.activity_timer = Some(timer);
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {

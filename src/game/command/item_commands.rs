@@ -147,25 +147,23 @@ impl<'a> CommandHandler for EquipCommand<'a> {
 
 pub struct UnequipCommand<'a> {
     item_id: u64,
-    game_data: &'a mut GameData,
-    player_mounting_points: &'a mut MountingPointMap,
     inventory: &'a mut Inventory,
-    // items: &'a mut ItemList,
+    player: &'a mut Player,
+    items: &'a mut ItemList,
 }
 
 impl<'a> UnequipCommand<'a> {
     pub fn new(
         item_id: u64,
-        game_data: &'a mut GameData,
-        player_mounting_points: &'a mut MountingPointMap,
         inventory: &'a mut Inventory,
-        // items: &'a mut ItemList,
+        player: &'a mut Player,
+        items: &'a mut ItemList,
     ) -> UnequipCommand<'a> {
         UnequipCommand {
             item_id,
-            game_data,
-            player_mounting_points: player_mounting_points,
             inventory,
+            player,
+            items,
         }
     }
 }
@@ -176,20 +174,13 @@ impl<'a> CommandHandler for UnequipCommand<'a> {
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
-        // self.player_mounting_points = &mut self.game_state.game_data.player.mounting_points;
-        let items = &mut self.game_data.items;
-
-        self.game_data.player.mounting_points.unmount_item_by_id(
-            self.item_id,
-            self.inventory,
-            items,
-        );
+        self.player
+            .mounting_points
+            .unmount_item_by_id(self.item_id, self.inventory, self.items);
     }
 
     fn announce(&self, update_tx: &GameUpdateSender) {
-        let equipment_list: Vec<Item> = self
-            .player_mounting_points
-            .to_vec_of_items(&self.game_data.items);
+        let equipment_list: Vec<Item> = self.player.mounting_points.to_vec_of_items(&self.items);
 
         GameUpdate::send(
             Some(update_tx),
@@ -552,18 +543,11 @@ mod unequip_command {
 
         let item_mounting_points = vec![&MountingPoint::Head];
 
-        let mut game_data = GameData::new();
-
         player
             .mounting_points
             .mount(&item, &item_class_specifiers, &mut inventory, &mut items);
 
-        let mut subject = UnequipCommand::new(
-            item.id,
-            &mut game_data,
-            &mut player.mounting_points,
-            &mut inventory,
-        );
+        let mut subject = UnequipCommand::new(item.id, &mut inventory, &mut player, &mut items);
 
         subject.execute(None, None);
 
@@ -589,16 +573,9 @@ mod unequip_command {
             &mut items,
         );
 
-        let mut game_data = GameData::new();
-
         let mut player = Player::new();
 
-        let mut subject = UnequipCommand::new(
-            item.id,
-            &mut game_data,
-            &mut player.mounting_points,
-            &mut inventory,
-        );
+        let mut subject = UnequipCommand::new(item.id, &mut inventory, &mut player, &mut items);
 
         let (sender, receiver) = std::sync::mpsc::channel();
         subject.execute(Some(&sender), None);

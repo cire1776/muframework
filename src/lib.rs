@@ -1,6 +1,6 @@
-#[macro_use]
-extern crate lazy_static;
-use mut_static::MutStatic;
+// #[macro_use]
+// extern crate lazy_static;
+// use mut_static::MutStatic;
 
 extern crate chrono;
 

@@ -3,38 +3,31 @@ use super::*;
 pub struct Level {}
 
 impl Level {
-    pub fn new(
-        game_state: &mut game::GameState,
-        update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
+    pub fn introduce_player(
+        player: &Player,
+        inventories: &InventoryList,
+        update_tx: Option<&GameUpdateSender>,
     ) {
-        Self::introduce_player(game_state, update_tx);
-        Self::introduce_other_characters(game_state, update_tx);
-        Self::introduce_items(game_state, update_tx);
-        Self::introduce_facilities(game_state, update_tx);
-
-        GameUpdate::send(update_tx, SetBackground(game_state.game_data.map.clone()));
-    }
-
-    fn introduce_player(game_state: &game::GameState, update_tx: Option<&GameUpdateSender>) {
         GameUpdate::send(
             update_tx,
             CharacterEntered {
-                id: game_state.game_data.player.id,
-                x: game_state.game_data.player.x,
-                y: game_state.game_data.player.y,
+                id: player.id,
+                x: player.x,
+                y: player.y,
                 character_type: CharacterType::Player,
             },
         );
 
-        let inventory = game_state.game_data.inventories.get(&1).unwrap();
+        let inventory = inventories.get(&1).unwrap();
         GameUpdate::send(update_tx, InventoryUpdated(inventory.to_vec()));
     }
 
-    fn introduce_other_characters(
-        game_state: &mut game::GameState,
+    pub fn introduce_other_characters(
+        characters: &CharacterList,
+        obstacles: &mut BlockingMap,
         update_tx: Option<&GameUpdateSender>,
     ) {
-        for character in game_state.game_data.characters.iter() {
+        for character in characters.iter() {
             GameUpdate::send(
                 update_tx,
                 CharacterEntered {
@@ -44,15 +37,12 @@ impl Level {
                     character_type: character.character_type,
                 },
             );
-            game_state
-                .game_data
-                .obstacles
-                .block_at(character.x, character.y);
+            obstacles.block_at(character.x, character.y);
         }
     }
 
-    fn introduce_items(game_state: &game::GameState, update_tx: Option<&GameUpdateSender>) {
-        for (index, item) in game_state.game_data.items.iter() {
+    pub fn introduce_items(items: &ItemList, update_tx: Option<&GameUpdateSender>) {
+        for (index, item) in items.iter() {
             match item {
                 ItemState::Bundle(item, x, y) => {
                     GameUpdate::send(
@@ -71,11 +61,13 @@ impl Level {
         }
     }
 
-    fn introduce_facilities(
-        game_state: &mut game::GameState,
+    pub fn introduce_facilities(
+        facilities: &FacilityList,
+        map: &mut TileMap,
+        obstacles: &mut BlockingMap,
         update_tx: Option<&GameUpdateSender>,
     ) {
-        for (index, facility) in game_state.game_data.facilities.iter() {
+        for (index, facility) in facilities.iter() {
             GameUpdate::send(
                 update_tx,
                 FacilityAdded {
@@ -86,15 +78,8 @@ impl Level {
                     description: facility.description.clone(),
                 },
             );
-            game_state
-                .game_data
-                .obstacles
-                .block_at(facility.x, facility.y);
-            game_state.game_data.map.set_tile_at(
-                facility.x,
-                facility.y,
-                tile_map::Tile::Facility(*index),
-            );
+            obstacles.block_at(facility.x, facility.y);
+            map.set_tile_at(facility.x, facility.y, tile_map::Tile::Facility(*index));
         }
     }
 }

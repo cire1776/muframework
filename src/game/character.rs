@@ -1,7 +1,6 @@
 use super::*;
 use regex::Regex;
 
-#[derive(Debug, Clone)]
 pub struct Player {
     pub id: u64,
     pub x: i32,
@@ -11,6 +10,8 @@ pub struct Player {
     pub mounting_points: MountingPointMap,
     pub external_inventory: Option<Vec<Item>>,
     pub endorsements: HashMap<String, bool>,
+    pub activity_guard: Option<Guard>,
+    pub activity_timer: Option<timer::Timer>,
 }
 
 impl Player {
@@ -24,6 +25,8 @@ impl Player {
             mounting_points: MountingPointMap::new(),
             external_inventory: None,
             endorsements: HashMap::new(),
+            activity_guard: None,
+            activity_timer: None,
         }
     }
 

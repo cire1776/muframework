@@ -32,16 +32,29 @@ impl Command {
     pub fn move_player(
         direction: Direction,
         mode: MoveCommandMode,
-        game_state: &mut game::GameState,
+        player: &mut Player,
+        map: &mut TileMap,
+        obstacles: &mut BlockingMap,
+        facilities: &mut FacilityList,
+        inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
     ) {
         let (dx, dy) = get_deltas_from_direction(direction);
 
         let command = if mode == MoveCommandMode::Normal || mode == MoveCommandMode::Sneak {
-            attempt_to_enter(direction, dx, dy, game_state)
+            attempt_to_enter(direction, dx, dy, player, obstacles)
         } else {
-            attempt_to_use(direction, dx, dy, game_state)
+            attempt_to_use(
+                direction,
+                dx,
+                dy,
+                player,
+                map,
+                obstacles,
+                facilities,
+                inventories,
+            )
         };
         if let Some(mut val) = command {
             val.deref_mut().execute(update_tx, command_tx)
@@ -52,45 +65,38 @@ impl Command {
         inventory_id: u64,
         class: ItemClass,
         description: &String,
-        game_state: &mut game::GameState,
+        inventories: &mut InventoryList,
+        items: &mut ItemList,
         _update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         _command_tx: Option<&CommandSender>,
     ) {
-        let game_data = &mut game_state.game_data;
-
-        let inventory = game_data
-            .inventories
+        let inventory = inventories
             .get_mut(&inventory_id)
             .expect("unable to find inventory");
 
-        inventory.spawn_item(class, description, &mut game_data.items);
+        inventory.spawn_item(class, description, items);
     }
 
     pub fn pickup_item(
         item_index: u64,
-        game_state: &mut game::GameState,
+        player: &mut Player,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         command_tx: Option<&CommandSender>,
     ) {
-        let x = game_state.game_data.player.x;
-        let y = game_state.game_data.player.y;
+        let x = player.x;
+        let y = player.y;
 
-        let item = game_state
-            .game_data
-            .items
-            .find_nth_at(x, y, (item_index - 1) as i32)
-            .cloned();
+        let item = items.find_nth_at(x, y, (item_index - 1) as i32).cloned();
 
         match item {
             None => println!("item not found"),
             Some(ItemState::Bundle(item, _x, _y)) => {
-                let inventory = &mut game_state
-                    .game_data
-                    .inventories
-                    .get_mut(&game_state.game_data.player.inventory_id())
+                let inventory = &mut inventories
+                    .get_mut(&player.inventory_id())
                     .expect("unable to find inventory");
-                let mut command =
-                    PickupCommand::new(item.id, inventory, &mut game_state.game_data.items);
+                let mut command = PickupCommand::new(item.id, inventory, items);
                 command.execute(update_tx, command_tx);
             }
             Some(_) => panic!("unbundled item found"),
@@ -98,23 +104,22 @@ impl Command {
     }
     pub fn drop_item(
         item_index: u64,
-        game_state: &mut game::GameState,
+        player: &mut Player,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         command_tx: Option<&CommandSender>,
     ) {
-        let item = &game_state.game_data.items[item_index].clone();
-        let x = game_state.game_data.player.x;
-        let y = game_state.game_data.player.y;
+        let item = &items[item_index].clone();
+        let x = player.x;
+        let y = player.y;
         match item {
             ItemState::Bundle(_, _, _) => panic!("can't drop something not held"),
             ItemState::Stored(item, inventory_id) => {
-                let inventory = &mut game_state
-                    .game_data
-                    .inventories
+                let inventory = &mut inventories
                     .get_mut(&inventory_id)
                     .expect("unable to find inventory");
-                let mut command =
-                    DropCommand::new(item, x, y, inventory, &mut game_state.game_data.items);
+                let mut command = DropCommand::new(item, x, y, inventory, items);
                 command.execute(update_tx, command_tx);
             }
             ItemState::Equipped(_item_id, _inventory_id) => panic!("can't drop an equipped item!"),
@@ -123,15 +128,25 @@ impl Command {
 
     pub fn equip_item(
         item_index: u64,
-        game_state: &mut game::GameState,
+        player: &mut Player,
+        item_class_specifiers: &mut ItemClassSpecifierList,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         command_tx: Option<&CommandSender>,
     ) {
-        let item = &game_state.game_data.items[item_index].clone();
+        let item = &items.clone()[item_index];
         match item {
             ItemState::Bundle(_, _, _) => panic!("can't equip something not held"),
             ItemState::Stored(item, inventory_id) => {
-                let command = process_equip_item(item, inventory_id, game_state);
+                let command = process_equip_item(
+                    item,
+                    player,
+                    inventory_id,
+                    item_class_specifiers,
+                    items,
+                    inventories,
+                );
                 if let Some(mut cmd) = command {
                     cmd.execute(update_tx, command_tx);
                 }
@@ -144,17 +159,18 @@ impl Command {
 
     pub fn unequip_item(
         item_index: u64,
-        game_state: &mut game::GameState,
+        player: &mut Player,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
     ) {
-        let item_state = &game_state.game_data.items[item_index].clone();
+        let item_state = &items.clone()[item_index];
         match item_state {
             ItemState::Bundle(_, _, _) => panic!("can't unequip something not held"),
             ItemState::Stored(_, _) => panic!("cant unequip an already unequipped item."),
             ItemState::Equipped(item, inventory_id) => {
-                let command =
-                    process_unequip_item(item, inventory_id, game_state, &mut game_state.game_data);
+                let command = process_unequip_item(item, inventory_id, player, items, inventories);
                 if let Some(mut cmd) = command {
                     cmd.execute(update_tx, command_tx);
                 }
@@ -166,15 +182,13 @@ impl Command {
         item_id: u64,
         source_id: u64,
         destination_id: u64,
-        game_state: &mut game::GameState,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
     ) {
-        let item_state = &game_state.game_data.items[item_id];
+        let item_state = &items[item_id];
         let item = ItemState::extract_item(item_state);
-
-        let inventories = &mut game_state.game_data.inventories;
-        let items = &mut game_state.game_data.items;
 
         let mut command =
             TransferItemCommand::new(&item, source_id, destination_id, inventories, items);
@@ -184,41 +198,39 @@ impl Command {
     pub fn transfer_all_items(
         source_id: u64,
         destination_id: u64,
-        game_state: &mut game::GameState,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&CommandSender>,
     ) {
-        let inventories = &mut game_state.game_data.inventories;
-        let items = &mut game_state.game_data.items;
+        let inventories = inventories;
 
         let mut command = TransferAllCommand::new(source_id, destination_id, inventories, items);
         command.execute(update_tx, None);
     }
 
-    pub fn close_external_inventory(
-        __game_state: &mut game::GameState,
-        update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
-    ) {
+    pub fn close_external_inventory(update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>) {
         GameUpdate::send(update_tx, GameUpdate::ExternalInventoryClosed);
     }
 }
 
 fn process_equip_item<'a>(
     item: &'a Item,
+    player: &'a mut Player,
     inventory_id: &'a u64,
-    game_state: &'a mut game::GameState,
+    item_class_specifiers: &'a ItemClassSpecifierList,
+    items: &'a mut ItemList,
+    inventories: &'a mut InventoryList,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
-    let item_class_specifiers = &game_state.game_data.item_class_specifiers;
+    let item_class_specifiers = &item_class_specifiers;
 
-    let player_mounting_points = &mut game_state.game_data.player.mounting_points;
+    let player_mounting_points = &mut player.mounting_points;
 
-    let inventory = game_state
-        .game_data
-        .inventories
+    let inventory = inventories
         .get_mut(&inventory_id)
         .expect("unable to find inventory");
 
-    let items = &mut game_state.game_data.items;
+    let items = items;
 
     Some(std::boxed::Box::new(EquipCommand::new(
         item,
@@ -232,22 +244,14 @@ fn process_equip_item<'a>(
 fn process_unequip_item<'a>(
     item: &'a Item,
     inventory_id: &'a u64,
-    game_state: &'a mut game::GameState,
-    game_data: &'a mut GameData,
+    player: &'a mut Player,
+    items: &'a mut ItemList,
+    inventories: &'a mut InventoryList,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
-    let player_mounting_points = &mut game_state.game_data.player.mounting_points;
-
-    let inventory = game_state
-        .game_data
-        .inventories
-        .get_mut(inventory_id)
-        .unwrap();
+    let inventory = inventories.get_mut(inventory_id).unwrap();
 
     Some(std::boxed::Box::new(UnequipCommand::new(
-        item.id,
-        game_data,
-        player_mounting_points,
-        inventory,
+        item.id, inventory, player, items,
     )))
 }
 
@@ -268,28 +272,24 @@ fn attempt_to_enter<'a>(
     facing: Direction,
     dx: i32,
     dy: i32,
-    game_state: &'a mut game::GameState,
+    player: &'a mut Player,
+    obstacles: &'a mut BlockingMap,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
-    let new_x = game_state.game_data.player.x + dx;
-    let new_y = game_state.game_data.player.y + dy;
+    let new_x = player.x + dx;
+    let new_y = player.y + dy;
 
-    if game_state.game_data.obstacles.is_blocked_at(new_x, new_y) {
-        if facing == game_state.game_data.player.facing {
+    if obstacles.is_blocked_at(new_x, new_y) {
+        if facing == player.facing {
             return None;
         } else {
             return Some(std::boxed::Box::new(ChangeFacingCommand::new(
-                &mut game_state.game_data.player,
-                facing,
+                player, facing,
             )));
         }
     }
 
     Some(std::boxed::Box::new(MoveCommand::new(
-        &mut game_state.game_data.player,
-        facing,
-        new_x,
-        new_y,
-        &mut game_state.game_data.obstacles,
+        player, facing, new_x, new_y, obstacles,
     )))
 }
 
@@ -297,29 +297,41 @@ fn attempt_to_use<'a>(
     facing: Direction,
     dx: i32,
     dy: i32,
-    game_state: &'a mut game::GameState,
+    player: &'a mut Player,
+    map: &'a mut TileMap,
+    obstacles: &'a mut BlockingMap,
+    facilities: &'a mut FacilityList,
+    inventories: &'a mut InventoryList,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
-    let target_x = game_state.game_data.player.x + dx;
-    let target_y = game_state.game_data.player.y + dy;
+    let target_x = player.x + dx;
+    let target_y = player.y + dy;
 
-    if can_use_at(target_x, target_y, game_state) {
-        use_at(game_state, facing, target_x, target_y)
+    if can_use_at(target_x, target_y, map, player, facilities) {
+        use_at(
+            facing,
+            target_x,
+            target_y,
+            player,
+            map,
+            obstacles,
+            facilities,
+            inventories,
+        )
     } else {
-        attempt_to_enter(facing, dx, dy, game_state)
+        attempt_to_enter(facing, dx, dy, player, obstacles)
     }
 }
 
-fn can_use_at(x: i32, y: i32, game_state: &game::GameState) -> bool {
-    match game_state.game_data.map.at(x, y) {
+fn can_use_at(x: i32, y: i32, map: &TileMap, player: &Player, facilities: &FacilityList) -> bool {
+    match map.at(x, y) {
         tile_map::Tile::ClosedDoor | tile_map::Tile::OpenDoor => true,
         tile_map::Tile::Facility(facility_id) => {
-            let facility = game_state
-                .game_data
-                .facilities
-                .get(facility_id)
-                .expect("facility not found");
+            let facility = facilities.get(facility_id).expect("facility not found");
             match facility.class {
-                FacilityClass::ClosedChest | FacilityClass::AppleTree => !facility.is_in_use(),
+                FacilityClass::ClosedChest => !facility.is_in_use(),
+                FacilityClass::AppleTree => {
+                    !facility.is_in_use() && player.is_endorsed_with(":can_pick_apples")
+                }
                 _ => false,
             }
         }
@@ -328,43 +340,31 @@ fn can_use_at(x: i32, y: i32, game_state: &game::GameState) -> bool {
 }
 
 fn use_at<'a>(
-    game_state: &'a mut game::GameState,
     __facing: Direction,
     x: i32,
     y: i32,
+    player: &'a mut Player,
+    map: &'a mut TileMap,
+    obstacles: &'a mut BlockingMap,
+    facilities: &'a mut FacilityList,
+    inventories: &'a mut InventoryList,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
-    match game_state.game_data.map.at(x, y) {
-        tile_map::Tile::ClosedDoor => Some(Box::new(OpenDoorCommand::new(
-            x,
-            y,
-            &mut game_state.game_data.obstacles,
-            &mut game_state.game_data.map,
-        ))),
-        tile_map::Tile::OpenDoor => Some(Box::new(CloseDoorCommand::new(
-            x,
-            y,
-            &mut game_state.game_data.obstacles,
-            &mut game_state.game_data.map,
-        ))),
+    match map.at(x, y) {
+        tile_map::Tile::ClosedDoor => Some(Box::new(OpenDoorCommand::new(x, y, obstacles, map))),
+        tile_map::Tile::OpenDoor => Some(Box::new(CloseDoorCommand::new(x, y, obstacles, map))),
         tile_map::Tile::Facility(facility_id) => {
-            let facility = game_state
-                .game_data
-                .facilities
-                .get(facility_id)
-                .expect("missing facility");
+            let facility = facilities.get(facility_id).expect("missing facility");
 
             match facility.class {
                 FacilityClass::ClosedChest => Some(Box::new(OpenChestCommand::new(
                     x,
                     y,
-                    &mut game_state.game_data.player,
+                    player,
                     facility_id,
-                    &mut game_state.game_data.facilities,
-                    &game_state.game_data.inventories,
+                    facilities,
+                    inventories,
                 ))),
-                FacilityClass::AppleTree => {
-                    Some(Box::new(ActivateAppleTreeCommand::new(game_state)))
-                }
+                FacilityClass::AppleTree => Some(Box::new(ActivateAppleTreeCommand::new(player))),
                 _ => {
                     println!("facility not matched!");
                     None
@@ -376,7 +376,7 @@ fn use_at<'a>(
 }
 
 pub trait CommandHandler {
-    fn can_perform(&self, _game_state: &game::GameState) -> bool {
+    fn can_perform(&self) -> bool {
         true
     }
 
@@ -400,10 +400,21 @@ pub trait CommandHandler {
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    );
+    ) {
+    }
 
     /// announce the results through GameUpdates
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>);
+    fn announce(&self, _update_tx: &std::sync::mpsc::Sender<GameUpdate>) {}
 }
+
+pub struct NullCommand {}
+
+impl NullCommand {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl CommandHandler for NullCommand {}
 
 pub mod test_transfer_items;

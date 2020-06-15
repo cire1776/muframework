@@ -49,45 +49,6 @@ pub struct GameData {
     pub inventories: InventoryList,
 }
 
-lazy_static! {
-    static ref GAME_DATA: MutStatic<GameData> = MutStatic::from(GameData::new());
-}
-
-fn LIBRARIES() -> &'static mut InventoryList {
-    let game_data = GAME_DATA.read().unwrap();
-    &mut game_data.inventories
-}
-
-pub trait StaticData: 'static {}
-
-impl StaticData for GameData {}
-
-impl GameData {
-    pub fn new() -> Self {
-        Self {
-            player: Player {
-                id: 1,
-                x: 0,
-                y: 0,
-                facing: Direction::Up,
-                character_type: CharacterType::Player,
-                mounting_points: MountingPointMap::new(),
-                external_inventory: None,
-                endorsements: HashMap::new(),
-            },
-
-            map: TileMap::new(),
-            obstacles: BlockingMap::new(),
-            characters: CharacterList::new(),
-
-            item_class_specifiers: HashMap::new(),
-            items: ItemList::new(),
-            facilities: FacilityList::new(),
-            inventories: HashMap::new(),
-        }
-    }
-}
-
 // starts at two to reserve one for the player.
 //  this is temporary
 static GLOBAL_NEXT_ID: AtomicU64 = AtomicU64::new(2);
@@ -103,92 +64,11 @@ fn NEXT_ITEM_ID() -> u64 {
     GLOBAL_NEXT_ITEM_ID.fetch_add(1, Ordering::SeqCst)
 }
 
-pub struct GameState {
-    pub activity_guard: Option<Guard>,
-    pub activity_timer: Option<timer::Timer>,
-
-    pub game_data: &'static GameData,
-}
-
-/// Interface methods
-impl GameState {
-    pub fn get_player_inventory<'a>(&'a mut self) -> &'a mut Inventory {
-        self.game_data
-            .inventories
-            .get_mut(&self.game_data.player.inventory_id())
-            .unwrap()
-    }
-}
+pub struct GameState {}
 
 impl GameState {
-    pub fn new<S: ToString>(level_path: S) -> GameState {
-        let (tile_map, mut characters, mut items, mut facilities, mut stored_items) =
-            TileMap::load_from_file(level_path.to_string());
-
-        let mut blocking_map = BlockingMap::new();
-        blocking_map.refresh(&tile_map);
-
-        let mut game_state = GameState::initialize(
-            &mut characters,
-            &mut items,
-            &mut facilities,
-            &mut stored_items,
-        );
-
-        game_state.game_data.item_class_specifiers = ItemClassSpecifier::initialize();
-
-        game_state.game_data.map = tile_map;
-        game_state.game_data.obstacles = blocking_map;
-
-        game_state
-    }
-
-    fn initialize<'a>(
-        characters: &'a mut Vec<String>,
-        items: &'a mut Vec<String>,
-        facilities: &'a mut Vec<String>,
-        stored_items: &'a mut Vec<String>,
-    ) -> GameState {
-        let (player_x, player_y) =
-            common::geometry::Point::read_coordinates(characters[0].to_owned());
-        let character_vec = Character::read_in_characters(characters);
-        let item_vec = Item::read_in_items(items);
-        let mut game_state = GameState {
-            activity_guard: None,
-            activity_timer: None,
-
-            game_data: GET_GAME_DATA(),
-        };
-        game_state.game_data.player.x = player_x;
-        game_state.game_data.player.y = player_y;
-
-        game_state.game_data.player.x = player_x;
-        game_state.game_data.player.y = player_y;
-
-        game_state.game_data.characters = character_vec.clone();
-        game_state.game_data.characters = character_vec;
-
-        game_state.game_data.items = item_vec.clone();
-        game_state.game_data.items = item_vec;
-
-        let (facilities, aliases) =
-            Facility::read_in_facilities(facilities, &mut game_state.game_data.inventories);
-
-        game_state.game_data.facilities = facilities;
-
-        let inventories = &mut game_state.game_data.inventories;
-
-        // create the player's inventory
-        Inventory::new_into_inventory_list(game_state.game_data.player.id, inventories);
-
-        Item::read_in_stored_items(
-            stored_items,
-            aliases,
-            &mut game_state.game_data.items,
-            inventories,
-        );
-
-        game_state
+    pub fn new() -> Self {
+        Self {}
     }
 
     pub fn game_loop(
@@ -196,13 +76,35 @@ impl GameState {
         command_rx: std::sync::mpsc::Receiver<Command>,
         command_tx: CommandSender,
     ) {
-        let game_state = &mut Self::initialize_game_loop(&update_tx);
+        let (
+            player,
+            map,
+            obstacles,
+            characters,
+            item_class_specifiers,
+            items,
+            facilities,
+            inventories,
+        ) = &mut Self::initialize_game("maps/level1.map", Some(&update_tx));
 
+        let game_state = &mut GameState::new();
         loop {
             let command = command_rx.recv();
 
             if let Ok(command) = command {
-                game_state.game_loop_iteration(&command, Some(&update_tx), Some(&command_tx));
+                game_state.game_loop_iteration(
+                    player,
+                    map,
+                    obstacles,
+                    characters,
+                    item_class_specifiers,
+                    items,
+                    facilities,
+                    inventories,
+                    &command,
+                    Some(&update_tx),
+                    Some(&command_tx),
+                );
             } else {
                 // if receiver is broken, we just bail, ending the game.
                 //   eventually, we need to save the game, probably whenever
@@ -212,29 +114,103 @@ impl GameState {
         }
     }
 
-    fn initialize_game_loop(update_tx: &GameUpdateSender) -> GameState {
-        let mut game_state = GameState::new("maps/level1.map");
-        Level::new(&mut game_state, Some(update_tx));
-        game_state
+    /// public for testing purposes
+    pub fn initialize_game<S: ToString>(
+        level_path: S,
+        update_tx: Option<&GameUpdateSender>,
+    ) -> (
+        Player,
+        TileMap,
+        BlockingMap,
+        CharacterList,
+        ItemClassSpecifierList,
+        ItemList,
+        FacilityList,
+        InventoryList,
+    ) {
+        let (mut map, mut character_vec, item_vec, facility_vec, stored_item_vec) =
+            TileMap::load_from_file(level_path.to_string());
+
+        let mut obstacles = BlockingMap::new();
+        obstacles.refresh(&map);
+
+        let (player_x, player_y) =
+            common::geometry::Point::read_coordinates(character_vec[0].to_owned());
+        let characters = Character::read_in_characters(&mut character_vec);
+        let mut items = Item::read_in_items(&item_vec);
+
+        // find home for activity guard and activity timer
+
+        let mut player = Player::new();
+
+        player.x = player_x;
+        player.y = player_y;
+
+        let inventories = &mut InventoryList::new();
+
+        let (facilities, aliases) = Facility::read_in_facilities(&facility_vec, inventories);
+
+        // create the player's inventory
+        Inventory::new_into_inventory_list(player.id, inventories);
+
+        Item::read_in_stored_items(&stored_item_vec, aliases, &mut items, inventories);
+
+        let item_class_specifiers = ItemClassSpecifier::initialize();
+
+        // consider adding a function to level to do these things
+        Level::introduce_player(&player, inventories, update_tx);
+        Level::introduce_other_characters(&characters, &mut obstacles, update_tx);
+        Level::introduce_items(&items, update_tx);
+        Level::introduce_facilities(&facilities, &mut map, &mut obstacles, update_tx);
+
+        // consider moving this to a function
+        GameUpdate::send(update_tx, SetBackground(map.clone()));
+
+        (
+            player,
+            map,
+            obstacles,
+            characters,
+            item_class_specifiers,
+            items,
+            facilities,
+            inventories.clone(),
+        )
     }
 
     /// pub for testing purposes only
     pub fn game_loop_iteration(
         &mut self,
+        player: &mut Player,
+        map: &mut TileMap,
+        obstacles: &mut BlockingMap,
+        _characters: &mut CharacterList,
+        item_class_specifiers: &mut ItemClassSpecifierList,
+        items: &mut ItemList,
+        facilities: &mut FacilityList,
+        inventories: &mut InventoryList,
         command: &Command,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         command_tx: Option<&CommandSender>,
     ) {
-        self.abort_activity_if_necessary(command, update_tx);
+        self.abort_activity_if_necessary(player, command, update_tx);
 
         match command {
             Command::QuitGame => {
                 GameUpdate::send(update_tx, Exit);
                 return;
             }
-            Command::Move(direction, mode) => {
-                Command::move_player(*direction, *mode, self, update_tx, command_tx)
-            }
+            Command::Move(direction, mode) => Command::move_player(
+                *direction,
+                *mode,
+                player,
+                map,
+                obstacles,
+                facilities,
+                inventories,
+                update_tx,
+                command_tx,
+            ),
             Command::Teleport(id, _new_x, _new_y) => {
                 if *id != 1 {
                     todo!()
@@ -247,29 +223,47 @@ impl GameState {
                     *inventory_id,
                     *class,
                     description,
-                    self,
+                    inventories,
+                    items,
                     update_tx,
                     command_tx,
                 );
             }
-            Command::TakeItem(item_index) => {
-                Command::pickup_item(*item_index, self, update_tx, command_tx)
-            }
-            Command::DropItem(item_index) => {
-                Command::drop_item(*item_index, self, update_tx, command_tx)
-            }
-            Command::EquipItem(item_id) => {
-                Command::equip_item(*item_id, self, update_tx, command_tx)
-            }
+            Command::TakeItem(item_index) => Command::pickup_item(
+                *item_index,
+                player,
+                items,
+                inventories,
+                update_tx,
+                command_tx,
+            ),
+            Command::DropItem(item_index) => Command::drop_item(
+                *item_index,
+                player,
+                items,
+                inventories,
+                update_tx,
+                command_tx,
+            ),
+            Command::EquipItem(item_id) => Command::equip_item(
+                *item_id,
+                player,
+                item_class_specifiers,
+                items,
+                inventories,
+                update_tx,
+                command_tx,
+            ),
             Command::UnequipItem(item_id) => {
-                Command::unequip_item(*item_id, self, update_tx, command_tx)
+                Command::unequip_item(*item_id, player, items, inventories, update_tx, command_tx)
             }
             Command::TransferItem(item_id, src_inventory, dest_inventory) => {
                 Command::transfer_item(
                     *item_id,
                     *src_inventory,
                     *dest_inventory,
-                    self,
+                    items,
+                    inventories,
                     update_tx,
                     command_tx,
                 );
@@ -278,23 +272,25 @@ impl GameState {
                 Command::transfer_all_items(
                     *src_inventory,
                     *dest_inventory,
-                    self,
+                    items,
+                    inventories,
                     update_tx,
                     command_tx,
                 )
             }
-            Command::CloseExternalInventory => Command::close_external_inventory(self, update_tx),
-            Command::RefreshInventory => Self::refresh_inventory(self, update_tx),
+            Command::CloseExternalInventory => Command::close_external_inventory(update_tx),
+            Command::RefreshInventory => Self::refresh_inventory(player, inventories, update_tx),
             Command::AbortActivity | Command::None => {}
         }
     }
 
     fn abort_activity_if_necessary(
         &mut self,
+        player: &mut Player,
         command: &Command,
         update_tx: Option<&GameUpdateSender>,
     ) {
-        if let None = self.activity_guard {
+        if let None = player.activity_guard {
             return;
         }
 
@@ -307,8 +303,8 @@ impl GameState {
             | Command::DropItem(_) => {}
 
             _ => {
-                if let Some(_) = self.activity_guard {
-                    self.activity_guard = None;
+                if let Some(_) = player.activity_guard {
+                    player.activity_guard = None;
                 }
 
                 GameUpdate::send(update_tx, GameUpdate::ActivityAborted());
@@ -316,14 +312,16 @@ impl GameState {
         };
     }
 
-    pub fn refresh_inventory(game_state: &game::GameState, update_tx: Option<&GameUpdateSender>) {
+    pub fn refresh_inventory(
+        player: &Player,
+        inventories: &InventoryList,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
         GameUpdate::send(
             update_tx,
             GameUpdate::InventoryUpdated(
-                game_state
-                    .game_data
-                    .inventories
-                    .get(&game_state.game_data.player.inventory_id())
+                inventories
+                    .get(&player.inventory_id())
                     .expect("unable to find player inventory")
                     .to_vec(),
             ),
@@ -335,15 +333,17 @@ impl GameState {
         &mut self,
         new_x: U,
         new_y: U,
+        player: &mut Player,
+        obstacles: &mut BlockingMap,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
     ) {
         use crate::game::command::CommandHandler;
 
-        let character = &mut self.game_data.player;
+        let character = player;
         let facing = character.facing;
 
-        let obstacles = &mut self.game_data.obstacles;
+        let obstacles = obstacles;
         let mut command = game::command::MoveCommand::new(
             character,
             facing,
@@ -360,3 +360,5 @@ impl GameState {
         command.execute(update_tx, command_tx);
     }
 }
+#[cfg(test)]
+mod test_external_inventories;

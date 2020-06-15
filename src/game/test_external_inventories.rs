@@ -1,10 +1,13 @@
 use super::*;
+use std::sync::mpsc::channel;
+use ui::input::InputState;
+use ui::UIState;
 use ItemClass::*;
 
 #[test]
 fn entering_external_inventory_state() {
-    let (update_tx, update_rx) = mpsc::channel();
-    let (command_tx, _command_rx) = mpsc::channel();
+    let (update_tx, update_rx) = channel();
+    let (command_tx, _command_rx) = channel();
 
     let mut subject = UIState::new(update_rx, command_tx);
 
@@ -28,8 +31,8 @@ fn entering_external_inventory_state() {
 
 #[test]
 fn leaving_external_inventory_state() {
-    let (update_tx, update_rx) = mpsc::channel();
-    let (command_tx, _command_rx) = mpsc::channel();
+    let (update_tx, update_rx) = channel();
+    let (command_tx, _command_rx) = channel();
 
     let mut subject = UIState::new(update_rx, command_tx);
 
@@ -58,8 +61,8 @@ fn leaving_external_inventory_state() {
 
 #[test]
 fn escape_ends_external_inventory_mode() {
-    let (update_tx, update_rx) = mpsc::channel();
-    let (command_tx, _command_rx) = mpsc::channel();
+    let (update_tx, update_rx) = channel();
+    let (command_tx, _command_rx) = channel();
     let mut subject = UIState::new(update_rx, command_tx);
 
     let exp_inventory = vec![Item::new(
@@ -77,7 +80,7 @@ fn escape_ends_external_inventory_mode() {
 
     subject.perform_tick(None);
 
-    let input = input::Input {
+    let input = ui::input::Input {
         key: Some(VirtualKeyCode::Escape),
         shift: false,
         control: false,
@@ -95,23 +98,36 @@ fn escape_ends_external_inventory_mode() {
 }
 
 #[test]
-fn game_state_opening_external_inventory() {
+fn opening_external_inventory() {
     let (update_tx, update_rx) = std::sync::mpsc::channel();
 
-    let mut subject: game::GameState;
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+    ) = game::GameState::initialize_game("maps/test.map", None);
 
-    {
-        subject = game::GameState::new("maps/test.map");
-        game::Level::new(&mut subject, None);
-        subject.teleport_player(8, 7, None, None);
-    }
+    let mut game_state = GameState::new();
+    game_state.teleport_player(8, 7, &mut player, &mut obstacles, None, None);
 
-    subject.game_loop_iteration(
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
         Some(&update_tx),
         None,
     );
-
     let update = update_rx.try_recv().expect("did not receive update");
 
     let exp_inventory = vec![
@@ -146,11 +162,7 @@ fn game_state_opening_external_inventory() {
 
         // assert player's external inventory is also appropriately set
         assert_eq!(
-            subject
-                .game_data
-                .player
-                .external_inventory
-                .map(|i| i.clone().sort()),
+            player.external_inventory.map(|i| i.clone().sort()),
             Some(exp_inventory.clone().sort())
         );
     } else {
@@ -161,12 +173,33 @@ fn game_state_opening_external_inventory() {
 #[test]
 #[ignore = "finish alias implementation"]
 fn game_state_closing_external_inventory() {
-    let mut subject = game::GameState::new("maps/test.map");
+    let mut subject = game::GameState::new();
 
-    let (update_tx, update_rx) = std::sync::mpsc::channel();
-    game::Level::new(&mut subject, None);
+    let (update_tx, update_rx) = channel();
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+    ) = game::GameState::initialize_game("maps/test.map", None);
 
-    subject.game_loop_iteration(&Command::CloseExternalInventory, Some(&update_tx), None);
+    subject.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &Command::CloseExternalInventory,
+        Some(&update_tx),
+        None,
+    );
 
     let update = update_rx.try_recv().unwrap();
 
