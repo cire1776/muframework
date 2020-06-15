@@ -148,18 +148,8 @@ impl Item {
             let description = capture_string(&captures, 4);
             let class = ItemClass::from_symbol(symbol);
 
-            let item_id = NEXT_ITEM_ID();
-
-            result.add(ItemState::Bundle(
-                Item {
-                    id: item_id,
-                    class,
-                    description: description.to_string(),
-                    quantity: 1,
-                },
-                x,
-                y,
-            ));
+            let item = Item::spawn(class, description);
+            result.bundle(&item, x, y);
         }
 
         result
@@ -192,8 +182,7 @@ impl Item {
                 ));
             }
             if let Some(inventory) = inventory {
-                let id = NEXT_ITEM_ID();
-                let mut item = Item::new(id, class, description, 1);
+                let mut item = Item::spawn(class, description);
                 inventory.accept_stack(&mut item, items);
             } else {
                 panic!("unable to find or create inventory")
