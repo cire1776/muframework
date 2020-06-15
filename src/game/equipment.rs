@@ -271,7 +271,7 @@ mod mounting_point_map {
     #[test]
     fn mount_mounts_item_at_specified_mounting_point() {
         let mut subject = MountingPointMap::new();
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let item_class_specifiers = ItemClassSpecifier::initialize();
         let item = Item {
             id: 1,
@@ -291,7 +291,7 @@ mod mounting_point_map {
     fn mount_changes_items_state_from_equipped_to_stored_and_vice_versa() {
         let mut subject = MountingPointMap::new();
 
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
 
         let item = Item {
             id: 1,
@@ -329,7 +329,7 @@ mod mounting_point_map {
     fn mount_items_unequipped_are_addded_to_the_inventory() {
         let mut subject = MountingPointMap::new();
 
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut inventory = Inventory::new(1);
 
         let item_class_specifiers = ItemClassSpecifier::initialize();
@@ -369,7 +369,7 @@ mod mounting_point_map {
     fn mount_items_equipped_are_removed_from_the_inventory() {
         let mut subject = MountingPointMap::new();
 
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut inventory = Inventory::new(1);
 
         let item_class_specifiers = ItemClassSpecifier::initialize();
@@ -434,7 +434,7 @@ mod mounting_point_map {
     fn to_vec_returns_an_array_with_multiple_items_when_multiple_item_are_equipped() {
         let mut subject = MountingPointMap::new();
 
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut inventory = Inventory::new(1);
 
         let item1 = test_item(
@@ -493,7 +493,7 @@ mod mounting_point_map_unmount {
     fn given_no_mounting_points() {
         let mut subject = MountingPointMap::new();
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
 
         let item = Item::new(232, ItemType::new(ItemClass::Headwear, "An Amazon Cap"), 1);
         subject.perform_mount(&item, &vec![&MountingPoint::Head]);
@@ -508,7 +508,7 @@ mod mounting_point_map_unmount {
     fn given_an_empty_mounting_point() {
         let mut subject = MountingPointMap::new();
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
 
         let item = Item::new(232, ItemType::new(ItemClass::Headwear, "An Amazon Cap"), 1);
         subject.perform_mount(&item, &vec![&MountingPoint::Head]);
@@ -522,7 +522,7 @@ mod mounting_point_map_unmount {
     fn given_an_item_in_the_mounting_point() {
         let mut subject = MountingPointMap::new();
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let item_mounting_points = &vec![&MountingPoint::Head];
         let item = test_item(
             "A hat".into(),

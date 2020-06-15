@@ -70,13 +70,20 @@ impl TileMap {
     /// loads a level from a file.
     /// # Arguments:
     /// * `filename` - A string slice that
-    pub fn load_from_file<S: ToString> (
+    pub fn load_from_file<S: ToString>(
         filename: S,
-    ) -> (TileMap, Vec<String>, Vec<String>, Vec<String>, Vec<String>) {
+    ) -> (
+        TileMap,
+        Vec<String>,
+        Vec<String>,
+        Vec<String>,
+        Vec<String>,
+        Vec<String>,
+    ) {
         let contents = fs::read_to_string(filename.to_string()).expect("unable to read level file");
 
         let re = Regex::new(
-            r"(?s)(.+)===END OF MAP===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEMS===\n(.*)===END OF FACILITIES===\n(.*)===END OF STORED ITEMS===",
+            r"(?s)(.+)===END OF MAP===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEM TYPES===\n(.*)===END OF ITEMS===\n(.*)===END OF FACILITIES===\n(.*)===END OF STORED ITEMS===",
         )
         .expect("unable to initialize regex");
 
@@ -87,13 +94,15 @@ impl TileMap {
         let map_width: usize = Self::get_map_column_count(&map_rows);
 
         let characters = capture_section(&captures, 2);
-        let items = capture_section(&captures, 3);
-        let facilities: Vec<String> = capture_section(&captures, 4);
-        let stored_items = capture_section(&captures, 5);
+        let item_types = capture_section(&captures, 3);
+        let items = capture_section(&captures, 4);
+        let facilities: Vec<String> = capture_section(&captures, 5);
+        let stored_items = capture_section(&captures, 6);
 
         (
             Self::load_map_from_vector(&map_rows, map_width, map_height),
             characters,
+            item_types,
             items,
             facilities,
             stored_items,
@@ -291,5 +300,4 @@ impl TileMap {
             }
         }
     }
-
 }

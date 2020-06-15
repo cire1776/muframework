@@ -31,6 +31,23 @@ impl ItemClass {
         }
     }
 
+    pub fn from_name<S: ToString>(name: S) -> ItemClass {
+        match &name.to_string()[..] {
+            "bladeweapon" => BladeWeapon,
+            "dagger" => Dagger,
+            "shield" => Shield,
+            "softarmor" => SoftArmor,
+            "pants" => Pants,
+            "gloves" => Gloves,
+            "shoes" => Shoes,
+            "headwear" => Headwear,
+            "tool" => Tool,
+            "potion" => Potion,
+            "food" => Food,
+            _ => panic!("unknown item class"),
+        }
+    }
+
     pub fn stack_limits(class: ItemClass) -> u8 {
         use ItemClass::*;
 
@@ -83,6 +100,26 @@ impl ItemType {
             class,
             description: description.to_string(),
         }
+    }
+
+    pub fn read_in_item_types(items: &mut Vec<String>) -> ItemTypeList {
+        let mut result = ItemTypeList::new();
+
+        let re = Regex::new("(?m)^(\\w+)\\s(\\w+)\\s*\\s\"([^\"]+)\"").unwrap();
+
+        for string in items {
+            let captures = re.captures(string).unwrap();
+            let type_name = capture_string(&captures, 1);
+            let class_name = capture_string(&captures, 2);
+            let description = capture_string(&captures, 3);
+
+            let class = ItemClass::from_name(class_name);
+
+            let new_type = ItemType::new(class, description);
+            result.insert(type_name.to_string(), new_type);
+        }
+
+        result
     }
 }
 
@@ -143,6 +180,20 @@ impl Item {
         Self::spawn_stack(class, description, 1)
     }
 
+    pub fn spawn_from_type<S: ToString, N: TryInto<u8>>(
+        item_type_name: S,
+        quantity: N,
+        item_types: &ItemTypeList,
+    ) -> Item {
+        let item_type = &item_types[&item_type_name.to_string()];
+
+        Self::new(
+            NEXT_ITEM_ID(),
+            item_type.clone(),
+            quantity.try_into().ok().expect("must be convertible to u8"),
+        )
+    }
+
     pub fn spawn_stack<S: ToString, N: TryInto<u8>>(
         class: ItemClass,
         description: S,
@@ -155,10 +206,10 @@ impl Item {
             quantity.try_into().ok().expect("must be convertible to u8"),
         )
     }
-    pub fn read_in_items(items: &Vec<String>) -> ItemList {
-        let mut result = ItemList::new();
+    pub fn read_in_items(items: &Vec<String>, item_types: ItemTypeList) -> ItemList {
+        let mut result = ItemList::new(Some(item_types));
 
-        let re = Regex::new("(?m)^(.)\\s(\\d+)\\s*,\\s*(\\d+)\\s\"([^\"]*)\"").unwrap();
+        let re = Regex::new("(?m)^(.)\\s(\\d+)\\s*,\\s*(\\d+)\\s(\\w+)").unwrap();
 
         for string in items {
             let captures = re.captures(string).unwrap();
@@ -167,10 +218,11 @@ impl Item {
             let x = capture_coordinate(&captures, 2);
             let y = capture_coordinate(&captures, 3);
 
-            let description = capture_string(&captures, 4);
-            let class = ItemClass::from_symbol(symbol);
+            let item_type_name = capture_string(&captures, 4);
 
-            let item = Item::spawn(class, description);
+            let _class = ItemClass::from_symbol(symbol);
+
+            let item = Item::spawn_from_type(item_type_name, 1, &result.item_types);
             result.bundle(&item, x, y);
         }
 
@@ -183,16 +235,13 @@ impl Item {
         items: &mut ItemList,
         inventories: &mut InventoryList,
     ) {
-        let re = Regex::new("(?m)^(.)\\s(.+)\\s\"([^\"]*)\"").unwrap();
+        let re = Regex::new("(?m)^(\\w+)\\s(\\w+)").unwrap();
 
         for string in stored_items {
             let captures = re.captures(&string).unwrap();
 
-            let symbol = capture_symbol(&captures, 1);
-            let destination_alias = capture_string(&captures, 2);
-            let description = capture_string(&captures, 3);
-
-            let class = ItemClass::from_symbol(symbol);
+            let destination_alias = capture_string(&captures, 1);
+            let item_type_name = capture_string(&captures, 2);
 
             let destination_id = *aliases.get(&destination_alias).unwrap();
 
@@ -204,7 +253,7 @@ impl Item {
                 ));
             }
             if let Some(inventory) = inventory {
-                let mut item = Item::spawn(class, description);
+                let mut item = Item::spawn_from_type(item_type_name, 1, &items.item_types);
                 inventory.accept_stack(&mut item, items);
             } else {
                 panic!("unable to find or create inventory")
@@ -251,14 +300,20 @@ impl Item {
 #[derive(Debug, Clone)]
 pub struct ItemList {
     items: HashMap<u64, ItemState>,
-    item_types: ItemTypeList,
+    pub item_types: ItemTypeList,
 }
 
 impl ItemList {
-    pub fn new() -> ItemList {
+    pub fn new(item_types: Option<ItemTypeList>) -> ItemList {
+        let item_types = if let Some(item_types) = item_types {
+            item_types
+        } else {
+            ItemTypeList::new()
+        };
+
         ItemList {
             items: HashMap::new(),
-            item_types: ItemTypeList::new(),
+            item_types,
         }
     }
 
@@ -271,12 +326,12 @@ impl ItemList {
     /// # Examples:
     /// ```
     /// # use muframework::game::items::*;
-    /// let subject = ItemList::new();
+    /// let subject = ItemList::new(None);
     /// assert!(subject.is_empty());
     /// ```
     /// ```
     /// # use muframework::game::items::*;
-    /// let mut subject = ItemList::new();
+    /// let mut subject = ItemList::new(None);
     /// let item = Item::new(208, ItemType::new(ItemClass::Potion, "A green, odorous potion"),1);
     /// subject.store(&item, 1);
     /// assert!(!subject.is_empty());
@@ -328,7 +383,7 @@ impl ItemList {
     /// # Examples:
     /// ```
     /// # use muframework::game::items::*;
-    /// let mut subject = ItemList::new();
+    /// let mut subject = ItemList::new(None);
     /// let mut item = Item::new(600, ItemType::new(ItemClass::BladeWeapon, "A rusty sword"),1);
     /// subject.add_item_to_bundle_at(10,15, &item);
     /// ```
@@ -348,7 +403,7 @@ impl ItemList {
     /// # Examples:
     /// ```
     /// # use muframework::game::items::*;
-    /// let mut subject = ItemList::new();
+    /// let mut subject = ItemList::new(None);
     /// subject.add_new_item_to_bundle_at(10,15,600, ItemClass::Headwear, "A holey baseball cap" );
     /// ```
     pub fn add_new_item_to_bundle_at(
@@ -439,7 +494,7 @@ mod item_list_index_mut {
 
     #[test]
     fn test_returns_properly_when_given_a_non_existent_element() {
-        let mut subject = ItemList::new();
+        let mut subject = ItemList::new(None);
 
         let item = Item {
             id: 1776,
@@ -461,7 +516,7 @@ mod update_item {
         let item = Item::spawn(Potion, "Coca-Cola");
         let item_id = item.id;
         let new_item = Item::new(item.id, ItemType::new(item.class(), item.description()), 8);
-        let mut subject = ItemList::new();
+        let mut subject = ItemList::new(None);
 
         subject.add(ItemState::Stored(item, item_id));
 
@@ -476,7 +531,7 @@ mod update_item {
         let item_id = item.id;
         let new_item = Item::new(item.id, ItemType::new(item.class(), item.description()), 8);
 
-        let mut subject = ItemList::new();
+        let mut subject = ItemList::new(None);
 
         subject.add(ItemState::Bundle(item, 10, 10));
 

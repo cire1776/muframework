@@ -304,9 +304,14 @@ mod inventory_aliases {
     #[test]
     fn read_in_stored_items_using_empty_alias_list() {
         let mut inventories = InventoryList::new();
-        let items: &mut ItemList = &mut ItemList::new();
+        let items: &mut ItemList = &mut ItemList::new(None);
+        items.item_types = ItemTypeList::new();
+        items.item_types.insert(
+            "green_leather_cap".into(),
+            ItemType::new(ItemClass::Headwear, "Green Leather cap"),
+        );
         let aliases = AliasList::new(1);
-        let stored_items = vec![r#"^ player "A Green Leather Cap""#.into()];
+        let stored_items = vec![r#"player green_leather_cap"#.into()];
 
         Item::read_in_stored_items(&stored_items, aliases, items, &mut inventories);
 
@@ -315,17 +320,32 @@ mod inventory_aliases {
         let inventory = inventories.get(&1).unwrap();
         assert_eq!(inventory.count(), 1);
     }
+
     #[test]
     fn read_in_stored_items_populated_alias_list() {
         let mut inventories = InventoryList::new();
-        let items: &mut ItemList = &mut ItemList::new();
+        let items: &mut ItemList = &mut ItemList::new(None);
+        items.item_types = ItemTypeList::new();
+        items.item_types.insert(
+            "green_leather_cap".into(),
+            ItemType::new(ItemClass::Headwear, "Green Leather cap"),
+        );
+        items.item_types.insert(
+            "purple_leather_cap".into(),
+            ItemType::new(ItemClass::Headwear, "Purple Leather cap"),
+        );
+        items.item_types.insert(
+            "black_leather_cap".into(),
+            ItemType::new(ItemClass::Headwear, "Black Leather cap"),
+        );
+
         let mut aliases = AliasList::new(1);
         aliases.insert("alias1", 502);
 
         let stored_items = vec![
-            r#"^ alias1 "A Green Leather Cap""#.into(),
-            r#"^ player "A Purple Leather Cap""#.into(),
-            r#"^ alias1 "A Black Leather Cap""#.into(),
+            r#"alias1 green_leather_cap"#.into(),
+            r#"player purple_leather_cap"#.into(),
+            r#"alias1 black_leather_cap"#.into(),
         ];
 
         Item::read_in_stored_items(&stored_items, aliases, items, &mut inventories);

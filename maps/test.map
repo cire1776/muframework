@@ -39,18 +39,33 @@ R 8,10  // rat at 8,44
 R 44,13  // rat at 8,44
 S 28,23 // spider at 28,23
 ===END OF CHARACTERS===
-↓ 25,23 "Crusty Dagger" // a dagger
-^ 27,7 "Very Old Leather Cap"
-! 27,7 "Warped Short Sword"
-¡ 52,32 "Yellow Potion"
-^ 28,7 "baseball cap"
+crusty_dagger dagger "Crusty Dagger"
+shiny_dagger dagger "Shiny Dagger" // a dagger
+very_old_leather_cap headwear "Very Old Leather Cap"
+old_leather_cap headwear "Old Leather Cap"
+baseball_cap headwear "Baseball Cap"
+amber_leather_cap headwear "Amber Leather Cap"
+warped_short_sword bladeweapon "Warped Short Sword"
+sharp_short_sword bladeweapon "Sharp Short Sword"
+yellow_potion potion "Yellow Potion"
+pink_potion potion "Pink Potion"
+reed_basket tool "Reed Basket"
+===END OF ITEM TYPES===
+↓ 25,23 crusty_dagger // a dagger
+^ 27,7 very_old_leather_cap
+! 27,7 warped_short_sword
+¡ 52,32 yellow_potion
+^ 28,7 baseball_cap
 ===END OF ITEMS===
 ≡ 7,7 "An unlocked chest made of wood" chest1
 ▲r 9,9 "An old Apple Tree" 
 ===END OF FACILITIES===
-^ player "Amber Leather Cap"
-↓ chest1 "Shiny Dagger" // a dagger
-! chest1 "Sharp Short Sword"
-¡ chest1 "Pink Potion"
-^ chest1 "Old Leather Cap"
+player amber_leather_cap
+chest1 shiny_dagger // a dagger
+chest1 sharp_short_sword
+chest1 pink_potion
+chest1 old_leather_cap
+chest1 reed_basket
+chest1 baseball_cap
+chest1 yellow_potion
 ===END OF STORED ITEMS===

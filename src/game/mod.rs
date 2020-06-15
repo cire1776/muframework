@@ -17,7 +17,7 @@ pub mod level;
 pub use level::Level;
 
 pub mod items;
-pub use items::{Item, ItemClass, ItemList, ItemState, ItemType};
+pub use items::{Item, ItemClass, ItemList, ItemState, ItemType, ItemTypeList};
 
 pub mod inventory;
 pub use inventory::{AliasList, Inventory, InventoryList};
@@ -128,8 +128,14 @@ impl GameState {
         FacilityList,
         InventoryList,
     ) {
-        let (mut map, mut character_vec, item_vec, facility_vec, stored_item_vec) =
-            TileMap::load_from_file(level_path.to_string());
+        let (
+            mut map,
+            mut character_vec,
+            mut item_type_vec,
+            item_vec,
+            facility_vec,
+            stored_item_vec,
+        ) = TileMap::load_from_file(level_path.to_string());
 
         let mut obstacles = BlockingMap::new();
         obstacles.refresh(&map);
@@ -137,7 +143,10 @@ impl GameState {
         let (player_x, player_y) =
             common::geometry::Point::read_coordinates(character_vec[0].to_owned());
         let characters = Character::read_in_characters(&mut character_vec);
-        let mut items = Item::read_in_items(&item_vec);
+
+        let item_types = ItemType::read_in_item_types(&mut item_type_vec);
+
+        let mut items = Item::read_in_items(&item_vec, item_types);
 
         // find home for activity guard and activity timer
 

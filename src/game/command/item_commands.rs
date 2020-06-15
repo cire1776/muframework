@@ -357,7 +357,7 @@ mod pickup_command {
     #[test]
     fn execute_sends_two_game_update_messages() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         items.add_new_item_to_bundle_at(10, 15, 1776, ItemClass::Potion, "A Red Bubbling Potion");
 
         let mut command = PickupCommand::new(1776, &mut inventory, &mut items);
@@ -383,7 +383,7 @@ mod pickup_command {
     #[test]
     fn execute_adds_item_to_inventory() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         items.add_new_item_to_bundle_at(10, 15, 1776, ItemClass::Potion, "A Red Bubbling Potion");
 
         let mut command = PickupCommand::new(1776, &mut inventory, &mut items);
@@ -396,7 +396,7 @@ mod pickup_command {
     #[test]
     fn execute_adds_item_to_item_list() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         items.add_new_item_to_bundle_at(10, 15, 1776, ItemClass::Potion, "A Red Bubbling Potion");
 
         let mut command = PickupCommand::new(1776, &mut inventory, &mut items);
@@ -427,7 +427,7 @@ mod drop_command {
     #[test]
     fn execute_sends_two_messages() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut item = Item::new(
             1776,
             ItemType::new(ItemClass::Potion, "A Red Bubbling Potion"),
@@ -469,7 +469,7 @@ mod drop_command {
     #[test]
     fn execute_adds_a_bundle_at_location() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut item = Item::new(
             1776,
             ItemType::new(ItemClass::Potion, "A Red Bubbling Potion"),
@@ -491,7 +491,7 @@ mod drop_command {
     #[test]
     fn execute_adds_removes_item_from_the_inventory() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut item = Item::new(
             1776,
             ItemType::new(ItemClass::Potion, "A Red Bubbling Potion"),
@@ -539,7 +539,7 @@ mod unequip_command {
     #[test]
     fn execute_unmounts_item_that_occupies_single_mounting_point() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let item_class_specifiers = ItemClassSpecifier::initialize();
 
         let item = test_item(
@@ -574,7 +574,7 @@ mod unequip_command {
     #[test]
     fn announce_sends_two_messages() {
         let mut inventory = Inventory::new(1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
 
         let item = test_item(
             "a fuzzy hat",

@@ -128,7 +128,7 @@ impl Inventory {
     /// # use muframework::game::inventory::*;
     /// # use muframework::game::items::*;
     /// let mut subject = Inventory::new(1);
-    /// let mut items = ItemList::new();
+    /// let mut items = ItemList::new(None);
     /// let item = Item::new(601, ItemType::new(ItemClass::Headwear,"baseball cap"),1);
     /// subject.accept(&item, &mut items);
     /// assert_eq!(subject.count(), 1);
@@ -161,7 +161,7 @@ impl Inventory {
     /// # use muframework::game::inventory::*;
     /// # use muframework::game::items::*;
     /// let mut subject = Inventory::new(1);
-    /// let mut items = ItemList::new();
+    /// let mut items = ItemList::new(None);
     /// let item = Item::new(1146, ItemType::new(ItemClass::Shoes, "Prada red papal shoes"),1);
     ///
     /// subject.accept(& item, &mut items);
@@ -220,7 +220,7 @@ impl Inventory {
     /// # use muframework::game::inventory::*;
     /// # use muframework::game::items::*;
     /// let mut subject = Inventory::new(1);
-    /// let mut items = ItemList::new();
+    /// let mut items = ItemList::new(None);
     /// let item = Item::new(1146, ItemType::new(ItemClass::Shoes, "Prada red papal shoes"),1);
     /// items.store(&item,subject.id());
     ///
@@ -231,7 +231,7 @@ impl Inventory {
     /// ``` should_panic
     /// # use muframework::game::*;
     /// let mut subject = Inventory::new(1);
-    /// let mut items = ItemList::new();
+    /// let mut items = ItemList::new(None);
     ///
     /// subject.accept_by_id(404, &mut items);
     /// ```
@@ -284,7 +284,7 @@ impl Inventory {
         match possible_item {
             None => panic!("expected item_id to exist"),
             Some(ItemState::Stored(_item, _inventory_id)) => panic!("expected dropped item"),
-            Some(ItemState::Bundle(item, _x, _y)) => self.accept(&item, items),
+            Some(ItemState::Bundle(mut item, _x, _y)) => self.accept_stack_unmut(&item, items),
             Some(ItemState::Equipped(_item, _inventory_id)) => {
                 panic!("expected a non-equipped item")
             }
@@ -327,7 +327,7 @@ mod test_inventory {
     fn index() {
         let mut subject = Inventory::new(1);
         let item = Item::new(1, ItemType::new(ItemClass::Gloves, "some item"), 1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         subject.accept(&item, &mut items);
 
         assert_eq!(subject[1], item);
@@ -338,7 +338,7 @@ mod test_inventory {
     fn index_should_panic_when_index_not_found() {
         let mut subject = Inventory::new(1);
         let item = Item::new(1, ItemType::new(ItemClass::Gloves, "some item"), 1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         subject.accept(&item, &mut items);
 
         &subject[1777];
@@ -349,7 +349,7 @@ mod test_inventory {
     fn remove_item_removes_the_item() {
         let mut subject = Inventory::new(1);
         let item = Item::new(1777, ItemType::new(ItemClass::Gloves, "some item"), 1);
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         subject.accept(&item, &mut items);
 
         subject.release_item(&1777);
@@ -365,7 +365,7 @@ mod inventory_spawn_item {
 
     #[test]
     fn it_stacks_correctly() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
         let item = Item::spawn(Potion, "Mtn Dew");
 
@@ -385,20 +385,26 @@ mod accept_stack {
 
     #[test]
     fn if_item_is_non_stackable_it_adds_it_to_inventory_as_new_stack() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
 
         let mut item = Item::spawn(Headwear, "Mtn Dew Cap");
 
         subject.accept_stack(&mut item, &mut items);
 
+        let mut new_item = Item::spawn(Headwear, "Mtn Dew Cap");
+
+        subject.accept_stack(&mut new_item, &mut items);
+
         assert_eq!(item.quantity, 1);
         assert!(subject.holds(item.id));
+        assert_eq!(new_item.quantity, 1);
+        assert!(subject.holds(new_item.id));
     }
 
     #[test]
     fn adds_1_to_the_stack_when_given_an_item_of_1() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
         let item = Item::spawn(Potion, "Mtn Dew");
         let item_id = item.id;
@@ -418,7 +424,7 @@ mod accept_stack {
 
     #[test]
     fn only_first_in_multiple_stacks_changed_if_it_can_fit() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
         let item1 = Item::spawn(Potion, "Mtn Dew");
         let item2 = Item::spawn_stack(Potion, "Mtn Dew", 2);
@@ -466,7 +472,7 @@ mod accept_stack {
 
     #[test]
     fn restricts_stacking_to_same_type_of_item() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
         let item1 = Item::spawn_stack(Potion, "Mtn Dew", 2);
         subject.accept(&item1, &mut items);
@@ -481,7 +487,7 @@ mod accept_stack {
 
     #[test]
     fn adds_new_stack_if_existing_stack_is_completely_full() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
         let item1 = Item::spawn_stack(Potion, "Mtn Dew", 18);
         subject.accept(&item1, &mut items);
@@ -496,7 +502,7 @@ mod accept_stack {
 
     #[test]
     fn adds_new_stack_with_remainder_if_existing_stack_is_almost_full() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
         let item1 = Item::spawn_stack(Potion, "Mtn Dew", 15);
         subject.accept(&item1, &mut items);
@@ -512,7 +518,7 @@ mod accept_stack {
 
     #[test]
     fn if_finishes_with_zero_stack_is_removed_from_inventory_and_items() {
-        let mut items = ItemList::new();
+        let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
         let item1 = Item::spawn_stack(Potion, "Mtn Dew", 9);
         subject.accept(&item1, &mut items);

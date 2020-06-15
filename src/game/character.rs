@@ -16,7 +16,7 @@ pub struct Player {
 
 impl Player {
     pub fn new() -> Player {
-        Player {
+        let mut player = Player {
             id: 1,
             x: 0,
             y: 0,
@@ -27,7 +27,9 @@ impl Player {
             endorsements: HashMap::new(),
             activity_guard: None,
             activity_timer: None,
-        }
+        };
+        player.endorse_with(":can_pick_apples");
+        player
     }
 
     pub fn inventory_id(&self) -> u64 {
