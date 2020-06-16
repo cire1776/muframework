@@ -36,19 +36,6 @@ pub use parsing::*;
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
-pub struct GameData {
-    pub player: Player,
-    pub map: TileMap,
-    pub obstacles: BlockingMap,
-    pub characters: CharacterList,
-
-    pub item_class_specifiers: ItemClassSpecifierList,
-    pub items: ItemList,
-    pub facilities: FacilityList,
-
-    pub inventories: InventoryList,
-}
-
 // starts at two to reserve one for the player.
 //  this is temporary
 static GLOBAL_NEXT_ID: AtomicU64 = AtomicU64::new(2);
