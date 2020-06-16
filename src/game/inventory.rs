@@ -276,7 +276,7 @@ impl Inventory {
         match possible_item {
             None => panic!("expected item_id to exist"),
             Some(ItemState::Stored(_item, _inventory_id)) => panic!("expected dropped item"),
-            Some(ItemState::Bundle(mut item, _x, _y)) => self.accept_stack_unmut(&item, items),
+            Some(ItemState::Bundle(mut item, _x, _y)) => self.accept_stack(&mut item, items),
             Some(ItemState::Equipped(_item, _inventory_id)) => {
                 panic!("expected a non-equipped item")
             }
