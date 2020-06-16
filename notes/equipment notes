@@ -71,3 +71,9 @@ basket "light-weight reed basket" {
      endorsements: [:can_pick_apples]
 }
 
+Item Naming
+===========
+     Items can earn names a random occurance the chance of which increases when the item is beyond its expected life.
+     This does not change the item as far as the game is concerned, but makes it a collectible item, especially once
+     museums are implemented.
+
