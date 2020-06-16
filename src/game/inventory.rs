@@ -138,21 +138,6 @@ impl Inventory {
         self.items.len()
     }
 
-    // fn can_hold(&self, item: &Item) -> bool {
-    //     if !self.is_full() {
-    //         return true;
-    //     }
-
-    //     if !item.is_stackable() {
-    //         self.any_open_stacks_for(item)
-    //         return false;
-    //     }
-    //     println!(
-    //         "Your inventory is full.  Cannot pick up {}.",
-    //         item.description()
-    //     );
-    // }
-
     /// adds an item to the inventory and sets the item to stored in the item list.
     /// # Arguments:
     /// * item - the item to be added
