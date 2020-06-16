@@ -94,7 +94,7 @@ impl<'a> CommandHandler for DropCommand<'a> {
 
 pub struct EquipCommand<'a> {
     item: &'a Item,
-    player_mounting_points: &'a mut MountingPointMap,
+    player: &'a mut Player,
     item_class_specifiers: &'a ItemClassSpecifierList,
     inventory: &'a mut Inventory,
     items: &'a mut ItemList,
@@ -103,14 +103,14 @@ pub struct EquipCommand<'a> {
 impl<'a> EquipCommand<'a> {
     pub fn new(
         item: &'a Item,
-        player_mounting_points: &'a mut MountingPointMap,
+        player: &'a mut Player,
         item_class_specifiers: &'a ItemClassSpecifierList,
         inventory: &'a mut Inventory,
         items: &'a mut ItemList,
     ) -> EquipCommand<'a> {
         EquipCommand {
             item,
-            player_mounting_points,
+            player,
             item_class_specifiers,
             inventory,
             items,
@@ -124,16 +124,23 @@ impl<'a> CommandHandler for EquipCommand<'a> {
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
-        self.player_mounting_points.mount(
-            self.item,
-            self.item_class_specifiers,
-            self.inventory,
-            &mut self.items,
-        );
+        {
+            let player_mounting_points = &mut self.player.mounting_points;
+
+            player_mounting_points.mount(
+                self.item,
+                self.item_class_specifiers,
+                self.inventory,
+                &mut self.items,
+            );
+        }
+        let player_mounting_points = self.player.mounting_points.clone();
+        player_mounting_points
+            .endorse(self.player, &self.items)
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
-        let equipment_list: Vec<Item> = self.player_mounting_points.to_vec_of_items(&self.items);
+        let equipment_list: Vec<Item> = (&self.player.mounting_points).to_vec_of_items(&self.items);
 
         GameUpdate::send(
             Some(update_tx),
@@ -178,6 +185,9 @@ impl<'a> CommandHandler for UnequipCommand<'a> {
         self.player
             .mounting_points
             .unmount_item_by_id(self.item_id, self.inventory, self.items);
+
+        self.player.clear_endorsements();
+        self.player.mounting_points.clone().endorse(&mut self.player,self.items);
     }
 
     fn announce(&self, update_tx: &GameUpdateSender) {

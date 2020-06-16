@@ -80,6 +80,14 @@ impl MountingPointMap {
             .collect()
     }
 
+    pub fn endorse(&self, player: &mut Player, items: &ItemList) {
+        let all_equipment = self.to_vec_of_items(items);
+
+        for equipment in all_equipment {
+            equipment.endorse(player);
+        }
+    }
+
     // TODO: allow for multiple mounting points
     fn perform_mount(&mut self, item: &Item, mounting_points: &Vec<&MountingPoint>) {
         if mounting_points.is_empty() {

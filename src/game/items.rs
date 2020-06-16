@@ -203,6 +203,12 @@ impl Item {
         format!("{} {}", prefix, inflected_description).clone()
     }
 
+    pub fn endorse(&self,player: &mut Player) {
+        for endorsement in &self.item_type.endorsements {
+            player.endorse_with(endorsement);
+        }
+    }
+
     /// creates a new item assigning it its Id as appropriate.
     pub fn spawn<S: ToString>(class: ItemClass, description: S) -> Item {
         Self::spawn_stack(class, description, 1)

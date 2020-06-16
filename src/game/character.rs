@@ -28,7 +28,8 @@ impl Player {
             activity_guard: None,
             activity_timer: None,
         };
-        player.endorse_with(":can_pick_apples");
+        // temporary.  Not sure where this belongs once saving is in place.
+        player.endorse_with(":newb");
         player
     }
 
@@ -42,6 +43,10 @@ impl Player {
 
     pub fn endorse_with<S: ToString>(&mut self, endorsement: S) {
         self.endorsements.insert(endorsement.to_string(), true);
+    }
+
+    pub fn clear_endorsements(&mut self) {
+        self.endorsements.clear();
     }
 
     pub fn unendorse_with<S: ToString>(&mut self, endorsement: S) {

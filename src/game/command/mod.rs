@@ -224,8 +224,6 @@ fn process_equip_item<'a>(
 ) -> Option<Box<dyn CommandHandler + 'a>> {
     let item_class_specifiers = &item_class_specifiers;
 
-    let player_mounting_points = &mut player.mounting_points;
-
     let inventory = inventories
         .get_mut(&inventory_id)
         .expect("unable to find inventory");
@@ -234,7 +232,7 @@ fn process_equip_item<'a>(
 
     Some(std::boxed::Box::new(EquipCommand::new(
         item,
-        player_mounting_points,
+        player,
         item_class_specifiers,
         inventory,
         items,
