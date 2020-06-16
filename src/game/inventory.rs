@@ -169,6 +169,11 @@ impl Inventory {
         self.force_accept(item);
     }
 
+    /// adds a stack of items to the inventory.  This should be the primary
+    /// means of adding items to the inventory, because it handles stacks.
+    /// # Arguments:
+    /// * item - the item to be added
+    /// * items - the master item list
     pub fn accept_stack(&mut self, item: &mut Item, items: &mut ItemList) {
         use std::cmp::min;
 
@@ -253,16 +258,18 @@ impl Inventory {
         self.release_item(&item_id);
     }
 
-    // simply lets go of an item without placing it in a bundle in effect disposing of the item if it
-    //   has not been transferred already.
+    /// simply lets go of an item without placing it in a bundle in effect disposing of the item if it
+    ///   has not been transferred already.
     pub fn release_item(&mut self, item_id: &u64) {
         self.items.remove(&item_id);
     }
 
+    /// returns true if inventory holds an item_id.
     pub fn holds(&mut self, item_id: u64) -> bool {
         self.items.contains_key(&item_id)
     }
 
+    /// picks up an item from a bundle and puts it into the inventory.
     pub fn pick_up_item(&mut self, item_id: u64, items: &mut ItemList) {
         let possible_item = items.get(item_id);
 
@@ -276,6 +283,7 @@ impl Inventory {
         }
     }
 
+    /// returns an vector of items.
     pub fn to_vec(&self) -> Vec<Item> {
         self.items.values().cloned().collect()
     }
