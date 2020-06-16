@@ -44,8 +44,13 @@ Fruit Press
 
 Chest/Locked Chest/Open Chest
 ---
-* Unlock chest - use locked chest
+* Unlock chest - use locked chest with key in inventory.
 * Lock chest   - sneak use unlocked chest ???
 * Open chest   - use unlocked chest
 * Close chest  - move away from opened chest ?
+* Installing lock - equip lock and use chest. 200 second timer.
+* Removing lock - key must be in inventory. :can-remove-lock tool equipped.
+                  100 second timer.  sneak-use unlocked chest.
+* Lock picking  - :can-pick-lock tool equipped. can fail.  use locked chest.  must not have key
+                  in inventory 100 second timer.  chance to reveal key.
 
