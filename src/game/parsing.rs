@@ -25,6 +25,13 @@ pub fn capture_string<'a>(captures: &'a regex::Captures, index: usize) -> &'a st
         .as_str()
 }
 
+pub fn capture_optional_string<'a>(captures: &'a regex::Captures, index: usize) -> &'a str {
+    match captures.get(index) {
+        Some(re_match) => re_match.as_str(),
+        None => "",
+    }
+}
+
 pub fn capture_section(captures: &regex::Captures, index: usize) -> Vec<String> {
     captures
         .get(index)

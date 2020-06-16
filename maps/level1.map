@@ -40,7 +40,7 @@ R 44,13  // rat at 8,44
 S 28,23 // spider at 28,23
 ===END OF CHARACTERS===
 crusty_dagger dagger "Crusty Dagger"
-shiny_dagger dagger "Shiny Dagger" // a dagger
+shiny_dagger dagger "Shiny Dagger" // a shiny dagger
 very_old_leather_cap headwear "Very Old Leather Cap"
 old_leather_cap headwear "Old Leather Cap"
 baseball_cap headwear "Baseball Cap"
@@ -49,7 +49,9 @@ warped_short_sword bladeweapon "Warped Short Sword"
 sharp_short_sword bladeweapon "Sharp Short Sword"
 yellow_potion potion "Yellow Potion"
 pink_potion potion "Pink Potion"
-reed_basket tool "Reed Basket"
+reed_basket tool "Reed Basket" {
+    endorsement: :can_pick_apples
+}
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap

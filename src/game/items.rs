@@ -92,6 +92,7 @@ pub trait StaticData: 'static {}
 pub struct ItemType {
     class: ItemClass,
     description: String,
+    endorsements: Vec<String>,
 }
 
 impl ItemType {
@@ -99,27 +100,54 @@ impl ItemType {
         Self {
             class,
             description: description.to_string(),
+            endorsements: vec![],
         }
+    }
+
+    pub fn add_endorsement<S: ToString>(&mut self, endorsement: S) {
+        self.endorsements.push(endorsement.to_string());
     }
 
     pub fn read_in_item_types(items: &mut Vec<String>) -> ItemTypeList {
         let mut result = ItemTypeList::new();
+        let long_string = items.join("\n");
 
-        let re = Regex::new("(?m)^(\\w+)\\s(\\w+)\\s*\\s\"([^\"]+)\"").unwrap();
+        let re = Regex::new(r#"(?m)^(\w+)\s+(\w+)\s*\s"([^"]+)"\s*(?:\{([^}]*)*\})?(?:\s*//.*)?$"#)
+            .unwrap();
 
-        for string in items {
-            let captures = re.captures(string).unwrap();
+        for captures in re.captures_iter(&long_string[..]) {
             let type_name = capture_string(&captures, 1);
             let class_name = capture_string(&captures, 2);
             let description = capture_string(&captures, 3);
+            let attributes = capture_optional_string(&captures, 4).trim();
 
             let class = ItemClass::from_name(class_name);
 
-            let new_type = ItemType::new(class, description);
+            let mut new_type = ItemType::new(class, description);
+
+            Self::read_in_type_attributes_for(&mut new_type, attributes);
             result.insert(type_name.to_string(), new_type);
         }
 
         result
+    }
+
+    fn read_in_type_attributes_for(new_type: &mut ItemType, attributes: &str) {
+        if attributes.is_empty() {
+            return;
+        }
+
+        let re = Regex::new(r#"^(endorsement):\s+(:\w+|\d+)(?:\s*//.*)?$"#).unwrap();
+
+        let captures = re.captures(attributes).expect("unable to parse attribute");
+
+        let attribute_name = capture_string(&captures, 1);
+        let attribute_value = capture_string(&captures, 2);
+
+        match attribute_name {
+            "endorsement" => new_type.add_endorsement(attribute_value),
+            _ => panic!("unrecognized attribute: {}", attribute_name),
+        }
     }
 }
 
