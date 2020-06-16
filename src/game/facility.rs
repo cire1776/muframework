@@ -23,6 +23,8 @@ impl FacilityClass {
     }
 }
 
+pub type NumericPropertyList = HashMap<String, i128>;
+
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Facility {
     pub id: u64,
@@ -31,6 +33,7 @@ pub struct Facility {
     pub class: FacilityClass,
     pub description: String,
     pub inventory: Option<u64>,
+    properties: Option<NumericPropertyList>,
 }
 
 impl<'a> Facility {
@@ -61,6 +64,7 @@ impl<'a> Facility {
             class,
             description,
             inventory: inventory_id,
+            properties: None,
         }
     }
     pub fn new_with_inventory<T, U>(
@@ -92,6 +96,38 @@ impl<'a> Facility {
             class,
             description,
             inventory: Some(inventory_id),
+            properties: None,
+        }
+    }
+
+    pub fn enable_properties(&mut self) {
+        self.properties = Some(NumericPropertyList::new());
+    }
+
+    pub fn set_property<S: ToString, N: TryInto<i128>>(&mut self, property_name: S, new_value: N) {
+        match self.properties {
+            Some(ref mut properties) => {
+                let new_value = new_value
+                    .try_into()
+                    .ok()
+                    .expect("must be convertible to i128");
+                let value = properties
+                    .entry(property_name.to_string())
+                    .or_insert(new_value);
+                *value = new_value;
+            }
+            None => panic!("properties not available for this facility"),
+        }
+    }
+
+    pub fn get_property<S: ToString>(&self, property_name: S) -> i128 {
+        if let Some(ref properties) = self.properties {
+            *properties
+                .get(&property_name.to_string())
+                .or(Some(&0))
+                .unwrap()
+        } else {
+            0
         }
     }
 
@@ -255,6 +291,7 @@ impl IndexMut<u64> for FacilityList {
                     class: FacilityClass::ClosedChest,
                     description: "".into(),
                     inventory: Some(u64::MAX),
+                    properties: None,
                 },
             );
         }

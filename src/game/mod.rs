@@ -374,3 +374,6 @@ mod test_external_inventories;
 
 #[cfg(test)]
 mod test_item_type;
+
+#[cfg(test)]
+mod test_facility_properties;
