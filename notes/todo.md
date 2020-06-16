@@ -8,28 +8,49 @@ Items to be completed
 - √ unequpping items
 - inventory capacity by weight
 - tooltips
-- first facility
-- use of facility
-- endorsements/enablements
+- √ first facility
+- √ use of facility
+- √ endorsements/enablements
 - quests
 - npc characters
 - npc AIs
 - attacking
 - RT action
-- chests
+- √ chests
 - √ facing
 
 Faciltiies
 ===
 
 Apple Tree:
----
+===
+#r 7,7 "An old apple tree" {
+  property: apples => 35
+  property: wood => 1000
+  propery: age => 120     // in months
+  timer(90000): increment(apples)
+  timer(180000): increment(wood)
+  timer(864_000_000): increment(age)
+                      toggle(property)
+                      select(property)
+                      clear(property)
+                      decrement(property)
+                      set(property,1234)
+                      add(property,1234)
+                      subtract(property,1234)
+}
 
+
+---
+* Properties:
+     logs left
+     Apples left
 
 * Pick apple
+  * :can_pick_apples  ?? should this be :can_pick??
   * equipment requirements: basket
-  * 
-* Saw tree
+  
+* Chop tree
   
 Lumber mill
 ---
