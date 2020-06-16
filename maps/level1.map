@@ -60,7 +60,11 @@ reed_basket tool "Reed Basket" {
 ^ 28,7 baseball_cap
 ===END OF ITEMS===
 ≡ 7,7 "An unlocked chest made of wood" chest1
-▲r 9,9 "An old Apple Tree" 
+▲r 9,9 "An old Apple Tree" {
+    property: apples => 35
+    property: wood => 1000
+    property: age => 120     // in months
+}
 ===END OF FACILITIES===
 player amber_leather_cap
 chest1 shiny_dagger // a dagger

@@ -101,7 +101,9 @@ impl<'a> Facility {
     }
 
     pub fn enable_properties(&mut self) {
-        self.properties = Some(NumericPropertyList::new());
+        if self.properties == None {
+            self.properties = Some(NumericPropertyList::new());
+        }
     }
 
     pub fn set_property<S: ToString, N: TryInto<i128>>(&mut self, property_name: S, new_value: N) {
@@ -131,6 +133,30 @@ impl<'a> Facility {
         }
     }
 
+    pub fn read_in_facilities(
+        facilities: &Vec<String>,
+        inventories: &mut InventoryList,
+    ) -> (FacilityList, AliasList) {
+        let mut aliases = AliasList::new(1);
+        let mut result = FacilityList::new();
+
+        let re =
+            regex::Regex::new(r#"(?m)^(.+)\s(\d+)\s*,\s*(\d+)\s"([^"]*)"\s*(\w+)?(?:\{([^}]*)})?"#)
+                .unwrap();
+
+        let facilities_string = facilities.join("\n");
+
+        for captures in re.captures_iter(&facilities_string) {
+            let (facility, possible_alias) = Self::read_facility(&captures, inventories);
+
+            aliases.insert_if_necessary(possible_alias, facility.id);
+
+            result.add(facility);
+        }
+
+        (result, aliases)
+    }
+
     fn read_facility(
         captures: &'a regex::Captures,
         inventories: &'a mut InventoryList,
@@ -143,44 +169,23 @@ impl<'a> Facility {
 
         let inventory_alias: Option<&str> = captures.get(5).map(|m| m.as_str());
 
+        let property_list_string = capture_optional_string(captures, 6).trim();
+
         let class = FacilityClass::from_symbol(symbol);
+        let mut facility = Facility::new(NEXT_ID(), x, y, class, description.into(), inventories);
 
-        (
-            Facility::new(NEXT_ID(), x, y, class, description.into(), inventories),
-            inventory_alias,
-        )
-    }
+        let re = regex::Regex::new(r#"(?m)^\s*property:\s*(\w+)\s*=>\s*(-?\d+)(?:\s*//.*)?$"#)
+            .expect("unable to parse propertylist");
 
-    fn read_facility_from_string(
-        re: &regex::Regex,
-        string: &str,
-        aliases: &mut AliasList,
-        result: &mut FacilityList,
-        inventories: &mut InventoryList,
-    ) {
-        let captures = re.captures(string).unwrap();
-        let (facility, possible_alias) = Self::read_facility(&captures, inventories);
+        for captures in re.captures_iter(property_list_string) {
+            let property_name = capture_string(&captures, 1);
+            let property_value = capture_string(&captures, 2).parse::<i128>().unwrap();
 
-        aliases.insert_if_necessary(possible_alias, facility.id);
-
-        result.add(facility);
-    }
-
-    pub fn read_in_facilities(
-        facilities: &Vec<String>,
-        inventories: &mut InventoryList,
-    ) -> (FacilityList, AliasList) {
-        let mut aliases = AliasList::new(1);
-        let mut result = FacilityList::new();
-
-        let re = regex::Regex::new("(?m)^(.+)\\s(\\d+)\\s*,\\s*(\\d+)\\s\"([^\"]*)\"\\s*(\\w+)?")
-            .unwrap();
-
-        for string in facilities {
-            Self::read_facility_from_string(&re, string, &mut aliases, &mut result, inventories);
+            facility.enable_properties();
+            facility.set_property(property_name, property_value);
         }
 
-        (result, aliases)
+        (facility, inventory_alias)
     }
 
     pub fn is_in_use(&self) -> bool {

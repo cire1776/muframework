@@ -33,11 +33,12 @@ Apple Tree:
   timer(90000): increment(apples)
   timer(180000): increment(wood)
   timer(864_000_000): increment(age)
-                      toggle(property)
-                      select(property)
-                      clear(property)
                       decrement(property)
-                      set(property,1234)
+                      toggle(property)
+                      set(property)
+                      clear(property)
+                      
+                      property => 1234
                       add(property,1234)
                       subtract(property,1234)
 }
