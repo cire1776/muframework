@@ -8,15 +8,15 @@ Items to be completed
 - √ unequpping items
 - inventory capacity by weight
 - tooltips
-- first facility
-- use of facility
-- endorsements/enablements
+- √ first facility
+- √ use of facility
+- √ endorsements/enablements
 - quests
 - npc characters
 - npc AIs
 - attacking
 - RT action
-- chests
+- √ chests
 - √ facing
 
 Faciltiies
