@@ -28,6 +28,8 @@ Apple Tree:
   property: apples => 35
   property: wood => 1000
   propery: age => 120     // in months
+
+  future???
   timer(90000): increment(apples)
   timer(180000): increment(wood)
   timer(864_000_000): increment(age)
