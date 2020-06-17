@@ -49,12 +49,16 @@ impl ItemClass {
     }
 
     pub fn stack_limits(class: ItemClass) -> u8 {
+        const MAX_STACK: u8 = 64;
+        const LIMITED_STACK: u8 = 16;
+        const UNSTACKABLE: u8 = 1;
+
         use ItemClass::*;
 
         match class {
-            Food => 64,
-            Potion => 16,
-            _ => 1,
+            Food => MAX_STACK,
+            Potion => LIMITED_STACK,
+            _ => UNSTACKABLE,
         }
     }
 }
