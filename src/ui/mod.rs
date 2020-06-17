@@ -95,6 +95,8 @@ impl GameState for UIState {
 impl UIState {
     /// public for testing purposes
     pub fn perform_tick(&mut self, context: Option<&mut BTerm>) {
+        use pane::PaneTitle::*;
+
         let received = self.update_rx.try_recv();
 
         match received {
@@ -177,17 +179,23 @@ impl UIState {
             Ok(ExternalInventoryOpened(external_inventory, external_inventory_id)) => {
                 self.input_state = InputState::ExternalInventoryOpen;
                 self.map_window.window_mode = MapWindowMode::ExternalInventory;
-                self.map_window.active_pane =
-                    Some(Pane::new(10, 5, 25, 28, external_inventory.len() as u8));
+                self.map_window.active_pane = Some(Pane::new(
+                    ChestContents,
+                    10,
+                    5,
+                    25,
+                    28,
+                    external_inventory.len() as u8,
+                ));
                 self.external_inventory = Some(external_inventory);
                 self.external_inventory_id = Some(external_inventory_id);
             }
             Ok(ExternalInventoryClosed) => {
                 self.input_state = InputState::Normal;
                 self.map_window.window_mode = MapWindowMode::Normal;
-                self.map_window.active_pane = None;
-                self.external_inventory = None;
-                self.external_inventory_id = None;
+                self.map_window.active_pane = std::option::Option::None;
+                self.external_inventory = std::option::Option::None;
+                self.external_inventory_id = std::option::Option::None;
             }
             Ok(ExternalInventoryUpdated(external_inventory)) => {
                 if self.input_state == InputState::ExternalInventoryOpen {
@@ -199,17 +207,23 @@ impl UIState {
             }
             Ok(ActivityStarted(duration)) => {
                 self.activity_time = Some(time_in_millis() + duration as u64);
-                self.map_window.active_pane =
-                    Some(Pane::new(self.player.x + 2, self.player.y + 2, 11, 3, 0));
+                self.map_window.active_pane = Some(Pane::new(
+                    None,
+                    self.player.x + 2,
+                    self.player.y + 2,
+                    11,
+                    3,
+                    0,
+                ));
                 self.input_state = InputState::Activity;
             }
             Ok(ActivityExpired()) => {
                 self.input_state = InputState::Normal;
-                self.activity_time = None;
+                self.activity_time = std::option::Option::None;
             }
             Ok(ActivityAborted()) => {
                 self.input_state = InputState::Normal;
-                self.activity_time = None;
+                self.activity_time = std::option::Option::None;
             }
             Err(_) => {}
         }
@@ -418,10 +432,14 @@ impl UIState {
     fn draw_activity_pane(&self, window: &dyn BasicWindow, context: &mut BTerm) {
         if let Some(expiration) = self.activity_time {
             let seconds = (expiration - time_in_millis()) / 1000;
-            let pane = self.map_window.active_pane.unwrap();
+            let pane = if let Some(pane) = &self.map_window.active_pane {
+                pane
+            } else {
+                panic!("active pane not found!")
+            };
 
             pane.draw_frame("ESC: Abort", window, context);
-            pane.draw_text(format!("{}", seconds), 5, 1, window, context)
+            pane.draw_text(format!("{}", seconds), pane.width / 2, 1, window, context)
         }
     }
 

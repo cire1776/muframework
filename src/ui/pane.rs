@@ -2,19 +2,50 @@ use super::*;
 use window::ScreenObject;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum PaneTitle {
+    None,
+    PickingApples,
+    Logging,
+    ChestContents,
+}
+
+impl ToString for PaneTitle {
+    fn to_string(&self) -> String {
+        let str = match self {
+            PaneTitle::None => "",
+            PaneTitle::PickingApples => "Picking Apples",
+            PaneTitle::Logging => "Logging",
+            PaneTitle::ChestContents => "Chest Contents",
+        };
+
+        str.into()
+    }
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Pane {
-    x: i32,
-    y: i32,
-    width: i32,
-    height: i32,
+    title: PaneTitle,
+
+    pub x: i32,
+    pub y: i32,
+    pub width: i32,
+    pub height: i32,
 
     pub selection: Option<u8>,
     max_selection: u8,
 }
 
 impl<'a> Pane {
-    pub fn new(x: i32, y: i32, width: i32, height: i32, max_selection: u8) -> Self {
+    pub fn new(
+        title: PaneTitle,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+        max_selection: u8,
+    ) -> Self {
         Self {
+            title,
             x,
             y,
             width,
@@ -38,6 +69,7 @@ impl<'a> Pane {
             self.height,
             context,
         );
+        window.draw_text(&self.title.to_string()[..], 1 + self.x, self.y, context);
         window.draw_text(
             &message.to_string()[..],
             1 + self.x,
