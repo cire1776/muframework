@@ -10,8 +10,7 @@ pub struct Player {
     pub mounting_points: MountingPointMap,
     pub external_inventory: Option<Vec<Item>>,
     pub endorsements: HashMap<String, bool>,
-    pub activity_guard: Option<Guard>,
-    pub activity_timer: Option<timer::Timer>,
+    pub activity: Option<Box<dyn command::Activity>>,
 }
 
 impl Player {
@@ -25,8 +24,7 @@ impl Player {
             mounting_points: MountingPointMap::new(),
             external_inventory: None,
             endorsements: HashMap::new(),
-            activity_guard: None,
-            activity_timer: None,
+            activity: None,
         };
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");

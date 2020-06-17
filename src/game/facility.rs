@@ -36,6 +36,8 @@ pub struct Facility {
     properties: Option<NumericPropertyList>,
 }
 
+impl StaticData for Facility {}
+
 impl<'a> Facility {
     pub fn new<T, U>(
         id: T,
@@ -193,10 +195,12 @@ impl<'a> Facility {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FacilityList {
     facilities: HashMap<u64, Facility>,
 }
+
+impl StaticData for FacilityList {}
 
 impl FacilityList {
     pub fn new() -> FacilityList {
@@ -260,6 +264,14 @@ impl FacilityList {
         )
     }
 
+    pub fn get_mut<T: TryInto<u64>>(&mut self, item_id: T) -> Option<&mut Facility> {
+        self.facilities.get_mut(
+            &item_id
+                .try_into()
+                .ok()
+                .expect("Must be able to convert to i32"),
+        )
+    }
     /// adds a facility to the list.
     /// # Examples:
     /// ```

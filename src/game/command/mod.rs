@@ -13,7 +13,7 @@ pub use item_commands::{
     UnequipCommand,
 };
 pub mod facility_commands;
-pub use facility_commands::{ActivateAppleTreeCommand, OpenChestCommand};
+pub use facility_commands::{ActivatePickAppleTreeCommand, OpenChestCommand};
 
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
@@ -362,7 +362,10 @@ fn use_at<'a>(
                     facilities,
                     inventories,
                 ))),
-                FacilityClass::AppleTree => Some(Box::new(ActivateAppleTreeCommand::new(player))),
+                FacilityClass::AppleTree => Some(Box::new(ActivatePickAppleTreeCommand::new(
+                    player,
+                    facility_id,
+                ))),
                 _ => {
                     println!("facility not matched!");
                     None
@@ -403,6 +406,21 @@ pub trait CommandHandler {
 
     /// announce the results through GameUpdates
     fn announce(&self, _update_tx: &std::sync::mpsc::Sender<GameUpdate>) {}
+}
+
+pub trait Activity {
+    fn start(&self, update_tx: &GameUpdateSender);
+
+    fn complete(&mut self, facilities: &mut FacilityList);
+
+    fn on_completion(
+        &self,
+        player_inventory_id: u64,
+        facility: &mut Facility,
+        update_sender: &GameUpdateSender,
+        command_sender: &CommandSender,
+    );
+    fn clear_guard(&mut self) {}
 }
 
 pub struct NullCommand {}

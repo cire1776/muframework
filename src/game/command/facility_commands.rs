@@ -56,17 +56,21 @@ impl<'a> CommandHandler for OpenChestCommand<'a> {
     }
 }
 
-pub struct ActivateAppleTreeCommand<'a> {
+pub struct ActivatePickAppleTreeCommand<'a> {
     player: &'a mut Player,
+    facility_id: u64,
 }
 
-impl<'a> ActivateAppleTreeCommand<'a> {
-    pub fn new(player: &'a mut Player) -> Self {
-        Self { player }
+impl<'a> ActivatePickAppleTreeCommand<'a> {
+    pub fn new(player: &'a mut Player, facility_id: u64) -> Self {
+        Self {
+            player,
+            facility_id,
+        }
     }
 }
 
-impl<'a> CommandHandler for ActivateAppleTreeCommand<'a> {
+impl<'a> CommandHandler for ActivatePickAppleTreeCommand<'a> {
     fn can_perform(&self) -> bool {
         self.player.is_endorsed_with(":can_pick_apples")
     }
@@ -75,34 +79,90 @@ impl<'a> CommandHandler for ActivateAppleTreeCommand<'a> {
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
+        if !self.can_perform() {
+            return;
+        }
+
         let timer = timer::Timer::new();
 
         // unwrap senders to avoid thread sending problems
         let command_sender = command_tx.unwrap().clone();
         let update_sender = update_tx.unwrap().clone();
 
-        let player_inventory_id = self.player.inventory_id();
+        let guard = timer.schedule_repeating(chrono::Duration::seconds(60), move || {
+            Command::send(Some(&command_sender), Command::ActivityComplete);
+        });
 
-        self.player.activity_guard = Some(
-            timer.schedule_repeating(chrono::Duration::seconds(60), move || {
-                Self::complete_activity(player_inventory_id, &update_sender, &command_sender)
-            }),
+        let activity = AppleTreeActivity::new(
+            self.player.inventory_id(),
+            self.facility_id,
+            timer,
+            guard,
+            update_sender,
+            command_tx.unwrap().clone(),
         );
-        self.player.activity_timer = Some(timer);
+        self.player.activity = Some(Box::new(activity));
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
-        Self::start_activity(update_tx)
+        if let Some(activity) = &self.player.activity {
+            activity.start(update_tx);
+        }
     }
 }
 
-impl<'a> ActivateAppleTreeCommand<'a> {
-    fn start_activity(update_tx: &GameUpdateSender) {
+#[allow(dead_code)]
+pub struct AppleTreeActivity {
+    player_inventory_id: u64,
+    facility_id: u64,
+    timer: timer::Timer,
+    guard: Option<Guard>,
+    update_sender: GameUpdateSender,
+    command_sender: CommandSender,
+}
+
+impl<'a> AppleTreeActivity {
+    pub fn new(
+        player_inventory_id: u64,
+        facility_id: u64,
+        timer: timer::Timer,
+        guard: Guard,
+        update_sender: GameUpdateSender,
+        command_sender: CommandSender,
+    ) -> Self {
+        Self {
+            player_inventory_id,
+            facility_id,
+            timer,
+            guard: Some(guard),
+            update_sender,
+            command_sender,
+        }
+    }
+}
+
+impl<'a> Activity for AppleTreeActivity {
+    fn start(&self, update_tx: &GameUpdateSender) {
         GameUpdate::send(Some(update_tx), GameUpdate::ActivityStarted(60000));
     }
 
-    fn complete_activity(
+    fn complete(&mut self, facilities: &mut FacilityList) {
+        let facility = facilities
+            .get_mut(self.facility_id)
+            .expect("can't find facility");
+
+        self.on_completion(
+            self.player_inventory_id,
+            facility,
+            &self.update_sender,
+            &self.command_sender,
+        );
+    }
+
+    fn on_completion(
+        &self,
         player_inventory_id: u64,
+        facility: &mut Facility,
         update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
     ) {
@@ -115,6 +175,16 @@ impl<'a> ActivateAppleTreeCommand<'a> {
 
         Command::send(Some(&command_sender), Command::RefreshInventory);
 
-        Self::start_activity(&update_sender);
+        let count = facility.get_property("apples");
+        facility.set_property("apples", count - 1);
+        if facility.get_property("apples") <= 0 {
+            Command::send(Some(&command_sender), Command::ActivityAbort);
+        }
+
+        self.start(&update_sender);
+    }
+
+    fn clear_guard(&mut self) {
+        self.guard = None;
     }
 }

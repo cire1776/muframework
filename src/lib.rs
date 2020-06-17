@@ -54,6 +54,7 @@ pub enum Command {
     CloseExternalInventory,
     RefreshInventory,
     ActivityAbort,
+    ActivityComplete,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -120,3 +121,5 @@ impl GameUpdate {
     }
 }
 use GameUpdate::*;
+
+pub trait StaticData: 'static {}

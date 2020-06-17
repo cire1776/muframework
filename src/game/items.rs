@@ -86,7 +86,6 @@ impl ItemState {
         }
     }
 }
-pub trait StaticData: 'static {}
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
 pub struct ItemType {
@@ -203,7 +202,7 @@ impl Item {
         format!("{} {}", prefix, inflected_description).clone()
     }
 
-    pub fn endorse(&self,player: &mut Player) {
+    pub fn endorse(&self, player: &mut Player) {
         for endorsement in &self.item_type.endorsements {
             player.endorse_with(endorsement);
         }
