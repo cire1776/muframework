@@ -93,7 +93,7 @@ impl<'a> CommandHandler for ActivatePickAppleTreeCommand<'a> {
             Command::send(Some(&command_sender), Command::ActivityComplete);
         });
 
-        let activity = AppleTreeActivity::new(
+        let activity = AppleTreePickingActivity::new(
             self.player.inventory_id(),
             self.facility_id,
             timer,
@@ -112,7 +112,7 @@ impl<'a> CommandHandler for ActivatePickAppleTreeCommand<'a> {
 }
 
 #[allow(dead_code)]
-pub struct AppleTreeActivity {
+pub struct AppleTreePickingActivity {
     player_inventory_id: u64,
     facility_id: u64,
     timer: timer::Timer,
@@ -121,7 +121,7 @@ pub struct AppleTreeActivity {
     command_sender: CommandSender,
 }
 
-impl<'a> AppleTreeActivity {
+impl<'a> AppleTreePickingActivity {
     pub fn new(
         player_inventory_id: u64,
         facility_id: u64,
@@ -141,7 +141,7 @@ impl<'a> AppleTreeActivity {
     }
 }
 
-impl<'a> Activity for AppleTreeActivity {
+impl<'a> Activity for AppleTreePickingActivity {
     fn start(&self, update_tx: &GameUpdateSender) {
         GameUpdate::send(Some(update_tx), GameUpdate::ActivityStarted(60000));
     }
