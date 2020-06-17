@@ -52,6 +52,9 @@ pink_potion potion "Pink Potion"
 reed_basket tool "Reed Basket" {
     endorsement: :can_pick_apples
 }
+worn_bronze_axe tool "Worn Bronze Axe" {
+    endorsement: :can_chop
+}
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -74,4 +77,5 @@ chest1 old_leather_cap
 chest1 reed_basket
 chest1 baseball_cap
 chest1 yellow_potion
+chest1 worn_bronze_axe
 ===END OF STORED ITEMS===
