@@ -17,6 +17,7 @@ pub enum ItemClass {
     Tool,
     Potion,
     Food,
+    Material,
 }
 
 impl ItemClass {
@@ -58,6 +59,7 @@ impl ItemClass {
         match class {
             Food => MAX_STACK,
             Potion => LIMITED_STACK,
+            Material => MAX_STACK,
             _ => UNSTACKABLE,
         }
     }
