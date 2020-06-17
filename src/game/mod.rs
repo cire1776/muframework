@@ -276,7 +276,7 @@ impl GameState {
             }
             Command::CloseExternalInventory => Command::close_external_inventory(update_tx),
             Command::RefreshInventory => Self::refresh_inventory(player, inventories, update_tx),
-            Command::AbortActivity | Command::None => {}
+            Command::ActivityAbort | Command::None => {}
         }
     }
 

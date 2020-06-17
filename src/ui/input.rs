@@ -257,7 +257,7 @@ impl UIState {
 
     fn process_activity_keyboard_input(&mut self, input: &Input) -> Command {
         let command: Command = match input.key {
-            Some(VirtualKeyCode::Escape) => Command::AbortActivity,
+            Some(VirtualKeyCode::Escape) => Command::ActivityAbort,
             _ => Command::None,
         };
 

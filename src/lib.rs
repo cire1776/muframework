@@ -53,7 +53,7 @@ pub enum Command {
     TransferAllItems(u64, u64),  // (src_inventory_id, dest_inventory_id )
     CloseExternalInventory,
     RefreshInventory,
-    AbortActivity,
+    ActivityAbort,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
