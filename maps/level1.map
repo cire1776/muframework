@@ -65,7 +65,7 @@ worn_bronze_axe tool "Worn Bronze Axe" {
 ≡ 7,7 "An unlocked chest made of wood" chest1
 ▲r 9,9 "An old Apple Tree" {
     property: apples => 35
-    property: wood => 1000
+    property: logs => 1000
     property: age => 120     // in months
 }
 ===END OF FACILITIES===
