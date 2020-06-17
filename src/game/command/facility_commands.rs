@@ -89,7 +89,9 @@ impl<'a> CommandHandler for ActivatePickAppleTreeCommand<'a> {
         let command_sender = command_tx.unwrap().clone();
         let update_sender = update_tx.unwrap().clone();
 
-        let guard = timer.schedule_repeating(chrono::Duration::seconds(60), move || {
+        let base_time = 60;
+
+        let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
             Command::send(Some(&command_sender), Command::ActivityComplete);
         });
 
