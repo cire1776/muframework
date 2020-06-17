@@ -405,6 +405,12 @@ pub trait CommandHandler {
     fn announce(&self, _update_tx: &std::sync::mpsc::Sender<GameUpdate>) {}
 }
 
+pub trait Activity {
+    fn completion(&mut self);
+
+    fn clear_guard(&mut self) {}
+}
+
 pub struct NullCommand {}
 
 impl NullCommand {

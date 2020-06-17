@@ -54,6 +54,7 @@ pub enum Command {
     CloseExternalInventory,
     RefreshInventory,
     ActivityAbort,
+    ActivityComplete,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]

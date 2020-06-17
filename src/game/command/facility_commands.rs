@@ -83,16 +83,63 @@ impl<'a> CommandHandler for ActivateAppleTreeCommand<'a> {
 
         let player_inventory_id = self.player.inventory_id();
 
-        self.player.activity_guard = Some(
-            timer.schedule_repeating(chrono::Duration::seconds(60), move || {
-                Self::complete_activity(player_inventory_id, &update_sender, &command_sender)
-            }),
+        let guard = timer.schedule_repeating(chrono::Duration::seconds(60), move || {
+            Command::send(Some(&command_sender), Command::ActivityComplete);
+        });
+
+        let activity = AppleTreeActivity::new(
+            player_inventory_id,
+            timer,
+            guard,
+            update_sender,
+            command_tx.unwrap().clone(),
         );
-        self.player.activity_timer = Some(timer);
+        self.player.activity = Some(Box::new(activity));
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
         Self::start_activity(update_tx)
+    }
+}
+
+#[allow(dead_code)]
+pub struct AppleTreeActivity {
+    player_inventory_id: u64,
+    timer: timer::Timer,
+    guard: Option<Guard>,
+    update_sender: GameUpdateSender,
+    command_sender: CommandSender,
+}
+
+impl<'a> AppleTreeActivity {
+    pub fn new(
+        player_inventory_id: u64,
+        timer: timer::Timer,
+        guard: Guard,
+        update_sender: GameUpdateSender,
+        command_sender: CommandSender,
+    ) -> Self {
+        Self {
+            player_inventory_id,
+            timer,
+            guard: Some(guard),
+            update_sender,
+            command_sender,
+        }
+    }
+}
+
+impl<'a> Activity for AppleTreeActivity {
+    fn completion(&mut self) {
+        ActivateAppleTreeCommand::complete_activity(
+            self.player_inventory_id,
+            &self.update_sender,
+            &self.command_sender,
+        );
+    }
+
+    fn clear_guard(&mut self) {
+        self.guard = None;
     }
 }
 

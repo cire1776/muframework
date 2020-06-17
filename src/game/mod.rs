@@ -277,6 +277,13 @@ impl GameState {
             Command::CloseExternalInventory => Command::close_external_inventory(update_tx),
             Command::RefreshInventory => Self::refresh_inventory(player, inventories, update_tx),
             Command::ActivityAbort | Command::None => {}
+            Command::ActivityComplete => self.complete_activity(player),
+        }
+    }
+
+    fn complete_activity(&self, player: &mut Player) {
+        if let Some(ref mut activity) = &mut player.activity {
+            activity.completion();
         }
     }
 
@@ -286,26 +293,23 @@ impl GameState {
         command: &Command,
         update_tx: Option<&GameUpdateSender>,
     ) {
-        if let None = player.activity_guard {
-            return;
-        }
+        if let Some(ref mut activity) = player.activity {
+            match command {
+                // list commands that do not abort activities here
+                Command::None
+                | Command::SpawnItem(_, _, _)
+                | Command::RefreshInventory
+                | Command::TakeItem(_)
+                | Command::DropItem(_)
+                | Command::ActivityComplete => {}
 
-        match command {
-            // list commands that do not abort activities here
-            Command::None
-            | Command::SpawnItem(_, _, _)
-            | Command::RefreshInventory
-            | Command::TakeItem(_)
-            | Command::DropItem(_) => {}
+                _ => {
+                    activity.clear_guard();
 
-            _ => {
-                if let Some(_) = player.activity_guard {
-                    player.activity_guard = None;
+                    GameUpdate::send(update_tx, GameUpdate::ActivityAborted());
                 }
-
-                GameUpdate::send(update_tx, GameUpdate::ActivityAborted());
-            }
-        };
+            };
+        }
     }
 
     pub fn refresh_inventory(
