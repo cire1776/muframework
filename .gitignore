@@ -1,3 +1,5 @@
 target/
 kcov-*
 *.code-workspace
+.VSCodeCounter
+.vscode
