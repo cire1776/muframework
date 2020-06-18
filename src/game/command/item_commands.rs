@@ -135,8 +135,9 @@ impl<'a> CommandHandler for EquipCommand<'a> {
             );
         }
         let player_mounting_points = self.player.mounting_points.clone();
-        player_mounting_points
-            .endorse(self.player, &self.items)
+
+        self.player.clear_endorsements();
+        player_mounting_points.endorse(self.player, &self.items)
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -187,7 +188,10 @@ impl<'a> CommandHandler for UnequipCommand<'a> {
             .unmount_item_by_id(self.item_id, self.inventory, self.items);
 
         self.player.clear_endorsements();
-        self.player.mounting_points.clone().endorse(&mut self.player,self.items);
+        self.player
+            .mounting_points
+            .clone()
+            .endorse(&mut self.player, self.items);
     }
 
     fn announce(&self, update_tx: &GameUpdateSender) {
@@ -539,6 +543,23 @@ mod support {
 
         item
     }
+
+    pub fn test_item_from_type(
+        item_type: &ItemType,
+        id: u64,
+        inventory: &mut Inventory,
+        items: &mut ItemList,
+    ) -> Item {
+        let mut item = Item {
+            id,
+            quantity: 1,
+            item_type: item_type.clone(),
+        };
+        items[id] = ItemState::Stored(item.clone(), inventory.id());
+        inventory.accept_stack(&mut item, items);
+
+        item
+    }
 }
 
 #[cfg(test)]
@@ -612,5 +633,31 @@ mod unequip_command {
             }
             _ => panic!("Unexpected response"),
         }
+    }
+
+    #[test]
+    fn old_endorsements_are_removed() {
+        let mut inventory = Inventory::new(1);
+        let mut items = &mut ItemList::new(None);
+        let item_class_specifiers = ItemClassSpecifier::initialize();
+
+        let mut item_type = ItemType::new(ItemClass::Tool, "Reed Basket");
+        item_type.add_endorsement(":picks_nose");
+
+        let item = test_item_from_type(&item_type, 159, &mut inventory, &mut items);
+
+        let mut player = Player::new();
+
+        player
+            .mounting_points
+            .mount(&item, &item_class_specifiers, &mut inventory, items);
+
+        let mounting_points = player.mounting_points.clone();
+        mounting_points.endorse(&mut player, items);
+
+        let mut subject = UnequipCommand::new(item.id, &mut inventory, &mut player, &mut items);
+        subject.execute(None, None);
+
+        assert!(!player.is_endorsed_with(":picks_nose"));
     }
 }
