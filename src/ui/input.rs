@@ -40,7 +40,10 @@ impl UIState {
 
         self.process_mouse_input(context);
         Self::set_modifier_keys(&mut input);
-        self.process_keyboard_input(&input);
+
+        if input.key != None {
+            self.process_keyboard_input(&input);
+        }
     }
 
     fn process_mouse_input(&mut self, context: &mut BTerm) {
