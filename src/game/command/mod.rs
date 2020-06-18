@@ -91,7 +91,7 @@ impl Command {
         let item = items.find_nth_at(x, y, (item_index - 1) as i32).cloned();
 
         match item {
-            None => println!("item not found"),
+            None => println!("item not found"), // println so that play can continue.
             Some(ItemState::Bundle(item, _x, _y)) => {
                 let inventory = &mut inventories
                     .get_mut(&player.inventory_id())
@@ -420,6 +420,7 @@ pub trait Activity {
         update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
     );
+
     fn clear_guard(&mut self) {}
 }
 
