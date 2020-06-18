@@ -131,9 +131,8 @@ impl ItemType {
             let mut new_type = ItemType::new(class, description);
 
             Self::read_in_type_attributes_for(&mut new_type, attributes);
-            result.insert(type_name.to_string(), new_type);
+            result.insert(type_name, new_type);
         }
-
         result
     }
 
@@ -158,7 +157,45 @@ impl ItemType {
 
 impl StaticData for ItemType {}
 
-pub type ItemTypeList = HashMap<String, ItemType>;
+#[derive(Debug, Clone)]
+pub struct ItemTypeList {
+    item_types: HashMap<String, ItemType>,
+}
+
+impl ItemTypeList {
+    pub fn new() -> Self {
+        Self {
+            item_types: HashMap::new(),
+        }
+    }
+
+    pub fn insert<S: ToString>(&mut self, item_type_name: S, item_type: ItemType) {
+        self.item_types
+            .insert(item_type_name.to_string(), item_type);
+    }
+
+    pub fn lookup_or_insert<S: ToString>(
+        &mut self,
+        item_type_name: S,
+        class: ItemClass,
+        description: S,
+    ) -> &ItemType {
+        let key = item_type_name.to_string();
+        if !self.item_types.contains_key(&key) {
+            let new_item_type = ItemType::new(class, description);
+            self.item_types.insert(key.clone(), new_item_type);
+        }
+        &self.item_types[&key]
+    }
+}
+
+impl Index<&String> for ItemTypeList {
+    type Output = ItemType;
+
+    fn index(&self, key: &String) -> &Self::Output {
+        self.item_types.index(key)
+    }
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub struct Item {

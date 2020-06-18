@@ -361,7 +361,7 @@ mod inventory_aliases {
         let items: &mut ItemList = &mut ItemList::new(None);
         items.item_types = ItemTypeList::new();
         items.item_types.insert(
-            "green_leather_cap".into(),
+            "green_leather_cap",
             ItemType::new(ItemClass::Headwear, "Green Leather cap"),
         );
         let aliases = AliasList::new(1);
@@ -381,15 +381,15 @@ mod inventory_aliases {
         let items: &mut ItemList = &mut ItemList::new(None);
         items.item_types = ItemTypeList::new();
         items.item_types.insert(
-            "green_leather_cap".into(),
+            "green_leather_cap",
             ItemType::new(ItemClass::Headwear, "Green Leather cap"),
         );
         items.item_types.insert(
-            "purple_leather_cap".into(),
+            "purple_leather_cap",
             ItemType::new(ItemClass::Headwear, "Purple Leather cap"),
         );
         items.item_types.insert(
-            "black_leather_cap".into(),
+            "black_leather_cap",
             ItemType::new(ItemClass::Headwear, "Black Leather cap"),
         );
 
