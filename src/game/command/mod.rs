@@ -13,7 +13,9 @@ pub use item_commands::{
     UnequipCommand,
 };
 pub mod facility_commands;
-pub use facility_commands::{ActivatePickAppleTreeCommand, OpenChestCommand};
+pub use facility_commands::{
+    ActivateLogAppleTreeCommand, ActivatePickAppleTreeCommand, OpenChestCommand,
+};
 
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
@@ -328,7 +330,9 @@ fn can_use_at(x: i32, y: i32, map: &TileMap, player: &Player, facilities: &Facil
             match facility.class {
                 FacilityClass::ClosedChest => !facility.is_in_use(),
                 FacilityClass::AppleTree => {
-                    !facility.is_in_use() && player.is_endorsed_with(":can_pick_apples")
+                    !facility.is_in_use()
+                        && (player.is_endorsed_with(":can_pick_apples")
+                            || player.is_endorsed_with(":can_chop"))
                 }
                 _ => false,
             }
@@ -362,10 +366,19 @@ fn use_at<'a>(
                     facilities,
                     inventories,
                 ))),
-                FacilityClass::AppleTree => Some(Box::new(ActivatePickAppleTreeCommand::new(
-                    player,
-                    facility_id,
-                ))),
+                FacilityClass::AppleTree => {
+                    if player.is_endorsed_with(":can_pick_apples") {
+                        Some(Box::new(ActivatePickAppleTreeCommand::new(
+                            player,
+                            facility_id,
+                        )))
+                    } else {
+                        Some(Box::new(ActivateLogAppleTreeCommand::new(
+                            player,
+                            facility_id,
+                        )))
+                    }
+                }
                 _ => {
                     println!("facility not matched!");
                     None

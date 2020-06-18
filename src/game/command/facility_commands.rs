@@ -193,3 +193,145 @@ impl<'a> Activity for AppleTreePickingActivity {
         self.guard = None;
     }
 }
+
+pub struct ActivateLogAppleTreeCommand<'a> {
+    player: &'a mut Player,
+    facility_id: u64,
+}
+
+impl<'a> ActivateLogAppleTreeCommand<'a> {
+    pub fn new(player: &'a mut Player, facility_id: u64) -> Self {
+        Self {
+            player,
+            facility_id,
+        }
+    }
+}
+
+impl<'a> CommandHandler for ActivateLogAppleTreeCommand<'a> {
+    fn can_perform(&self) -> bool {
+        self.player.is_endorsed_with(":can_chop")
+    }
+    fn perform_execute(
+        &mut self,
+        update_tx: Option<&GameUpdateSender>,
+        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+    ) {
+        if !self.can_perform() {
+            return;
+        }
+
+        let timer = timer::Timer::new();
+
+        // unwrap senders to avoid thread sending problems
+        let command_sender = command_tx.unwrap().clone();
+        let update_sender = update_tx.unwrap().clone();
+
+        let base_time = 60;
+
+        let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
+            Command::send(Some(&command_sender), Command::ActivityComplete);
+        });
+
+        let activity = AppleTreeLoggingActivity::new(
+            self.player.inventory_id(),
+            self.facility_id,
+            timer,
+            guard,
+            update_sender,
+            command_tx.unwrap().clone(),
+        );
+        self.player.activity = Some(Box::new(activity));
+    }
+
+    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+        if let Some(activity) = &self.player.activity {
+            activity.start(update_tx);
+        }
+    }
+}
+
+#[allow(dead_code)]
+pub struct AppleTreeLoggingActivity {
+    player_inventory_id: u64,
+    facility_id: u64,
+    timer: timer::Timer,
+    guard: Option<Guard>,
+    update_sender: GameUpdateSender,
+    command_sender: CommandSender,
+}
+
+impl<'a> AppleTreeLoggingActivity {
+    pub fn new(
+        player_inventory_id: u64,
+        facility_id: u64,
+        timer: timer::Timer,
+        guard: Guard,
+        update_sender: GameUpdateSender,
+        command_sender: CommandSender,
+    ) -> Self {
+        Self {
+            player_inventory_id,
+            facility_id,
+            timer,
+            guard: Some(guard),
+            update_sender,
+            command_sender,
+        }
+    }
+}
+
+impl<'a> Activity for AppleTreeLoggingActivity {
+    fn start(&self, update_tx: &GameUpdateSender) {
+        GameUpdate::send(
+            Some(update_tx),
+            GameUpdate::ActivityStarted(60000, ui::pane::PaneTitle::Logging),
+        );
+    }
+
+    fn complete(&mut self, facilities: &mut FacilityList) {
+        let facility = facilities
+            .get_mut(self.facility_id)
+            .expect("can't find facility");
+
+        self.on_completion(
+            self.player_inventory_id,
+            facility,
+            &self.update_sender,
+            &self.command_sender,
+        );
+    }
+
+    fn on_completion(
+        &self,
+        player_inventory_id: u64,
+        facility: &mut Facility,
+        update_sender: &GameUpdateSender,
+        command_sender: &CommandSender,
+    ) {
+        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
+
+        Command::send(
+            Some(&command_sender),
+            Command::SpawnItem(
+                player_inventory_id,
+                ItemClass::Material,
+                "Hardwood Log".into(),
+            ),
+        );
+
+        Command::send(Some(&command_sender), Command::RefreshInventory);
+
+        let count = facility.get_property("logs");
+        facility.set_property("logs", count - 1);
+        if facility.get_property("logs") <= 0 {
+            Command::send(Some(&command_sender), Command::ActivityAbort);
+        }
+
+        self.start(&update_sender);
+    }
+
+    fn clear_guard(&mut self) {
+        self.guard = None;
+    }
+}
