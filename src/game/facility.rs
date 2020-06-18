@@ -3,7 +3,7 @@ use inventory::{AliasList, InventoryList};
 use std::collections::HashMap;
 use std::ops::{Index, IndexMut};
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum FacilityClass {
     ClosedChest,
     OpenChest,
