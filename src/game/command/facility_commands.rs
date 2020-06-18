@@ -56,54 +56,90 @@ impl<'a> CommandHandler for OpenChestCommand<'a> {
     }
 }
 
-pub struct ActivatePickAppleTreeCommand<'a> {
-    player: &'a mut Player,
-    facility_id: u64,
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum TreeUse {
+    Picking,
+    Logging,
 }
 
-impl<'a> ActivatePickAppleTreeCommand<'a> {
+pub struct ActivateTreeCommand<'a> {
+    player: &'a mut Player,
+    facility_id: u64,
+    tree_use: TreeUse,
+}
+
+impl<'a> ActivateTreeCommand<'a> {
     pub fn new(player: &'a mut Player, facility_id: u64) -> Self {
+        let tree_use = ActivateTreeCommand::how_is_player_using(player);
+
         Self {
             player,
             facility_id,
+            tree_use,
         }
+    }
+
+    pub fn can_perform(player: &Player, facility: &Facility) -> bool {
+        !facility.is_in_use()
+            && (player.is_endorsed_with(":can_pick_apples") || player.is_endorsed_with(":can_chop"))
+    }
+
+    fn how_is_player_using(player: &Player) -> TreeUse {
+        if player.is_endorsed_with(":can_pick_apples") {
+            TreeUse::Picking
+        } else {
+            if player.is_endorsed_with(":can_chop") {
+                TreeUse::Logging
+            } else {
+                panic!("player must either be picking or logging")
+            }
+        }
+    }
+
+    fn create_activity(
+        &self,
+        timer: timer::Timer,
+        guard: Guard,
+        update_sender: &GameUpdateSender,
+        command_sender: &CommandSender,
+    ) -> Box<dyn Activity> {
+        let command_sender = command_sender.clone();
+        let update_sender = update_sender.clone();
+
+        let activity = AppleTreeActivity::new(
+            self.tree_use,
+            self.player.inventory_id(),
+            self.facility_id,
+            timer,
+            guard,
+            update_sender,
+            command_sender,
+        );
+        Box::new(activity)
     }
 }
 
-impl<'a> CommandHandler for ActivatePickAppleTreeCommand<'a> {
-    fn can_perform(&self) -> bool {
-        self.player.is_endorsed_with(":can_pick_apples")
-    }
+impl<'a> CommandHandler for ActivateTreeCommand<'a> {
     fn perform_execute(
         &mut self,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
-        if !self.can_perform() {
-            return;
-        }
-
         let timer = timer::Timer::new();
 
         // unwrap senders to avoid thread sending problems
         let command_sender = command_tx.unwrap().clone();
         let update_sender = update_tx.unwrap().clone();
 
+        // currently base timer is the same for picking and logging
         let base_time = 60;
 
         let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
             Command::send(Some(&command_sender), Command::ActivityComplete);
         });
 
-        let activity = AppleTreePickingActivity::new(
-            self.player.inventory_id(),
-            self.facility_id,
-            timer,
-            guard,
-            update_sender,
-            command_tx.unwrap().clone(),
-        );
-        self.player.activity = Some(Box::new(activity));
+        let activity = self.create_activity(timer, guard, &update_sender, command_tx.unwrap());
+        self.player.activity = Some(activity);
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -114,7 +150,8 @@ impl<'a> CommandHandler for ActivatePickAppleTreeCommand<'a> {
 }
 
 #[allow(dead_code)]
-pub struct AppleTreePickingActivity {
+pub struct AppleTreeActivity {
+    tree_use: TreeUse,
     player_inventory_id: u64,
     facility_id: u64,
     timer: timer::Timer,
@@ -123,8 +160,9 @@ pub struct AppleTreePickingActivity {
     command_sender: CommandSender,
 }
 
-impl<'a> AppleTreePickingActivity {
+impl<'a> AppleTreeActivity {
     pub fn new(
+        tree_use: TreeUse,
         player_inventory_id: u64,
         facility_id: u64,
         timer: timer::Timer,
@@ -133,6 +171,7 @@ impl<'a> AppleTreePickingActivity {
         command_sender: CommandSender,
     ) -> Self {
         Self {
+            tree_use,
             player_inventory_id,
             facility_id,
             timer,
@@ -143,12 +182,14 @@ impl<'a> AppleTreePickingActivity {
     }
 }
 
-impl<'a> Activity for AppleTreePickingActivity {
+impl<'a> Activity for AppleTreeActivity {
     fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(60000, ui::pane::PaneTitle::PickingApples),
-        );
+        let title = match self.tree_use {
+            TreeUse::Logging => ui::pane::PaneTitle::Logging,
+            TreeUse::Picking => ui::pane::PaneTitle::PickingApples,
+        };
+
+        GameUpdate::send(Some(update_tx), GameUpdate::ActivityStarted(60000, title));
     }
 
     fn complete(&mut self, facilities: &mut FacilityList) {
@@ -173,16 +214,26 @@ impl<'a> Activity for AppleTreePickingActivity {
     ) {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
+        let mut item_class = ItemClass::Food;
+        let mut item_description = "Apple";
+        let mut item_property = "apples";
+
+        if self.tree_use == TreeUse::Logging {
+            item_class = ItemClass::Material;
+            item_description = "Hardwood Logs";
+            item_property = "logs"
+        }
+
         Command::send(
             Some(&command_sender),
-            Command::SpawnItem(player_inventory_id, ItemClass::Food, "Apple".into()),
+            Command::SpawnItem(player_inventory_id, item_class, item_description.into()),
         );
 
         Command::send(Some(&command_sender), Command::RefreshInventory);
 
-        let count = facility.get_property("apples");
-        facility.set_property("apples", count - 1);
-        if facility.get_property("apples") <= 0 {
+        let count = facility.get_property(item_property);
+        facility.set_property(item_property, count - 1);
+        if facility.get_property(item_property) <= 0 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
@@ -191,63 +242,6 @@ impl<'a> Activity for AppleTreePickingActivity {
 
     fn clear_guard(&mut self) {
         self.guard = None;
-    }
-}
-
-pub struct ActivateLogAppleTreeCommand<'a> {
-    player: &'a mut Player,
-    facility_id: u64,
-}
-
-impl<'a> ActivateLogAppleTreeCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64) -> Self {
-        Self {
-            player,
-            facility_id,
-        }
-    }
-}
-
-impl<'a> CommandHandler for ActivateLogAppleTreeCommand<'a> {
-    fn can_perform(&self) -> bool {
-        self.player.is_endorsed_with(":can_chop")
-    }
-    fn perform_execute(
-        &mut self,
-        update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
-        if !self.can_perform() {
-            return;
-        }
-
-        let timer = timer::Timer::new();
-
-        // unwrap senders to avoid thread sending problems
-        let command_sender = command_tx.unwrap().clone();
-        let update_sender = update_tx.unwrap().clone();
-
-        let base_time = 60;
-
-        let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
-            Command::send(Some(&command_sender), Command::ActivityComplete);
-        });
-
-        let activity = AppleTreeLoggingActivity::new(
-            self.player.inventory_id(),
-            self.facility_id,
-            timer,
-            guard,
-            update_sender,
-            command_tx.unwrap().clone(),
-        );
-        self.player.activity = Some(Box::new(activity));
-    }
-
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
-        if let Some(activity) = &self.player.activity {
-            activity.start(update_tx);
-        }
     }
 }
 

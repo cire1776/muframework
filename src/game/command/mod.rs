@@ -13,9 +13,7 @@ pub use item_commands::{
     UnequipCommand,
 };
 pub mod facility_commands;
-pub use facility_commands::{
-    ActivateLogAppleTreeCommand, ActivatePickAppleTreeCommand, OpenChestCommand,
-};
+pub use facility_commands::{ActivateTreeCommand, OpenChestCommand};
 
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
@@ -329,11 +327,7 @@ fn can_use_at(x: i32, y: i32, map: &TileMap, player: &Player, facilities: &Facil
             let facility = facilities.get(facility_id).expect("facility not found");
             match facility.class {
                 FacilityClass::ClosedChest => !facility.is_in_use(),
-                FacilityClass::AppleTree => {
-                    !facility.is_in_use()
-                        && (player.is_endorsed_with(":can_pick_apples")
-                            || player.is_endorsed_with(":can_chop"))
-                }
+                FacilityClass::AppleTree => ActivateTreeCommand::can_perform(player, facility),
                 _ => false,
             }
         }
@@ -367,17 +361,7 @@ fn use_at<'a>(
                     inventories,
                 ))),
                 FacilityClass::AppleTree => {
-                    if player.is_endorsed_with(":can_pick_apples") {
-                        Some(Box::new(ActivatePickAppleTreeCommand::new(
-                            player,
-                            facility_id,
-                        )))
-                    } else {
-                        Some(Box::new(ActivateLogAppleTreeCommand::new(
-                            player,
-                            facility_id,
-                        )))
-                    }
+                    Some(Box::new(ActivateTreeCommand::new(player, facility_id)))
                 }
                 _ => {
                     println!("facility not matched!");
@@ -390,10 +374,6 @@ fn use_at<'a>(
 }
 
 pub trait CommandHandler {
-    fn can_perform(&self) -> bool {
-        true
-    }
-
     /// execute and announce the results of the command.
     /// # Arguments
     /// * update_tx - an optional channel to announce upon.  Can be None for testing purposes.
