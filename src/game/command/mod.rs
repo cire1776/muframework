@@ -13,7 +13,9 @@ pub use item_commands::{
     UnequipCommand,
 };
 pub mod facility_commands;
-pub use facility_commands::{ActivateTreeCommand, OpenChestCommand};
+pub use facility_commands::{
+    ActivateTreeLoggingCommand, ActivateTreePickingCommand, OpenChestCommand, TreeType,
+};
 
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
@@ -327,7 +329,10 @@ fn can_use_at(x: i32, y: i32, map: &TileMap, player: &Player, facilities: &Facil
             let facility = facilities.get(facility_id).expect("facility not found");
             match facility.class {
                 FacilityClass::ClosedChest => !facility.is_in_use(),
-                FacilityClass::AppleTree => ActivateTreeCommand::can_perform(player, facility),
+                FacilityClass::AppleTree => {
+                    ActivateTreePickingCommand::can_perform(player, facility)
+                        || ActivateTreeLoggingCommand::can_perform(player, facility)
+                }
                 _ => false,
             }
         }
@@ -361,12 +366,25 @@ fn use_at<'a>(
                     inventories,
                 ))),
                 FacilityClass::AppleTree => {
-                    Some(Box::new(ActivateTreeCommand::new(player, facility_id)))
+                    // this code cannot be extracted to a separate method
+                    //   because of some weird lifetime issue.
+                    if ActivateTreePickingCommand::can_perform(player, facility) {
+                        Some(Box::new(ActivateTreePickingCommand::new(
+                            TreeType::Apple,
+                            player,
+                            facility_id,
+                        )))
+                    } else if ActivateTreeLoggingCommand::can_perform(player, facility) {
+                        Some(Box::new(ActivateTreeLoggingCommand::new(
+                            TreeType::Apple,
+                            player,
+                            facility_id,
+                        )))
+                    } else {
+                        panic!("Tree that can't be logged or picked supplied")
+                    }
                 }
-                _ => {
-                    println!("facility not matched!");
-                    None
-                }
+                _ => None,
             }
         }
         _ => None,
