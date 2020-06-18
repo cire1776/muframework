@@ -205,13 +205,16 @@ impl UIState {
                     self.external_inventory = Some(external_inventory);
                 }
             }
-            Ok(ActivityStarted(duration)) => {
+            Ok(ActivityStarted(duration, description)) => {
                 self.activity_time = Some(time_in_millis() + duration as u64);
+
+                let width = std::cmp::max(11, description.to_string().len() + 1) as i32;
+
                 self.map_window.active_pane = Some(Pane::new(
-                    None,
+                    description,
                     self.player.x + 2,
                     self.player.y + 2,
-                    11,
+                    width,
                     3,
                     0,
                 ));

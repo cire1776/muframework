@@ -409,6 +409,10 @@ pub trait CommandHandler {
 }
 
 pub trait Activity {
+    fn description(&self) -> String {
+        "Activity".into()
+    }
+
     fn start(&self, update_tx: &GameUpdateSender);
 
     fn complete(&mut self, facilities: &mut FacilityList);

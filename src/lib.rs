@@ -103,7 +103,7 @@ pub enum GameUpdate {
     ExternalInventoryOpened(Vec<Item>, u64),
     ExternalInventoryUpdated(Vec<Item>),
     ExternalInventoryClosed,
-    ActivityStarted(u32),
+    ActivityStarted(u32, ui::pane::PaneTitle),
     ActivityExpired(),
     ActivityAborted(),
     Exit,

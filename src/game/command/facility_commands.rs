@@ -145,7 +145,10 @@ impl<'a> AppleTreePickingActivity {
 
 impl<'a> Activity for AppleTreePickingActivity {
     fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(Some(update_tx), GameUpdate::ActivityStarted(60000));
+        GameUpdate::send(
+            Some(update_tx),
+            GameUpdate::ActivityStarted(60000, ui::pane::PaneTitle::PickingApples),
+        );
     }
 
     fn complete(&mut self, facilities: &mut FacilityList) {
