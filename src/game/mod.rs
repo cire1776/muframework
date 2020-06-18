@@ -305,7 +305,7 @@ impl GameState {
 
                 _ => {
                     activity.clear_guard();
-
+                    player.activity = None;
                     GameUpdate::send(update_tx, GameUpdate::ActivityAborted());
                 }
             };
