@@ -216,7 +216,7 @@ impl<'a> Activity for AppleTreeActivity {
 
         let mut item_class = ItemClass::Food;
         let mut item_description = "Apple";
-        let mut item_property = "apples";
+        let mut item_property = "fruit";
 
         if self.tree_use == TreeUse::Logging {
             item_class = ItemClass::Material;
