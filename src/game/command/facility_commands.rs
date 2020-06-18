@@ -104,7 +104,7 @@ impl<'a> ActivateTreePickingCommand<'a> {
         let command_sender = command_sender.clone();
         let update_sender = update_sender.clone();
 
-        let activity = AppleTreePickingActivity::new(
+        let activity = TreePickingActivity::new(
             self.tree_type,
             self.player.inventory_id(),
             self.facility_id,
@@ -130,7 +130,10 @@ impl<'a> CommandHandler for ActivateTreePickingCommand<'a> {
         let update_sender = update_tx.unwrap().clone();
 
         // currently base timer is the same for all fruit trees
-        let base_time = 60;
+        let base_time = match self.tree_type {
+            TreeType::Apple => 60,
+            _ => panic!("Non-fruit tree supplied"),
+        };
 
         let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
             Command::send(Some(&command_sender), Command::ActivityComplete);
@@ -148,7 +151,7 @@ impl<'a> CommandHandler for ActivateTreePickingCommand<'a> {
 }
 
 #[allow(dead_code)]
-pub struct AppleTreePickingActivity {
+pub struct TreePickingActivity {
     tree_type: TreeType,
     player_inventory_id: u64,
     facility_id: u64,
@@ -158,7 +161,7 @@ pub struct AppleTreePickingActivity {
     command_sender: CommandSender,
 }
 
-impl<'a> AppleTreePickingActivity {
+impl<'a> TreePickingActivity {
     pub fn new(
         tree_type: TreeType,
         player_inventory_id: u64,
@@ -180,7 +183,7 @@ impl<'a> AppleTreePickingActivity {
     }
 }
 
-impl<'a> Activity for AppleTreePickingActivity {
+impl<'a> Activity for TreePickingActivity {
     fn start(&self, update_tx: &GameUpdateSender) {
         let title = match self.tree_type {
             TreeType::Apple => ui::pane::PaneTitle::PickingApples,
@@ -212,8 +215,16 @@ impl<'a> Activity for AppleTreePickingActivity {
     ) {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
-        let item_class = ItemClass::Food;
-        let item_description = "Apple";
+        let item_class: ItemClass;
+        let item_description: &str;
+
+        match self.tree_type {
+            TreeType::Apple => {
+                item_class = ItemClass::Food;
+                item_description = "Apple"
+            }
+            _ => panic!("{:?} is not a fruit tree.", self.tree_type),
+        }
 
         Command::send(
             Some(&command_sender),
@@ -252,8 +263,7 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
     }
 
     pub fn can_perform(player: &Player, facility: &Facility) -> bool {
-        !facility.is_in_use()
-            && (player.is_endorsed_with(":can_pick") || player.is_endorsed_with(":can_chop"))
+        !facility.is_in_use() && player.is_endorsed_with(":can_chop")
     }
 
     fn create_activity(
@@ -291,7 +301,7 @@ impl<'a> CommandHandler for ActivateTreeLoggingCommand<'a> {
         let command_sender = command_tx.unwrap().clone();
         let update_sender = update_tx.unwrap().clone();
 
-        // currently base timer is the same for picking and logging
+        // currently base timer is the same for all logging
         let base_time = 60;
 
         let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
@@ -372,13 +382,14 @@ impl<'a> Activity for TreeLoggingActivity {
     ) {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
+        let wood_type = match self.tree_type {
+            TreeType::Apple => "Hardwood Log",
+            _ => panic!("unknown tree type"),
+        };
+
         Command::send(
             Some(&command_sender),
-            Command::SpawnItem(
-                player_inventory_id,
-                ItemClass::Material,
-                "Hardwood Log".into(),
-            ),
+            Command::SpawnItem(player_inventory_id, ItemClass::Material, wood_type.into()),
         );
 
         Command::send(Some(&command_sender), Command::RefreshInventory);
