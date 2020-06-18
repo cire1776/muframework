@@ -8,7 +8,7 @@ Chest
 
 
 Apple Tree
-    :can_pick_apples Pick apple: 60 sec timer starts
+    :can_pick Pick apple: 60 sec timer starts
     :can_chop        Allows for the gathering of wood with 60 second timer.
 
 Pine Tree

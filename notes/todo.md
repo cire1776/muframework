@@ -50,7 +50,7 @@ Apple Tree:
      Apples left
 
 * Pick apple
-  * :can_pick_apples  ?? should this be :can_pick??
+  * :can_pick  ?? should this be :can_pick??
   * equipment requirements: basket
   
 * Chop tree

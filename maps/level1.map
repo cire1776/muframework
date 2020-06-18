@@ -50,7 +50,7 @@ sharp_short_sword bladeweapon "Sharp Short Sword"
 yellow_potion potion "Yellow Potion"
 pink_potion potion "Pink Potion"
 reed_basket tool "Reed Basket" {
-    endorsement: :can_pick_apples
+    endorsement: :can_pick
 }
 worn_bronze_axe tool "Worn Bronze Axe" {
     endorsement: :can_chop

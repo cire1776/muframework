@@ -81,11 +81,11 @@ impl<'a> ActivateTreeCommand<'a> {
 
     pub fn can_perform(player: &Player, facility: &Facility) -> bool {
         !facility.is_in_use()
-            && (player.is_endorsed_with(":can_pick_apples") || player.is_endorsed_with(":can_chop"))
+            && (player.is_endorsed_with(":can_pick") || player.is_endorsed_with(":can_chop"))
     }
 
     fn how_is_player_using(player: &Player) -> TreeUse {
-        if player.is_endorsed_with(":can_pick_apples") {
+        if player.is_endorsed_with(":can_pick") {
             TreeUse::Picking
         } else {
             if player.is_endorsed_with(":can_chop") {

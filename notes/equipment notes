@@ -68,7 +68,7 @@ basket "light-weight reed basket" {
      required_skill: Harvesting
      required_level: 0
      degrade_path: basket_with_holes
-     endorsements: [:can_pick_apples]
+     endorsements: [:can_pick]
 }
 
 Item Naming
