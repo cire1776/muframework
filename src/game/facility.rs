@@ -21,6 +21,7 @@ impl FacilityClass {
             "▲r" => FacilityClass::AppleTree,
             "▲olive" => FacilityClass::OliveTree,
             "▲pine" => FacilityClass::PineTree,
+            "▲oak" => FacilityClass::OakTree,
             _ => panic!("unknown FacilityClass symbol"),
         }
     }

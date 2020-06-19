@@ -411,8 +411,9 @@ impl<'a> Activity for TreeLoggingActivity {
     ) {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
+        #[allow(unreachable_patterns)]
         let wood_type = match self.tree_type {
-            TreeType::Apple | TreeType::Olive => "Hardwood Log",
+            TreeType::Apple | TreeType::Olive | TreeType::Oak => "Hardwood Log",
             TreeType::Pine => "Softwood Log",
             _ => panic!("unknown tree type"),
         };

@@ -389,11 +389,9 @@ fn use_at<'a>(
                         panic!("Player cannot pick or log!")
                     }
                 }
-                FacilityClass::PineTree => Some(Box::new(ActivateTreeLoggingCommand::new(
-                    TreeType::Pine,
-                    player,
-                    facility_id,
-                ))),
+                FacilityClass::PineTree | FacilityClass::OakTree => Some(Box::new(
+                    ActivateTreeLoggingCommand::new(TreeType::Pine, player, facility_id),
+                )),
                 _ => None,
             }
         }

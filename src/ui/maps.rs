@@ -180,6 +180,16 @@ impl SparseMap {
                 y: 0,
                 facing: Direction::Up,
             },
+            FacilityClass::OakTree => ui::Sprite {
+                style: SpriteStyle {
+                    glyph: 0x1E as u8, // '▲'
+                    fg: RGB::named(rltk::TAN),
+                    bg: RGB::named(rltk::BLACK),
+                },
+                x: 0,
+                y: 0,
+                facing: Direction::Up,
+            },
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,
