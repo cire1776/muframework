@@ -60,8 +60,7 @@ impl<'a> Facility {
         let id = id.try_into().ok().expect("Must be able to convert to u64");
         let mut inventory_id: Option<u64> = None;
 
-        let has_inventory = [FacilityClass::ClosedChest, FacilityClass::OpenChest].contains(&class);
-        if has_inventory {
+        if Facility::has_inventory(class) {
             inventory_id = Some(Inventory::new_into_inventory_list(id, inventories).id());
         }
 
@@ -75,6 +74,16 @@ impl<'a> Facility {
             properties: None,
         }
     }
+
+    pub fn has_inventory(class: FacilityClass) -> bool {
+        [
+            FacilityClass::ClosedChest,
+            FacilityClass::OpenChest,
+            FacilityClass::FruitPress,
+        ]
+        .contains(&class)
+    }
+
     pub fn new_with_inventory<T, U>(
         id: T,
         x: U,
