@@ -9,6 +9,7 @@ pub enum FacilityClass {
     OpenChest,
     LockedChest,
     AppleTree,
+    OliveTree,
     PineTree,
     OakTree,
 }
@@ -18,6 +19,7 @@ impl FacilityClass {
         match symbol {
             "≡" => FacilityClass::ClosedChest,
             "▲r" => FacilityClass::AppleTree,
+            "▲olive" => FacilityClass::OliveTree,
             _ => panic!("unknown FacilityClass symbol"),
         }
     }

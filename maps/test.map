@@ -68,6 +68,11 @@ worn_bronze_axe tool "Worn Bronze Axe" {
     property: logs => 1000
     property: age => 120     // in months
 }
+▲olive 9,10 "An Olive Tree" {
+    property: fruit => 2
+    property: logs => 2
+    property: age => 36     // in months
+}
 ===END OF FACILITIES===
 player amber_leather_cap
 chest1 shiny_dagger // a dagger

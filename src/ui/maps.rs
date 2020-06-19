@@ -160,6 +160,16 @@ impl SparseMap {
                 y: 0,
                 facing: Direction::Up,
             },
+            FacilityClass::OliveTree => ui::Sprite {
+                style: SpriteStyle {
+                    glyph: 0x1E as u8, // '▲'
+                    fg: RGB::named(rltk::OLIVE),
+                    bg: RGB::named(rltk::BLACK),
+                },
+                x: 0,
+                y: 0,
+                facing: Direction::Up,
+            },
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,

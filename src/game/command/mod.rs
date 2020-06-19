@@ -329,7 +329,7 @@ fn can_use_at(x: i32, y: i32, map: &TileMap, player: &Player, facilities: &Facil
             let facility = facilities.get(facility_id).expect("facility not found");
             match facility.class {
                 FacilityClass::ClosedChest => !facility.is_in_use(),
-                FacilityClass::AppleTree => {
+                FacilityClass::AppleTree | FacilityClass::OliveTree => {
                     ActivateTreePickingCommand::can_perform(player, facility)
                         || ActivateTreeLoggingCommand::can_perform(player, facility)
                 }
@@ -365,23 +365,25 @@ fn use_at<'a>(
                     facilities,
                     inventories,
                 ))),
-                FacilityClass::AppleTree => {
+                FacilityClass::AppleTree | FacilityClass::OliveTree => {
+                    let tree_type = TreeType::from_facility_class(facility.class);
+
                     // this code cannot be extracted to a separate method
                     //   because of some weird lifetime issue.
                     if ActivateTreePickingCommand::can_perform(player, facility) {
                         Some(Box::new(ActivateTreePickingCommand::new(
-                            TreeType::Apple,
+                            tree_type,
                             player,
                             facility_id,
                         )))
                     } else if ActivateTreeLoggingCommand::can_perform(player, facility) {
                         Some(Box::new(ActivateTreeLoggingCommand::new(
-                            TreeType::Apple,
+                            tree_type,
                             player,
                             facility_id,
                         )))
                     } else {
-                        panic!("Tree that can't be logged or picked supplied")
+                        panic!("Player cannot pick or log!")
                     }
                 }
                 _ => None,

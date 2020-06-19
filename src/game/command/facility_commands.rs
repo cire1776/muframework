@@ -70,6 +70,17 @@ pub enum TreeType {
     Pine,
 }
 
+impl TreeType {
+    #[inline]
+    pub fn from_facility_class(class: FacilityClass) -> TreeType {
+        match class {
+            FacilityClass::AppleTree => TreeType::Apple,
+            FacilityClass::OliveTree => TreeType::Olive,
+            _ => panic!("{:?} is not a recognized tree", class),
+        }
+    }
+}
+
 pub struct ActivateTreePickingCommand<'a> {
     tree_type: TreeType,
     player: &'a mut Player,
@@ -89,7 +100,7 @@ impl<'a> ActivateTreePickingCommand<'a> {
         !facility.is_in_use()
             && player.is_endorsed_with(":can_pick")
             && match facility.class {
-                FacilityClass::AppleTree => true,
+                FacilityClass::AppleTree | FacilityClass::OliveTree => true,
                 _ => false,
             }
     }
@@ -122,6 +133,7 @@ impl<'a> CommandHandler for ActivateTreePickingCommand<'a> {
     fn expiration(&self) -> u32 {
         match self.tree_type {
             TreeType::Apple => 60,
+            TreeType::Olive => 90,
             _ => panic!("Non-fruit tree supplied"),
         }
     }
@@ -196,6 +208,7 @@ impl<'a> Activity for TreePickingActivity {
     fn start(&self, update_tx: &GameUpdateSender) {
         let title = match self.tree_type {
             TreeType::Apple => ui::pane::PaneTitle::PickingApples,
+            TreeType::Olive => ui::pane::PaneTitle::PickingOlives,
             _ => panic!("Non-fruit tree specified"),
         };
 
@@ -234,6 +247,10 @@ impl<'a> Activity for TreePickingActivity {
             TreeType::Apple => {
                 item_class = ItemClass::Food;
                 item_description = "Apple"
+            }
+            TreeType::Olive => {
+                item_class = ItemClass::Food;
+                item_description = "Olive"
             }
             _ => panic!("{:?} is not a fruit tree.", self.tree_type),
         }
@@ -395,7 +412,7 @@ impl<'a> Activity for TreeLoggingActivity {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
         let wood_type = match self.tree_type {
-            TreeType::Apple => "Hardwood Log",
+            TreeType::Apple | TreeType::Olive => "Hardwood Log",
             _ => panic!("unknown tree type"),
         };
 

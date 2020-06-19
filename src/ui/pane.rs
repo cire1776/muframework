@@ -5,6 +5,7 @@ use window::ScreenObject;
 pub enum PaneTitle {
     None,
     PickingApples,
+    PickingOlives,
     Logging,
     ChestContents,
 }
@@ -14,6 +15,7 @@ impl ToString for PaneTitle {
         let str = match self {
             PaneTitle::None => "",
             PaneTitle::PickingApples => "Picking Apples",
+            PaneTitle::PickingOlives => "Picking Olives",
             PaneTitle::Logging => "Logging",
             PaneTitle::ChestContents => "Chest Contents",
         };
