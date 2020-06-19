@@ -106,6 +106,7 @@ impl<'a> ActivateTreePickingCommand<'a> {
 
         let activity = TreePickingActivity::new(
             self.tree_type,
+            self.expiration(),
             self.player.inventory_id(),
             self.facility_id,
             timer,
@@ -118,6 +119,13 @@ impl<'a> ActivateTreePickingCommand<'a> {
 }
 
 impl<'a> CommandHandler for ActivateTreePickingCommand<'a> {
+    fn expiration(&self) -> u32 {
+        match self.tree_type {
+            TreeType::Apple => 60,
+            _ => panic!("Non-fruit tree supplied"),
+        }
+    }
+
     fn perform_execute(
         &mut self,
         update_tx: Option<&GameUpdateSender>,
@@ -130,14 +138,12 @@ impl<'a> CommandHandler for ActivateTreePickingCommand<'a> {
         let update_sender = update_tx.unwrap().clone();
 
         // currently base timer is the same for all fruit trees
-        let base_time = match self.tree_type {
-            TreeType::Apple => 60,
-            _ => panic!("Non-fruit tree supplied"),
-        };
+        let base_time = self.expiration();
 
-        let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
-            Command::send(Some(&command_sender), Command::ActivityComplete);
-        });
+        let guard =
+            timer.schedule_repeating(chrono::Duration::seconds(base_time as i64), move || {
+                Command::send(Some(&command_sender), Command::ActivityComplete);
+            });
 
         let activity = self.create_activity(timer, guard, &update_sender, command_tx.unwrap());
         self.player.activity = Some(activity);
@@ -153,6 +159,7 @@ impl<'a> CommandHandler for ActivateTreePickingCommand<'a> {
 #[allow(dead_code)]
 pub struct TreePickingActivity {
     tree_type: TreeType,
+    expiration: u32,
     player_inventory_id: u64,
     facility_id: u64,
     timer: timer::Timer,
@@ -164,6 +171,7 @@ pub struct TreePickingActivity {
 impl<'a> TreePickingActivity {
     pub fn new(
         tree_type: TreeType,
+        expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
         timer: timer::Timer,
@@ -173,6 +181,7 @@ impl<'a> TreePickingActivity {
     ) -> Self {
         Self {
             tree_type,
+            expiration,
             player_inventory_id,
             facility_id,
             timer,
@@ -190,7 +199,10 @@ impl<'a> Activity for TreePickingActivity {
             _ => panic!("Non-fruit tree specified"),
         };
 
-        GameUpdate::send(Some(update_tx), GameUpdate::ActivityStarted(60000, title));
+        GameUpdate::send(
+            Some(update_tx),
+            GameUpdate::ActivityStarted(self.expiration * 1000, title),
+        );
     }
 
     fn complete(&mut self, facilities: &mut FacilityList) {

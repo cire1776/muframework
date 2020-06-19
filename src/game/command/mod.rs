@@ -392,6 +392,10 @@ fn use_at<'a>(
 }
 
 pub trait CommandHandler {
+    fn expiration(&self) -> u32 {
+        60
+    }
+
     /// execute and announce the results of the command.
     /// # Arguments
     /// * update_tx - an optional channel to announce upon.  Can be None for testing purposes.
