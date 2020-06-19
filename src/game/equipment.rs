@@ -17,9 +17,10 @@ pub enum MountingPoint {
     Hands,
     OnHand,
     OffHand,
+    AtReady,
 }
 
-static ALL_MOUNTING_POINTS: [MountingPoint; 14] = [
+static ALL_MOUNTING_POINTS: [MountingPoint; 15] = [
     MountingPoint::Head,
     MountingPoint::Face,
     MountingPoint::Neck,
@@ -34,6 +35,7 @@ static ALL_MOUNTING_POINTS: [MountingPoint; 14] = [
     MountingPoint::Hands,
     MountingPoint::OnHand,
     MountingPoint::OffHand,
+    MountingPoint::AtReady,
 ];
 
 #[derive(Debug, Clone)]
@@ -58,6 +60,31 @@ impl MountingPointMap {
             None => true,
             _ => false,
         }
+    }
+
+    /// returns the item id of the item mounted at the given mounting point or none
+    /// Examples:
+    /// ```
+    /// # use muframework::game::equipment::*;
+    /// let subject = MountingPointMap::new();
+    /// assert!(subject.at(&MountingPoint::Head) == None);
+    /// ```
+    /// ```
+    /// # use muframework::game::equipment::*;
+    /// # use muframework::game::items::*;
+    /// let mut subject = MountingPointMap::new();
+    /// let item_class_specifiers = ItemClassSpecifier::initialize();
+    /// let inventory = &mut Inventory::new(1002);
+    /// let items = &mut ItemList::new(None);
+    /// let hat = Item::new(958, ItemType::new(ItemClass::Headwear, "a trusty cap"),1);
+    /// items.store(&hat,1002);
+    ///
+    /// subject.mount(&hat, &item_class_specifiers, inventory, items);
+    ///
+    /// assert_eq!(subject.at(&MountingPoint::Head), Some(hat.id));
+    /// ```
+    pub fn at(&self, mounting_point: &MountingPoint) -> Option<u64> {
+        self.mounts[mounting_point]
     }
 
     pub fn to_vec(&self) -> Vec<u64> {
@@ -256,6 +283,12 @@ impl ItemClassSpecifier {
             ItemClass::Potion,
             ItemClassSpecifier {
                 mounting_points: [].iter().cloned().collect(),
+            },
+        );
+        item_class_specifiers.insert(
+            ItemClass::Food,
+            ItemClassSpecifier {
+                mounting_points: [MountingPoint::AtReady].iter().cloned().collect(),
             },
         );
         item_class_specifiers
@@ -546,5 +579,48 @@ mod mounting_point_map_unmount {
         assert!(subject.is_empty(item_mounting_points[0]));
         assert!(!items.is_empty());
         assert!(!inventory.is_empty());
+    }
+}
+
+#[cfg(test)]
+mod at_ready {
+    use super::*;
+
+    fn test_item(
+        description: &str,
+        class: ItemClass,
+        id: u64,
+        items: &mut ItemList,
+        inventory: &mut Inventory,
+    ) -> Item {
+        let mut item = Item {
+            id,
+            quantity: 1,
+            item_type: ItemType::new(class, description),
+        };
+        items[id] = ItemState::Stored(item.clone(), inventory.id());
+        inventory.accept_stack(&mut item, items);
+
+        item
+    }
+
+    #[test]
+    fn all_mounting_points_has_at_ready() {
+        assert!(ALL_MOUNTING_POINTS.contains(&MountingPoint::AtReady));
+    }
+
+    #[test]
+    fn food_mounts_at_at_ready() {
+        let mut subject = MountingPointMap::new();
+        let item_class_specifiers = ItemClassSpecifier::initialize();
+        let inventory = &mut Inventory::new(1114);
+        let mut item_types = ItemTypeList::new();
+        item_types.insert("Olive", ItemType::new(ItemClass::Food, "Olive"));
+        let items = &mut ItemList::new(Some(item_types.clone()));
+        let food_item = Item::spawn_from_type("Olive", 1, &item_types);
+        items.store(&food_item, 1114);
+        subject.mount(&food_item, &item_class_specifiers, inventory, items);
+
+        assert_eq!(subject.at(&MountingPoint::AtReady), Some(food_item.id));
     }
 }
