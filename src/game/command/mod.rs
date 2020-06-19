@@ -333,6 +333,9 @@ fn can_use_at(x: i32, y: i32, map: &TileMap, player: &Player, facilities: &Facil
                     ActivateTreePickingCommand::can_perform(player, facility)
                         || ActivateTreeLoggingCommand::can_perform(player, facility)
                 }
+                FacilityClass::PineTree => {
+                    ActivateTreeLoggingCommand::can_perform(player, facility)
+                }
                 _ => false,
             }
         }
@@ -386,6 +389,11 @@ fn use_at<'a>(
                         panic!("Player cannot pick or log!")
                     }
                 }
+                FacilityClass::PineTree => Some(Box::new(ActivateTreeLoggingCommand::new(
+                    TreeType::Pine,
+                    player,
+                    facility_id,
+                ))),
                 _ => None,
             }
         }

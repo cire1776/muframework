@@ -413,6 +413,7 @@ impl<'a> Activity for TreeLoggingActivity {
 
         let wood_type = match self.tree_type {
             TreeType::Apple | TreeType::Olive => "Hardwood Log",
+            TreeType::Pine => "Softwood Log",
             _ => panic!("unknown tree type"),
         };
 

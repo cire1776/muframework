@@ -20,6 +20,7 @@ impl FacilityClass {
             "≡" => FacilityClass::ClosedChest,
             "▲r" => FacilityClass::AppleTree,
             "▲olive" => FacilityClass::OliveTree,
+            "▲pine" => FacilityClass::PineTree,
             _ => panic!("unknown FacilityClass symbol"),
         }
     }
