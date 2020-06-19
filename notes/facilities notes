@@ -1,36 +1,103 @@
-previous command aborts when player moves or changes facing
+Player houses: used to store items
+Guild Compounds: 
+Auction houses
+General store
+Post Office
+Shop
+
+Crafting Station: used to craft items.
+*Mine: Tin
+Quarry
+*Woods (for hunting and woodcutting)
+*Stove
+*Firepit
+Oven
+*Lumbermill
+Storage Lockers
+*Smeltery
+*Smith
+*Fishing Spot/Dock
+*Tailor's Bench
+*Greenhouse
+Farm
+Garden
+Museum/Gallery
+Library
+Laboratory
+Dojo
+Classroom
+Ranch?
+Archery Field
+Studio
+Fletchery
+Lathe
+*Brewery
+*Winery
+Tannery
+Dance floor
+Mews: (Falconry)
+Ship/boat (movable facility)
+Coop
+Pens
+Stable
+Barn
+*Fruit Press
+Vat
+*Well
+Loom
+Spinning Wheel
+Gloryhole
+
+Principal Facilities
+====================
+AppleTree
+OliveTree
+PineTree
+OakTree
+ClosedChest
+OpenChest
+LockedChest
+Fruit Press
+Lumbermill
+Mine
+Stove or Firepit
+Smeltery
+Smithy
+Crafting Station
+Greenhouse
+Fishing Spot
 
 
+Fruit Press
+===========
+States
+------
+Empty
+Loaded
+Producing
 
+item_loaded: 0 is empty, 1 is apple, 2 is olive, 3 is grapes etc.
+loaded: 0-10
+output: 0-10
 
-Chest
-    Open
+Given an empty press,
+when player sneak uses the press
+Then an empty inventory window opens
+And the player can transfer fruits into press.
 
+Given a press that has output
+When player sneak uses the press
+Then a message "Press is in use" appears
 
-Apple Tree
-    :can_pick Pick apple: 60 sec timer starts
-    :can_chop        Allows for the gathering of wood with 60 second timer.
+Given a loaded press,
+When player uses the press
+Then a 60 second timer starts
+And after 60 seconds
+Then the press will have produced 1 output
 
-Pine Tree
-    :can_chop        Allows for the gathering of wood with 60 second timer.
-
-
-
-
-InventoryOpen(Vec<Item>)
-InventoryClosed()
-
-TimerStart(60)
-TimerComplete()
-AbortTimer()
-
-MovementBegins(0.1)
-TimerComplete()
-AbortTimer()
-
-player may have a activiity.
-Movement is an activity.
-
-That activity may have a timer like picking an apple or it may be ongoing, like opening a chest.
-
-You can only have one chest open at a time.
+Given the player has a glass bottle at ready,
+And the press has output of apples
+When the player uses the press
+The a 30 second timer starts
+And after 30 seconds
+Then a bottle of Apple Juice should be placed in the player's inventory.

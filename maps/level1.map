@@ -81,6 +81,11 @@ worn_bronze_axe tool "Worn Bronze Axe" {
     property: logs => 50
     property: age => 36     // in months
 }
+#press 11,11 "A Rickety Fruit Press" {
+    item: 0
+    loaded: 0
+    output: 0
+}
 ===END OF FACILITIES===
 player amber_leather_cap
 chest1 shiny_dagger // a dagger
