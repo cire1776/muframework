@@ -586,24 +586,6 @@ mod mounting_point_map_unmount {
 mod at_ready {
     use super::*;
 
-    fn test_item(
-        description: &str,
-        class: ItemClass,
-        id: u64,
-        items: &mut ItemList,
-        inventory: &mut Inventory,
-    ) -> Item {
-        let mut item = Item {
-            id,
-            quantity: 1,
-            item_type: ItemType::new(class, description),
-        };
-        items[id] = ItemState::Stored(item.clone(), inventory.id());
-        inventory.accept_stack(&mut item, items);
-
-        item
-    }
-
     #[test]
     fn all_mounting_points_has_at_ready() {
         assert!(ALL_MOUNTING_POINTS.contains(&MountingPoint::AtReady));
