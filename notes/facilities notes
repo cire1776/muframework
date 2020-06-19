@@ -1,32 +1,69 @@
-previous command aborts when player moves or changes facing
+Player houses: used to store items
+Guild Compounds: 
+Auction houses
+General store
+Post Office
+Shop
+
+Crafting Station: used to craft items.
+*Mine: Tin
+Quarry
+*Woods (for hunting and woodcutting)
+*Stove
+*Firepit
+Oven
+*Lumbermill
+Storage Lockers
+*Smeltery
+*Smith
+*Fishing Spot/Dock
+*Tailor's Bench
+*Greenhouse
+Farm
+Garden
+Museum/Gallery
+Library
+Laboratory
+Dojo
+Classroom
+Ranch?
+Archery Field
+Studio
+Fletchery
+Lathe
+*Brewery
+*Winery
+Tannery
+Dance floor
+Mews: (Falconry)
+Ship/boat (movable facility)
+Coop
+Pens
+Stable
+Barn
+*Fruit Press
+Vat
+*Well
+Loom
+Spinning Wheel
+Gloryhole
+
+Principal Facilities
+====================
+AppleTree
+OliveTree
+PineTree
+OakTree
+ClosedChest
+OpenChest
+LockedChest
+Fruit Press
 
 
-
-
-Chest
-    Open
-
-
-Apple Tree
-    Pick apple: 60 sec timer starts
-
-
-
-
-InventoryOpen(Vec<Item>)
-InventoryClosed()
-
-TimerStart(60)
-TimerComplete()
-AbortTimer()
-
-MovementBegins(0.1)
-TimerComplete()
-AbortTimer()
-
-player may have a activiity.
-Movement is an activity.
-
-That activity may have a timer like picking an apple or it may be ongoing, like opening a chest.
-
-You can only have one chest open at a time.
+Fruit Press
+===========
+States
+------
+Empty
+Loaded
+Productive
