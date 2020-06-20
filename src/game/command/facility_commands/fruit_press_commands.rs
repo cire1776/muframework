@@ -213,7 +213,6 @@ impl<'a> ActivateFruitPressCommand<'a> {
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
-        println!("press activted");
         let timer = timer::Timer::new();
 
         // unwrap senders to avoid thread sending problems
@@ -251,7 +250,6 @@ impl<'a> ActivateFruitPressCommand<'a> {
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
-        println!("fill activted");
 
         let timer = timer::Timer::new();
 
