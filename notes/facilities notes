@@ -6,13 +6,14 @@ Post Office
 Shop
 
 Crafting Station: used to craft items.
+*Chest
 *Mine: Tin
 Quarry
 *Woods (for hunting and woodcutting)
 *Stove
 *Firepit
 Oven
-*Lumbermill
+**Lumbermill
 Storage Lockers
 *Smeltery
 *Smith
@@ -43,21 +44,21 @@ Stable
 Barn
 *Fruit Press
 Vat
-*Well
+**Well
 Loom
 Spinning Wheel
 Gloryhole
 
 Principal Facilities
 ====================
-AppleTree
-OliveTree
-PineTree
-OakTree
-ClosedChest
+*AppleTree
+*OliveTree
+*PineTree
+*OakTree
+*ClosedChest
 OpenChest
 LockedChest
-Fruit Press
+*Fruit Press
 Lumbermill
 Mine
 Stove or Firepit
@@ -66,7 +67,7 @@ Smithy
 Crafting Station
 Greenhouse
 Fishing Spot
-
+Well
 
 Fruit Press
 ===========
