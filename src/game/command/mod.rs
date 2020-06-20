@@ -31,14 +31,16 @@ impl Command {
             .expect("unable to send command")
     }
 
-    pub fn move_player(
+    pub fn move_player<'a>(
         direction: Direction,
         mode: MoveCommandMode,
-        player: &mut Player,
-        map: &mut TileMap,
-        obstacles: &mut BlockingMap,
-        facilities: &mut FacilityList,
-        inventories: &mut InventoryList,
+        player: &'a mut Player,
+        map: &'a mut TileMap,
+        obstacles: &'a mut BlockingMap,
+        facilities: &'a mut FacilityList,
+        item_types: &'a ItemTypeList,
+        items: &'a mut ItemList,
+        inventories: &'a mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
     ) {
@@ -55,6 +57,8 @@ impl Command {
                 map,
                 obstacles,
                 facilities,
+                item_types,
+                items,
                 inventories,
             )
         };
@@ -301,12 +305,22 @@ fn attempt_to_use<'a>(
     map: &'a mut TileMap,
     obstacles: &'a mut BlockingMap,
     facilities: &'a mut FacilityList,
+    item_types: &'a ItemTypeList,
+    items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
     let target_x = player.x + dx;
     let target_y = player.y + dy;
 
-    if can_use_at(target_x, target_y, map, player, facilities) {
+    if can_use_at(
+        target_x,
+        target_y,
+        map,
+        player,
+        facilities,
+        items,
+        inventories,
+    ) {
         use_at(
             facing,
             target_x,
@@ -315,6 +329,8 @@ fn attempt_to_use<'a>(
             map,
             obstacles,
             facilities,
+            item_types,
+            items,
             inventories,
         )
     } else {
@@ -322,11 +338,21 @@ fn attempt_to_use<'a>(
     }
 }
 
-fn can_use_at(x: i32, y: i32, map: &TileMap, player: &Player, facilities: &FacilityList) -> bool {
+fn can_use_at(
+    x: i32,
+    y: i32,
+    map: &TileMap,
+    player: &Player,
+    facilities: &FacilityList,
+    items: &ItemList,
+    inventories: &mut InventoryList,
+) -> bool {
     match map.at(x, y) {
         tile_map::Tile::ClosedDoor | tile_map::Tile::OpenDoor => true,
         tile_map::Tile::Facility(facility_id) => {
             let facility = facilities.get(facility_id).expect("facility not found");
+            let inventory = inventories.get(&facility_id).expect("inventory not found");
+
             match facility.class {
                 FacilityClass::ClosedChest => !facility.is_in_use(),
                 FacilityClass::AppleTree | FacilityClass::OliveTree => {
@@ -351,6 +377,8 @@ fn use_at<'a>(
     map: &'a mut TileMap,
     obstacles: &'a mut BlockingMap,
     facilities: &'a mut FacilityList,
+    item_types: &'a ItemTypeList,
+    items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
     match map.at(x, y) {
@@ -438,12 +466,19 @@ pub trait Activity {
 
     fn start(&self, update_tx: &GameUpdateSender);
 
-    fn complete(&mut self, facilities: &mut FacilityList);
+    fn complete(
+        &mut self,
+        facilities: &mut FacilityList,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
+    );
 
     fn on_completion(
         &self,
         player_inventory_id: u64,
         facility: &mut Facility,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
     );

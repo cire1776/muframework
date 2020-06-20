@@ -133,7 +133,7 @@ impl GameState {
 
         let item_types = ItemType::read_in_item_types(&mut item_type_vec);
 
-        let mut items = Item::read_in_items(&item_vec, item_types);
+        let mut items = Item::read_in_items(&item_vec, item_types.clone());
 
         // find home for activity guard and activity timer
 
@@ -203,6 +203,8 @@ impl GameState {
                 map,
                 obstacles,
                 facilities,
+                &items.item_types.clone(),
+                items,
                 inventories,
                 update_tx,
                 command_tx,
@@ -277,13 +279,21 @@ impl GameState {
             Command::CloseExternalInventory => Command::close_external_inventory(update_tx),
             Command::RefreshInventory => Self::refresh_inventory(player, inventories, update_tx),
             Command::ActivityAbort | Command::None => {}
-            Command::ActivityComplete => self.complete_activity(player, facilities),
+            Command::ActivityComplete => {
+                self.complete_activity(player, facilities, items, inventories)
+            }
         }
     }
 
-    fn complete_activity(&self, player: &mut Player, facilities: &mut FacilityList) {
+    fn complete_activity(
+        &self,
+        player: &mut Player,
+        facilities: &mut FacilityList,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
+    ) {
         if let Some(ref mut activity) = &mut player.activity {
-            activity.complete(facilities);
+            activity.complete(facilities, items, inventories);
         }
     }
 

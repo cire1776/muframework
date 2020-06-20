@@ -218,7 +218,12 @@ impl<'a> Activity for TreePickingActivity {
         );
     }
 
-    fn complete(&mut self, facilities: &mut FacilityList) {
+    fn complete(
+        &mut self,
+        facilities: &mut FacilityList,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
+    ) {
         let facility = facilities
             .get_mut(self.facility_id)
             .expect("can't find facility");
@@ -226,6 +231,8 @@ impl<'a> Activity for TreePickingActivity {
         self.on_completion(
             self.player_inventory_id,
             facility,
+            items,
+            inventories,
             &self.update_sender,
             &self.command_sender,
         );
@@ -235,6 +242,8 @@ impl<'a> Activity for TreePickingActivity {
         &self,
         player_inventory_id: u64,
         facility: &mut Facility,
+        _items: &mut ItemList,
+        _inventories: &mut InventoryList,
         update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
     ) {
@@ -389,7 +398,12 @@ impl<'a> Activity for TreeLoggingActivity {
         );
     }
 
-    fn complete(&mut self, facilities: &mut FacilityList) {
+    fn complete(
+        &mut self,
+        facilities: &mut FacilityList,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
+    ) {
         let facility = facilities
             .get_mut(self.facility_id)
             .expect("can't find facility");
@@ -397,6 +411,8 @@ impl<'a> Activity for TreeLoggingActivity {
         self.on_completion(
             self.player_inventory_id,
             facility,
+            items,
+            inventories,
             &self.update_sender,
             &self.command_sender,
         );
@@ -406,6 +422,8 @@ impl<'a> Activity for TreeLoggingActivity {
         &self,
         player_inventory_id: u64,
         facility: &mut Facility,
+        _items: &mut ItemList,
+        _inventories: &mut InventoryList,
         update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
     ) {
