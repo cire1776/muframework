@@ -116,7 +116,7 @@ impl FruitType {
             _ => panic!("unknown fruit type"),
         }
     }
-
+    #[allow(unreachable_patterns)]
     pub fn to_index(&self) -> u8 {
         match self {
             FruitType::Apple => 1,
