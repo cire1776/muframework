@@ -44,7 +44,7 @@ pub enum Command {
     QuitGame,
     Move(Direction, MoveCommandMode),
     Teleport(u64, i32, i32),
-    SpawnItem(u64, ItemClass, String), // (???, ItemClass, Description)
+    SpawnItem(u64, ItemClass, String), // (inventory_id, ItemClass, Description)
     TakeItem(u64),
     DropItem(u64),
     EquipItem(u64),
