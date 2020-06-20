@@ -526,5 +526,3 @@ mod accept_stack {
         assert!(!items.holds(new_item.id));
     }
 }
-
-// TODO: test spawn_stack to ensure it enforces stacking limits
