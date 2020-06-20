@@ -102,6 +102,14 @@ impl FruitType {
             _ => panic!("unknown fruit type"),
         }
     }
+
+    pub fn from_string<S: ToString>(string: S) -> FruitType {
+        match &string.to_string().to_lowercase()[..] {
+            "apple" => FruitType::Apple,
+            "olive" => FruitType::Olive,
+            _ => panic!("unknown fruit type"),
+        }
+    }
 }
 
 pub struct ActivateFruitPressCommand<'a> {
@@ -163,6 +171,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
 
     fn create_press_activity(
         &self,
+        fruit_type: FruitType,
         timer: timer::Timer,
         guard: Guard,
         update_sender: &GameUpdateSender,
@@ -173,6 +182,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
 
         let activity = FruitPressActivity::new(
             self.player.id,
+            fruit_type,
             self.facility_id,
             timer,
             Some(guard),
@@ -240,8 +250,13 @@ impl<'a> ActivateFruitPressCommand<'a> {
             Command::send(Some(&command_sender), Command::ActivityComplete);
         });
 
-        let activity =
-            self.create_press_activity(timer, guard, &update_sender, command_tx.unwrap());
+        let activity = self.create_press_activity(
+            FruitType::from_string(item.raw_description()),
+            timer,
+            guard,
+            &update_sender,
+            command_tx.unwrap(),
+        );
         self.player.activity = Some(activity);
     }
 
@@ -309,6 +324,7 @@ impl<'a> CommandHandler for ActivateFruitPressCommand<'a> {
 
 pub struct FruitPressActivity {
     player_inventory_id: u64,
+    fruit_type: FruitType,
     facility_id: u64,
     _timer: timer::Timer,
     guard: Option<Guard>,
@@ -319,6 +335,7 @@ pub struct FruitPressActivity {
 impl FruitPressActivity {
     pub fn new(
         player_inventory_id: u64,
+        fruit_type: FruitType,
         facility_id: u64,
         timer: timer::Timer,
         guard: Option<Guard>,
@@ -327,6 +344,7 @@ impl FruitPressActivity {
     ) -> Self {
         Self {
             player_inventory_id,
+            fruit_type,
             facility_id,
             _timer: timer,
             guard,
@@ -380,7 +398,12 @@ impl Activity for FruitPressActivity {
             .get_mut(&facility.id)
             .expect("unable to find inventory");
 
-        if !inventory.any_left_after_consuming(ItemClass::Food, "Apple", 1, items) {
+        let fruit = match self.fruit_type {
+            FruitType::Apple => "Apple",
+            FruitType::Olive => "Olive",
+        };
+
+        if !inventory.any_left_after_consuming(ItemClass::Food, fruit, 1, items) {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
