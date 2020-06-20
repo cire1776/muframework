@@ -23,16 +23,18 @@ impl<'a> OpenDoorCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for OpenDoorCommand<'a> {
+impl<'a> CommandHandler<'a> for OpenDoorCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&CommandSender>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.map
             .set_tile_at(self.x, self.y, tile_map::Tile::OpenDoor);
         self.obstacles.unblock_at(self.x, self.y);
+        None
     }
+
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
         update_tx
             .send(TileChangedAt(self.x, self.y, tile_map::Tile::OpenDoor))
@@ -63,15 +65,16 @@ impl<'a> CloseDoorCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for CloseDoorCommand<'a> {
+impl<'a> CommandHandler<'a> for CloseDoorCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&CommandSender>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.map
             .set_tile_at(self.x, self.y, tile_map::Tile::ClosedDoor);
         self.obstacles.block_at(self.x, self.y);
+        None
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {

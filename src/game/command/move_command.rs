@@ -27,12 +27,12 @@ impl<'a> MoveCommand<'a> {
         }
     }
 }
-impl<'a> CommandHandler for MoveCommand<'a> {
+impl<'a> CommandHandler<'a> for MoveCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.obstacles
             .unblock_at(self.character.x, self.character.y);
         self.obstacles.block_at(self.x, self.y);
@@ -44,6 +44,7 @@ impl<'a> CommandHandler for MoveCommand<'a> {
             self.facing_changed = true;
             self.character.facing = self.facing;
         }
+        None
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -72,13 +73,14 @@ impl<'a> ChangeFacingCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for ChangeFacingCommand<'a> {
+impl<'a> CommandHandler<'a> for ChangeFacingCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.player.facing = self.facing;
+        None
     }
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
         GameUpdate::send(

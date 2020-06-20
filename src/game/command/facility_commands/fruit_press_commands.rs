@@ -70,7 +70,7 @@ impl<'a> OpenFruitPressCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for OpenFruitPressCommand<'a> {
+impl<'a> CommandHandler<'a> for OpenFruitPressCommand<'a> {
     fn expiration(&self) -> u32 {
         0
     }
@@ -78,8 +78,9 @@ impl<'a> CommandHandler for OpenFruitPressCommand<'a> {
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.player.external_inventory = Some(self.external_inventory.to_vec());
+        None
     }
 
     fn announce(&self, update_tx: &GameUpdateSender) {
@@ -93,6 +94,7 @@ impl<'a> CommandHandler for OpenFruitPressCommand<'a> {
     }
 }
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum FruitType {
     Apple = 1,
     Olive,
@@ -114,13 +116,22 @@ impl FruitType {
             _ => panic!("unknown fruit type"),
         }
     }
+
+    pub fn to_index(&self) -> u8 {
+        match self {
+            FruitType::Apple => 1,
+            FruitType::Olive => 2,
+            _ => panic!("unknown fruit type"),
+        }
+    }
 }
 
 pub struct ActivateFruitPressCommand<'a> {
     player: &'a mut Player,
+    fruit_type: FruitType,
     facility_id: u64,
     facilities: &'a mut FacilityList,
-    items: &'a mut ItemList,
+    __items: &'a mut ItemList,
     inventory: &'a mut Inventory,
     mode: FruitPressMode,
 }
@@ -138,48 +149,35 @@ impl<'a> ActivateFruitPressCommand<'a> {
             .expect("unable to find inventory");
         Self {
             player,
+            fruit_type: FruitType::Apple,
             facility_id,
             facilities,
-            items,
+            __items: items,
             inventory,
             mode: FruitPressMode::Filling,
         }
     }
 
-    fn is_ready_to_press(_facility: &Facility, inventory: &Inventory) -> bool {
+    pub fn can_perform(_facility: &Facility, inventory: &Inventory) -> bool {
         inventory.first().is_some()
     }
+}
 
-    fn is_able_to_fill(player: &Player, facility: &Facility, items: &ItemList) -> bool {
-        facility.get_property("output") > 0 && player.is_endorsed_with(":can_fill")
+impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
+    fn expiration(&self) -> u32 {
+        60
     }
 
-    pub fn can_perform(
-        player: &Player,
-        facility: &Facility,
-        items: &ItemList,
-        inventory: &Inventory,
-    ) -> bool {
-        if Self::is_able_to_fill(player, facility, items) {
-            return true;
-        }
-        Self::is_ready_to_press(facility, inventory)
-    }
-
-    fn create_press_activity(
+    fn create_activity(
         &self,
-        fruit_type: FruitType,
         timer: timer::Timer,
         guard: Guard,
-        update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
-    ) -> Box<dyn Activity> {
-        let command_sender = command_sender.clone();
-        let update_sender = update_sender.clone();
-
+        update_sender: GameUpdateSender,
+        command_sender: CommandSender,
+    ) -> Option<Box<dyn Activity>> {
         let activity = FruitPressActivity::new(
             self.player.id,
-            fruit_type,
+            self.fruit_type,
             self.expiration(),
             self.facility_id,
             timer,
@@ -187,48 +185,15 @@ impl<'a> ActivateFruitPressCommand<'a> {
             update_sender,
             command_sender,
         );
-        Box::new(activity)
+        Some(Box::new(activity))
     }
 
-    fn create_fill_activity(
-        &self,
-        fruit_type: FruitType,
-        timer: timer::Timer,
-        guard: Guard,
-        update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
-    ) -> Box<dyn Activity> {
-        let command_sender = command_sender.clone();
-        let update_sender = update_sender.clone();
-
-        let activity = FruitPressFillActivity::new(
-            fruit_type,
-            self.expiration(),
-            self.player.id,
-            self.facility_id,
-            timer,
-            Some(guard),
-            update_sender,
-            command_sender,
-        );
-        Box::new(activity)
+    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
+        self.player.activity = activity;
     }
 
-    pub fn activate_press(
-        &mut self,
-        // facility: &Facility,
-        // items: &ItemList,
-        // inventory: &Inventory,
-        update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    fn prepare_to_execute(&mut self) {
         self.mode = FruitPressMode::Pressing;
-
-        let timer = timer::Timer::new();
-
-        // unwrap senders to avoid thread sending problems
-        let command_sender = command_tx.unwrap().clone();
-        let update_sender = update_tx.unwrap().clone();
 
         let facility = self
             .facilities
@@ -236,93 +201,12 @@ impl<'a> ActivateFruitPressCommand<'a> {
             .expect("unable to get facility");
 
         let item = self.inventory.first().expect("unable to get inventory");
-        let fruit_value: u8 = match &item.raw_description()[..] {
-            "Apple" => 1,
-            "Olive" => 2,
-            _ => panic!("unknown fruit type: {}", item.raw_description()),
-        };
 
-        facility.set_property("item", fruit_value);
+        let fruit_value = FruitType::from_string(&item.raw_description()).to_index();
 
-        let guard = timer.schedule_repeating(
-            chrono::Duration::seconds(self.expiration() as i64),
-            move || {
-                Command::send(Some(&command_sender), Command::ActivityComplete);
-            },
-        );
+        facility.set_property("item", fruit_value as i128);
 
-        let activity = self.create_press_activity(
-            FruitType::from_string(item.raw_description()),
-            timer,
-            guard,
-            &update_sender,
-            command_tx.unwrap(),
-        );
-        self.player.activity = Some(activity);
-    }
-
-    pub fn activate_fill(
-        &mut self,
-        update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
-        self.mode = FruitPressMode::Filling;
-
-        let timer = timer::Timer::new();
-
-        // unwrap senders to avoid thread sending problems
-        let command_sender = command_tx.unwrap().clone();
-        let update_sender = update_tx.unwrap().clone();
-
-        let facility = self
-            .facilities
-            .get_mut(self.facility_id)
-            .expect("unable to find facility");
-
-        let index = facility.get_property("item");
-        let fruit_type = FruitType::from(index);
-
-        let guard = timer.schedule_repeating(chrono::Duration::seconds(30), move || {
-            Command::send(Some(&command_sender), Command::ActivityComplete);
-        });
-
-        let activity = self.create_fill_activity(
-            fruit_type,
-            timer,
-            guard,
-            &update_sender,
-            command_tx.unwrap(),
-        );
-        self.player.activity = Some(activity);
-    }
-}
-
-impl<'a> CommandHandler for ActivateFruitPressCommand<'a> {
-    fn expiration(&self) -> u32 {
-        match self.mode {
-            FruitPressMode::Filling => 30,
-            FruitPressMode::Pressing => 60,
-        }
-    }
-
-    fn perform_execute(
-        &mut self,
-        update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
-        let facility = self
-            .facilities
-            .get(self.facility_id)
-            .expect("unable to get facility");
-
-        if Self::is_able_to_fill(self.player, facility, self.items) {
-            self.activate_fill(update_tx, command_tx);
-            return;
-        }
-
-        if Self::is_ready_to_press(facility, self.inventory) {
-            self.activate_press(update_tx, command_tx);
-        }
+        self.fruit_type = FruitType::from_string(item.raw_description());
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -425,6 +309,91 @@ impl Activity for FruitPressActivity {
 
     fn clear_guard(&mut self) {
         self.guard = None;
+    }
+}
+
+pub struct ActivateFruitPressFillCommand<'a> {
+    player: &'a mut Player,
+    fruit_type: FruitType,
+    facility_id: u64,
+    facilities: &'a mut FacilityList,
+    __items: &'a mut ItemList,
+    __inventory: &'a mut Inventory,
+    mode: FruitPressMode,
+}
+
+impl<'a> ActivateFruitPressFillCommand<'a> {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &'a mut FacilityList,
+        __items: &'a mut ItemList,
+        inventories: &'a mut InventoryList,
+    ) -> Self {
+        let inventory = inventories
+            .get_mut(&facility_id)
+            .expect("unable to find inventory");
+        Self {
+            player,
+            fruit_type: FruitType::Apple,
+            facility_id,
+            facilities,
+            __items,
+            __inventory: inventory,
+            mode: FruitPressMode::Filling,
+        }
+    }
+
+    pub fn can_perform(player: &Player, facility: &Facility) -> bool {
+        facility.get_property("output") > 0 && player.is_endorsed_with(":can_fill")
+    }
+}
+
+impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
+    fn expiration(&self) -> u32 {
+        30
+    }
+
+    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
+        self.player.activity = activity
+    }
+
+    fn create_activity(
+        &self,
+        timer: timer::Timer,
+        guard: Guard,
+        update_sender: GameUpdateSender,
+        command_sender: CommandSender,
+    ) -> Option<Box<dyn Activity>> {
+        let activity = FruitPressFillActivity::new(
+            self.fruit_type,
+            self.expiration(),
+            self.player.id,
+            self.facility_id,
+            timer,
+            Some(guard),
+            update_sender,
+            command_sender,
+        );
+        Some(Box::new(activity))
+    }
+
+    fn prepare_to_execute(&mut self) {
+        self.mode = FruitPressMode::Filling;
+
+        let facility = self
+            .facilities
+            .get_mut(self.facility_id)
+            .expect("unable to find facility");
+
+        let index = facility.get_property("item");
+        self.fruit_type = FruitType::from(index);
+    }
+
+    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+        if let Some(activity) = &self.player.activity {
+            activity.start(update_tx);
+        }
     }
 }
 

@@ -32,13 +32,14 @@ impl<'a> OpenChestCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for OpenChestCommand<'a> {
+impl<'a> CommandHandler<'a> for OpenChestCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.player.external_inventory = Some(self.external_inventory.to_vec());
+        None
     }
 
     fn announce(&self, update_tx: &GameUpdateSender) {

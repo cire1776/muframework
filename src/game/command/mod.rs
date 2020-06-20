@@ -14,8 +14,8 @@ pub use item_commands::{
 };
 pub mod facility_commands;
 pub use facility_commands::{
-    ActivateFruitPressCommand, ActivateTreeLoggingCommand, ActivateTreePickingCommand,
-    OpenChestCommand, OpenFruitPressCommand, TreeType,
+    ActivateFruitPressCommand, ActivateFruitPressFillCommand, ActivateTreeLoggingCommand,
+    ActivateTreePickingCommand, OpenChestCommand, OpenFruitPressCommand, TreeType,
 };
 
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
@@ -229,7 +229,7 @@ fn process_equip_item<'a>(
     item_class_specifiers: &'a ItemClassSpecifierList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
-) -> Option<Box<dyn CommandHandler + 'a>> {
+) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let item_class_specifiers = &item_class_specifiers;
 
     let inventory = inventories
@@ -253,7 +253,7 @@ fn process_unequip_item<'a>(
     player: &'a mut Player,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
-) -> Option<Box<dyn CommandHandler + 'a>> {
+) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let inventory = inventories.get_mut(inventory_id).unwrap();
 
     Some(std::boxed::Box::new(UnequipCommand::new(
@@ -281,7 +281,7 @@ fn attempt_to_enter<'a>(
     dy: i32,
     player: &'a mut Player,
     obstacles: &'a mut BlockingMap,
-) -> Option<Box<dyn CommandHandler + 'a>> {
+) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let new_x = player.x + dx;
     let new_y = player.y + dy;
 
@@ -312,7 +312,7 @@ fn attempt_to_use<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
-) -> Option<Box<dyn CommandHandler + 'a>> {
+) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let mut mode = mode;
 
     let target_x = player.x + dx;
@@ -356,7 +356,7 @@ fn can_use_at(
     map: &TileMap,
     player: &Player,
     facilities: &FacilityList,
-    items: &ItemList,
+    _items: &ItemList,
     inventories: &mut InventoryList,
 ) -> bool {
     match map.at(x, y) {
@@ -380,7 +380,8 @@ fn can_use_at(
                     if mode == MoveCommandMode::SneakUse {
                         OpenFruitPressCommand::can_perform(player, facility)
                     } else {
-                        ActivateFruitPressCommand::can_perform(player, facility, items, inventory)
+                        ActivateFruitPressFillCommand::can_perform(player, facility)
+                            || ActivateFruitPressCommand::can_perform(facility, inventory)
                     }
                 }
                 _ => false,
@@ -402,7 +403,7 @@ fn use_at<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
-) -> Option<Box<dyn CommandHandler + 'a>> {
+) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     match map.at(x, y) {
         tile_map::Tile::ClosedDoor => Some(Box::new(OpenDoorCommand::new(x, y, obstacles, map))),
         tile_map::Tile::OpenDoor => Some(Box::new(CloseDoorCommand::new(x, y, obstacles, map))),
@@ -443,13 +444,25 @@ fn use_at<'a>(
                     ActivateTreeLoggingCommand::new(player, facility_id, facilities),
                 )),
                 FacilityClass::FruitPress => match mode {
-                    MoveCommandMode::Use => Some(Box::new(ActivateFruitPressCommand::new(
-                        player,
-                        facility_id,
-                        facilities,
-                        items,
-                        inventories,
-                    ))),
+                    MoveCommandMode::Use => {
+                        if ActivateFruitPressFillCommand::can_perform(player, facility) {
+                            Some(Box::new(ActivateFruitPressFillCommand::new(
+                                player,
+                                facility_id,
+                                facilities,
+                                items,
+                                inventories,
+                            )))
+                        } else {
+                            Some(Box::new(ActivateFruitPressCommand::new(
+                                player,
+                                facility_id,
+                                facilities,
+                                items,
+                                inventories,
+                            )))
+                        }
+                    }
                     MoveCommandMode::SneakUse => Some(Box::new(OpenFruitPressCommand::new(
                         player,
                         facility_id,
@@ -466,10 +479,26 @@ fn use_at<'a>(
     }
 }
 
-pub trait CommandHandler {
+pub trait CommandHandler<'a> {
     fn expiration(&self) -> u32 {
         60
     }
+
+    fn create_activity(
+        &self,
+        _timer: timer::Timer,
+        _guard: Guard,
+        _update_sender: GameUpdateSender,
+        _command_sender: CommandSender,
+    ) -> Option<Box<dyn Activity>> {
+        None
+    }
+
+    /// callback to set the activity in the player.
+    fn set_activity(&mut self, _activity: Option<Box<dyn Activity>>) {}
+
+    /// get ready to execute the command
+    fn prepare_to_execute(&mut self) {}
 
     /// execute and announce the results of the command.
     /// # Arguments
@@ -479,7 +508,9 @@ pub trait CommandHandler {
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
-        self.perform_execute(update_tx, command_tx);
+        self.prepare_to_execute();
+        let activity = self.perform_execute(update_tx, command_tx);
+        self.set_activity(activity);
 
         if let Some(update_tx) = update_tx {
             self.announce(update_tx);
@@ -489,9 +520,24 @@ pub trait CommandHandler {
     /// perform the actions of the command
     fn perform_execute(
         &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+        update_tx: Option<&GameUpdateSender>,
+        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+    ) -> Option<Box<dyn Activity>> {
+        let timer = timer::Timer::new();
+
+        // unwrap senders to avoid thread sending problems
+        let command_sender = command_tx.unwrap().clone();
+        let update_sender = update_tx.unwrap().clone();
+        let command_tx = command_tx.unwrap().clone();
+
+        let guard = timer.schedule_repeating(
+            chrono::Duration::seconds(self.expiration() as i64),
+            move || {
+                Command::send(Some(&command_sender), Command::ActivityComplete);
+            },
+        );
+
+        self.create_activity(timer, guard, update_sender, command_tx)
     }
 
     /// announce the results through GameUpdates
@@ -533,6 +579,6 @@ impl NullCommand {
     }
 }
 
-impl CommandHandler for NullCommand {}
+impl<'a> CommandHandler<'a> for NullCommand {}
 
 pub mod test_transfer_items;

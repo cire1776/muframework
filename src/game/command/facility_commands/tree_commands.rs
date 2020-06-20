@@ -48,17 +48,23 @@ impl<'a> ActivateTreePickingCommand<'a> {
                 _ => false,
             }
     }
+}
 
+impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
+    fn expiration(&self) -> u32 {
+        match self.tree_type {
+            TreeType::Apple => 60,
+            TreeType::Olive => 90,
+            _ => panic!("Non-fruit tree supplied"),
+        }
+    }
     fn create_activity(
         &self,
         timer: timer::Timer,
         guard: Guard,
-        update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
-    ) -> Box<dyn Activity> {
-        let command_sender = command_sender.clone();
-        let update_sender = update_sender.clone();
-
+        update_sender: GameUpdateSender,
+        command_sender: CommandSender,
+    ) -> Option<Box<dyn Activity>> {
         let activity = TreePickingActivity::new(
             self.tree_type,
             self.expiration(),
@@ -69,40 +75,11 @@ impl<'a> ActivateTreePickingCommand<'a> {
             update_sender,
             command_sender,
         );
-        Box::new(activity)
-    }
-}
-
-impl<'a> CommandHandler for ActivateTreePickingCommand<'a> {
-    fn expiration(&self) -> u32 {
-        match self.tree_type {
-            TreeType::Apple => 60,
-            TreeType::Olive => 90,
-            _ => panic!("Non-fruit tree supplied"),
-        }
+        Some(Box::new(activity))
     }
 
-    fn perform_execute(
-        &mut self,
-        update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
-        let timer = timer::Timer::new();
-
-        // unwrap senders to avoid thread sending problems
-        let command_sender = command_tx.unwrap().clone();
-        let update_sender = update_tx.unwrap().clone();
-
-        // currently base timer is the same for all fruit trees
-        let base_time = self.expiration();
-
-        let guard =
-            timer.schedule_repeating(chrono::Duration::seconds(base_time as i64), move || {
-                Command::send(Some(&command_sender), Command::ActivityComplete);
-            });
-
-        let activity = self.create_activity(timer, guard, &update_sender, command_tx.unwrap());
-        self.player.activity = Some(activity);
+    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
+        self.player.activity = activity;
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -259,14 +236,24 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
     pub fn can_perform(player: &Player, facility: &Facility) -> bool {
         !facility.is_in_use() && player.is_endorsed_with(":can_chop")
     }
+}
+
+impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
+    fn expiration(&self) -> u32 {
+        60
+    }
+
+    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
+        self.player.activity = activity
+    }
 
     fn create_activity(
         &self,
         timer: timer::Timer,
         guard: Guard,
-        update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
-    ) -> Box<dyn Activity> {
+        update_sender: GameUpdateSender,
+        command_sender: CommandSender,
+    ) -> Option<Box<dyn Activity>> {
         let command_sender = command_sender.clone();
         let update_sender = update_sender.clone();
 
@@ -279,31 +266,7 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
             update_sender,
             command_sender,
         );
-        Box::new(activity)
-    }
-}
-
-impl<'a> CommandHandler for ActivateTreeLoggingCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
-        let timer = timer::Timer::new();
-
-        // unwrap senders to avoid thread sending problems
-        let command_sender = command_tx.unwrap().clone();
-        let update_sender = update_tx.unwrap().clone();
-
-        // currently base timer is the same for all logging
-        let base_time = 60;
-
-        let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
-            Command::send(Some(&command_sender), Command::ActivityComplete);
-        });
-
-        let activity = self.create_activity(timer, guard, &update_sender, command_tx.unwrap());
-        self.player.activity = Some(activity);
+        Some(Box::new(activity))
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {

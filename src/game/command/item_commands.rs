@@ -20,13 +20,14 @@ impl<'a> PickupCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for PickupCommand<'a> {
+impl<'a> CommandHandler<'a> for PickupCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.inventory.pick_up_item(self.item_id, &mut self.items);
+        None
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -64,14 +65,15 @@ impl<'a> DropCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for DropCommand<'a> {
+impl<'a> CommandHandler<'a> for DropCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.inventory
             .release_item_at(self.x, self.y, &self.item, &mut self.items);
+        None
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -118,12 +120,12 @@ impl<'a> EquipCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for EquipCommand<'a> {
+impl<'a> CommandHandler<'a> for EquipCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         {
             let player_mounting_points = &mut self.player.mounting_points;
 
@@ -137,7 +139,8 @@ impl<'a> CommandHandler for EquipCommand<'a> {
         let player_mounting_points = self.player.mounting_points.clone();
 
         self.player.clear_endorsements();
-        player_mounting_points.endorse(self.player, &self.items)
+        player_mounting_points.endorse(self.player, &self.items);
+        None
     }
 
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
@@ -177,12 +180,12 @@ impl<'a> UnequipCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for UnequipCommand<'a> {
+impl<'a> CommandHandler<'a> for UnequipCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.player
             .mounting_points
             .unmount_item_by_id(self.item_id, self.inventory, self.items);
@@ -192,6 +195,7 @@ impl<'a> CommandHandler for UnequipCommand<'a> {
             .mounting_points
             .clone()
             .endorse(&mut self.player, self.items);
+        None
     }
 
     fn announce(&self, update_tx: &GameUpdateSender) {
@@ -293,12 +297,12 @@ impl<'a> TransferItemCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for TransferItemCommand<'a> {
+impl<'a> CommandHandler<'a> for TransferItemCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         transfer_an_item(
             self.item,
             self.source_id,
@@ -306,6 +310,7 @@ impl<'a> CommandHandler for TransferItemCommand<'a> {
             self.inventories,
             self.items,
         );
+        None
     }
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
         announce_transfer(
@@ -340,12 +345,12 @@ impl<'a> TransferAllCommand<'a> {
     }
 }
 
-impl<'a> CommandHandler for TransferAllCommand<'a> {
+impl<'a> CommandHandler<'a> for TransferAllCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
         _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         let src_inventory = self.inventories.get_mut(&self.source_id).unwrap();
 
         for (_id, item) in &src_inventory.items.clone() {
@@ -359,6 +364,7 @@ impl<'a> CommandHandler for TransferAllCommand<'a> {
                 break;
             };
         }
+        None
     }
     fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
         announce_transfer(
