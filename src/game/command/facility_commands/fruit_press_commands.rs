@@ -189,6 +189,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
         let activity = FruitPressActivity::new(
             self.player.id,
             fruit_type,
+            self.expiration(),
             self.facility_id,
             timer,
             Some(guard),
@@ -211,6 +212,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
 
         let activity = FruitPressFillActivity::new(
             fruit_type,
+            self.expiration(),
             self.player.id,
             self.facility_id,
             timer,
@@ -251,12 +253,12 @@ impl<'a> ActivateFruitPressCommand<'a> {
 
         facility.set_property("item", fruit_value);
 
-        // currently the base time is the same for all presses
-        let base_time = 60;
-
-        let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
-            Command::send(Some(&command_sender), Command::ActivityComplete);
-        });
+        let guard = timer.schedule_repeating(
+            chrono::Duration::seconds(self.expiration() as i64),
+            move || {
+                Command::send(Some(&command_sender), Command::ActivityComplete);
+            },
+        );
 
         let activity = self.create_press_activity(
             FruitType::from_string(item.raw_description()),
@@ -305,6 +307,13 @@ impl<'a> ActivateFruitPressCommand<'a> {
 }
 
 impl<'a> CommandHandler for ActivateFruitPressCommand<'a> {
+    fn expiration(&self) -> u32 {
+        match self.mode {
+            FruitPressMode::Filling => 30,
+            FruitPressMode::Pressing => 60,
+        }
+    }
+
     fn perform_execute(
         &mut self,
         update_tx: Option<&GameUpdateSender>,
@@ -335,6 +344,7 @@ impl<'a> CommandHandler for ActivateFruitPressCommand<'a> {
 pub struct FruitPressActivity {
     player_inventory_id: u64,
     fruit_type: FruitType,
+    expiration: u32,
     facility_id: u64,
     _timer: timer::Timer,
     guard: Option<Guard>,
@@ -346,6 +356,7 @@ impl FruitPressActivity {
     pub fn new(
         player_inventory_id: u64,
         fruit_type: FruitType,
+        expiration: u32,
         facility_id: u64,
         timer: timer::Timer,
         guard: Option<Guard>,
@@ -355,6 +366,7 @@ impl FruitPressActivity {
         Self {
             player_inventory_id,
             fruit_type,
+            expiration,
             facility_id,
             _timer: timer,
             guard,
@@ -368,7 +380,7 @@ impl Activity for FruitPressActivity {
     fn start(&self, update_tx: &GameUpdateSender) {
         GameUpdate::send(
             Some(update_tx),
-            GameUpdate::ActivityStarted(60000, ui::pane::PaneTitle::Pressing),
+            GameUpdate::ActivityStarted(self.expiration * 1000, ui::pane::PaneTitle::Pressing),
         );
     }
     fn complete(
@@ -427,6 +439,7 @@ impl Activity for FruitPressActivity {
 
 pub struct FruitPressFillActivity {
     fruit_type: FruitType,
+    expiration: u32,
     player_inventory_id: u64,
     facility_id: u64,
     _timer: timer::Timer,
@@ -438,6 +451,7 @@ pub struct FruitPressFillActivity {
 impl FruitPressFillActivity {
     pub fn new(
         fruit_type: FruitType,
+        expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
         timer: timer::Timer,
@@ -447,6 +461,7 @@ impl FruitPressFillActivity {
     ) -> Self {
         Self {
             fruit_type,
+            expiration,
             player_inventory_id,
             facility_id,
             _timer: timer,
@@ -461,7 +476,7 @@ impl Activity for FruitPressFillActivity {
     fn start(&self, update_tx: &GameUpdateSender) {
         GameUpdate::send(
             Some(update_tx),
-            GameUpdate::ActivityStarted(30000, ui::pane::PaneTitle::Filling),
+            GameUpdate::ActivityStarted(self.expiration * 1000, ui::pane::PaneTitle::Filling),
         );
     }
     fn complete(
