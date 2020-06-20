@@ -14,7 +14,8 @@ pub use item_commands::{
 };
 pub mod facility_commands;
 pub use facility_commands::{
-    ActivateTreeLoggingCommand, ActivateTreePickingCommand, OpenChestCommand, TreeType,
+    ActivateFruitPressCommand, ActivateTreeLoggingCommand, ActivateTreePickingCommand,
+    OpenChestCommand, OpenFruitPressCommand, TreeType,
 };
 
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
@@ -47,9 +48,10 @@ impl Command {
         let (dx, dy) = get_deltas_from_direction(direction);
 
         let command = if mode == MoveCommandMode::Normal || mode == MoveCommandMode::Sneak {
-            attempt_to_enter(direction, dx, dy, player, obstacles)
+            attempt_to_enter(mode, direction, dx, dy, player, obstacles)
         } else {
             attempt_to_use(
+                mode,
                 direction,
                 dx,
                 dy,
@@ -273,6 +275,7 @@ fn get_deltas_from_direction(direction: Direction) -> (i32, i32) {
 }
 
 fn attempt_to_enter<'a>(
+    _mode: MoveCommandMode,
     facing: Direction,
     dx: i32,
     dy: i32,
@@ -298,6 +301,7 @@ fn attempt_to_enter<'a>(
 }
 
 fn attempt_to_use<'a>(
+    mode: MoveCommandMode,
     facing: Direction,
     dx: i32,
     dy: i32,
@@ -309,10 +313,13 @@ fn attempt_to_use<'a>(
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
 ) -> Option<Box<dyn CommandHandler + 'a>> {
+    let mut mode = mode;
+
     let target_x = player.x + dx;
     let target_y = player.y + dy;
 
     if can_use_at(
+        mode,
         target_x,
         target_y,
         map,
@@ -322,6 +329,7 @@ fn attempt_to_use<'a>(
         inventories,
     ) {
         use_at(
+            mode,
             facing,
             target_x,
             target_y,
@@ -334,11 +342,15 @@ fn attempt_to_use<'a>(
             inventories,
         )
     } else {
-        attempt_to_enter(facing, dx, dy, player, obstacles)
+        if mode == MoveCommandMode::SneakUse {
+            mode = MoveCommandMode::Sneak;
+        }
+        attempt_to_enter(mode, facing, dx, dy, player, obstacles)
     }
 }
 
 fn can_use_at(
+    mode: MoveCommandMode,
     x: i32,
     y: i32,
     map: &TileMap,
@@ -351,8 +363,9 @@ fn can_use_at(
         tile_map::Tile::ClosedDoor | tile_map::Tile::OpenDoor => true,
         tile_map::Tile::Facility(facility_id) => {
             let facility = facilities.get(facility_id).expect("facility not found");
-            let inventory = inventories.get(&facility_id).expect("inventory not found");
-
+            let inventory = inventories
+                .get_mut(&facility.id)
+                .expect("unable to find inventory");
             match facility.class {
                 FacilityClass::ClosedChest => !facility.is_in_use(),
                 FacilityClass::AppleTree | FacilityClass::OliveTree => {
@@ -362,6 +375,13 @@ fn can_use_at(
                 FacilityClass::PineTree => {
                     ActivateTreeLoggingCommand::can_perform(player, facility)
                 }
+                FacilityClass::FruitPress => {
+                    if mode == MoveCommandMode::SneakUse {
+                        OpenFruitPressCommand::can_perform(player, facility)
+                    } else {
+                        ActivateFruitPressCommand::can_perform(player, facility, items, inventory)
+                    }
+                }
                 _ => false,
             }
         }
@@ -370,6 +390,7 @@ fn can_use_at(
 }
 
 fn use_at<'a>(
+    mode: MoveCommandMode,
     __facing: Direction,
     x: i32,
     y: i32,
@@ -420,6 +441,23 @@ fn use_at<'a>(
                 FacilityClass::PineTree | FacilityClass::OakTree => Some(Box::new(
                     ActivateTreeLoggingCommand::new(TreeType::Pine, player, facility_id),
                 )),
+                FacilityClass::FruitPress => match mode {
+                    MoveCommandMode::Use => Some(Box::new(ActivateFruitPressCommand::new(
+                        player,
+                        facility_id,
+                        facilities,
+                        items,
+                        inventories,
+                    ))),
+                    MoveCommandMode::SneakUse => Some(Box::new(OpenFruitPressCommand::new(
+                        player,
+                        facility_id,
+                        facilities,
+                        item_types,
+                        inventories,
+                    ))),
+                    _ => None,
+                },
                 _ => None,
             }
         }

@@ -434,6 +434,11 @@ impl ItemList {
         }
     }
 
+    pub fn does_item_match_description<S: ToString>(&self, item_id: u64, description: S) -> bool {
+        let item = self.get_as_item(item_id).expect("Item not found.");
+        item.raw_description() == description.to_string()
+    }
+
     /// returns true if the ItemList has an element with the given id.
     #[inline]
     pub fn holds(&self, item_id: u64) -> bool {
@@ -516,6 +521,10 @@ impl ItemList {
         } else {
             // do nothing if the item is not in the item list
         }
+    }
+
+    pub fn remove(&mut self, item: &Item) {
+        self.items.remove(&item.id);
     }
 
     pub fn iter(&self) -> std::collections::hash_map::Iter<'_, u64, ItemState> {

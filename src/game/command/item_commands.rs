@@ -216,8 +216,15 @@ fn transfer_an_item<'a>(
     items: &'a mut ItemList,
 ) -> bool {
     {
+        let src_inventory = inventories.get(&source_id).unwrap();
+        if src_inventory.prohibit_manual_extraction {
+            return false;
+        }
+    }
+
+    {
         let dest_inventory = &mut (inventories.get_mut(&destination_id).unwrap());
-        if dest_inventory.is_full() {
+        if dest_inventory.is_full() || dest_inventory.quantity_permitted(&item) == 0 {
             return false;
         }
         dest_inventory.accept_stack_unmut(&item, items);
@@ -260,7 +267,6 @@ fn announce_transfer(
     }
 }
 
-#[derive(Debug)]
 pub struct TransferItemCommand<'a> {
     item: &'a Item,
     source_id: u64,

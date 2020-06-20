@@ -192,7 +192,7 @@ impl SparseMap {
             },
             FacilityClass::FruitPress => ui::Sprite {
                 style: SpriteStyle {
-                    glyph: 0x1E as u8, // '#'
+                    glyph: '#' as u8, // '#'
                     fg: RGB::named(rltk::BLUE),
                     bg: RGB::named(rltk::YELLOW),
                 },

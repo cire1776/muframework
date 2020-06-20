@@ -287,7 +287,11 @@ impl UIState {
     ) -> Command {
         let mode: MoveCommandMode;
         if input.control {
-            mode = MoveCommandMode::Use
+            if input.shift {
+                mode = MoveCommandMode::SneakUse
+            } else {
+                mode = MoveCommandMode::Use
+            }
         } else if input.shift {
             mode = MoveCommandMode::Sneak
         } else {

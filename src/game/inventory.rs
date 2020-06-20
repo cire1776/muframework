@@ -1,4 +1,5 @@
 use super::*;
+use std::fmt;
 use std::ops::Index;
 
 #[derive(Debug)]
@@ -51,10 +52,53 @@ impl AliasList {
 
 pub type InventoryList = HashMap<u64, Inventory>;
 
-#[derive(Debug, Clone)]
+pub trait InventoryFilter {
+    fn filter(&self, inventory: &Inventory, item: &Item) -> u8 {
+        if !self.filter_type(&inventory, &item) {
+            return 0;
+        }
+        self.filter_quantity(&inventory, &item)
+    }
+    fn filter_type(&self, _inventory: &Inventory, _item: &Item) -> bool {
+        true
+    }
+    fn filter_quantity(&self, _inventory: &Inventory, _item: &Item) -> u8 {
+        64
+    }
+}
+
 pub struct Inventory {
     id: u64,
+    permitted_types: Vec<ItemType>,
+    item_filter: Option<Box<dyn InventoryFilter>>,
     pub items: HashMap<u64, Item>,
+    pub prohibit_manual_extraction: bool,
+}
+
+impl Clone for Inventory {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id,
+            permitted_types: self.permitted_types.clone(),
+            item_filter: None,
+            items: self.items.clone(),
+            prohibit_manual_extraction: false,
+        }
+    }
+}
+
+impl fmt::Debug for Inventory {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Point")
+            .field("id", &self.id)
+            .field("permitted_types", &self.permitted_types)
+            .field("items", &self.items)
+            .field(
+                "prohibit_manual_extraction",
+                &self.prohibit_manual_extraction,
+            )
+            .finish()
+    }
 }
 
 impl Inventory {
@@ -63,7 +107,10 @@ impl Inventory {
     pub fn new(id: u64) -> Inventory {
         Inventory {
             id,
+            permitted_types: vec![],
+            item_filter: None,
             items: HashMap::new(),
+            prohibit_manual_extraction: false,
         }
     }
 
@@ -138,6 +185,42 @@ impl Inventory {
         self.items.len()
     }
 
+    pub fn set_item_filter(&mut self, filter: Option<Box<dyn game::inventory::InventoryFilter>>) {
+        let result = if filter.is_some() {
+            Some(filter.unwrap())
+        } else {
+            None
+        };
+
+        self.item_filter = result;
+    }
+
+    pub fn permitted_type(&mut self, item_type: &ItemType) {
+        self.permitted_types.push(item_type.clone());
+    }
+
+    pub fn quantity_permitted(&self, item: &Item) -> u8 {
+        if self.permitted_types.is_empty() && self.item_filter.is_none() {
+            return 64;
+        }
+
+        let mut quantity = 64;
+
+        if let Some(item_filter) = &self.item_filter {
+            quantity = item_filter.filter(self, item)
+        };
+
+        if self.permitted_types.is_empty() {
+            quantity
+        } else {
+            if self.permitted_types.contains(&item.item_type) {
+                0
+            } else {
+                quantity
+            }
+        }
+    }
+
     /// adds an item to the inventory and sets the item to stored in the item list.
     /// # Arguments:
     /// * item - the item to be added
@@ -166,7 +249,7 @@ impl Inventory {
         }
 
         items.store(item, self.id);
-        self.force_accept(item);
+        self.accept_permissible(item, items);
     }
 
     /// adds a stack of items to the inventory.  This should be the primary
@@ -230,6 +313,30 @@ impl Inventory {
         self.accept(&item, items);
     }
 
+    fn accept_permissible(&mut self, item: &Item, items: &mut ItemList) {
+        let mut item = &mut item.clone();
+
+        let quantity = std::cmp::max(self.quantity_permitted(item), item.quantity);
+
+        if quantity < item.quantity {
+            let new_item_state = items.get(item.id);
+
+            let mut new_item = item.clone();
+            new_item.quantity = item.quantity - quantity;
+
+            match new_item_state {
+                None => panic!("item not found"),
+                Some(ItemState::Equipped(_, _)) => panic!("can't accept from equipped item"),
+                Some(ItemState::Bundle(_, _, _)) => panic!("Can't accept from a bundle"),
+                Some(ItemState::Stored(_, inventory_id)) => items.store(&new_item, inventory_id),
+            }
+
+            item.quantity = quantity;
+        }
+
+        self.force_accept(&item);
+    }
+
     /// is public for testing purposes only.
     pub fn force_accept(&mut self, item: &Item) {
         self.items.insert(item.id, item.clone());
@@ -246,6 +353,18 @@ impl Inventory {
         let mut item = Item::spawn(class, description);
         self.accept_stack(&mut item, items);
     }
+
+    pub fn spawn_by_type<S: ToString, N: TryInto<u8>>(
+        &mut self,
+        item_type_name: S,
+        quantity: N,
+        item_types: &ItemTypeList,
+        items: &mut ItemList,
+    ) {
+        let mut item = Item::spawn_from_type(item_type_name.to_string(), quantity, item_types);
+        self.accept_stack(&mut item, items);
+    }
+
     /// release item and bundle it at x,y
     ///
     /// # Arguments:
@@ -262,6 +381,43 @@ impl Inventory {
     ///   has not been transferred already.
     pub fn release_item(&mut self, item_id: &u64) {
         self.items.remove(&item_id);
+    }
+
+    pub fn any_left_after_consuming<S: ToString, N: TryInto<u8>>(
+        &mut self,
+        class: ItemClass,
+        description: S,
+        quantity: N,
+        items: &mut ItemList,
+    ) -> bool {
+        let quantity = quantity.try_into().ok().expect("must be convertible to u8");
+
+        if quantity > 1 {
+            todo!("Not yet implemented for more than 1");
+        }
+
+        let mut target = Item::new(NEXT_ITEM_ID(), ItemType::new(class, description), quantity);
+
+        for (_, v) in self.items.iter_mut() {
+            if target.quantity <= 0 {
+                target.quantity = 0;
+                break;
+            }
+
+            if v.is_same_type_as(&target) {
+                let delta = std::cmp::min(v.quantity, target.quantity);
+                target.quantity -= delta;
+                v.quantity -= delta;
+
+                if v.quantity > 0 {
+                    items.update_item(v);
+                } else {
+                    items.remove(v);
+                }
+            }
+        }
+
+        self.items.iter().any(|(_, i)| i.is_same_type_as(&target))
     }
 
     /// returns true if inventory holds an item_id.
@@ -281,6 +437,11 @@ impl Inventory {
                 panic!("expected a non-equipped item")
             }
         }
+    }
+
+    pub fn first(&self) -> Option<Item> {
+        let items: Vec<Item> = self.items.values().cloned().collect();
+        items.get(0).map(|i| i.clone())
     }
 
     /// returns an vector of items.
