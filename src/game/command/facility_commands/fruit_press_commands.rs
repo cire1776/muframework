@@ -250,7 +250,6 @@ impl<'a> ActivateFruitPressCommand<'a> {
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
-
         let timer = timer::Timer::new();
 
         // unwrap senders to avoid thread sending problems
@@ -265,12 +264,12 @@ impl<'a> ActivateFruitPressCommand<'a> {
         let index = facility.get_property("item");
         let fruit_type = FruitType::from(index);
 
-        // currently the base time is the same for all fills
-        let base_time = 30;
-
-        let guard = timer.schedule_repeating(chrono::Duration::seconds(base_time), move || {
-            Command::send(Some(&command_sender), Command::ActivityComplete);
-        });
+        let guard = timer.schedule_repeating(
+            chrono::Duration::seconds(self.expiration() as i64),
+            move || {
+                Command::send(Some(&command_sender), Command::ActivityComplete);
+            },
+        );
 
         let activity = self.create_fill_activity(
             fruit_type,
