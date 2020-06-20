@@ -236,7 +236,19 @@ pub struct ActivateTreeLoggingCommand<'a> {
 }
 
 impl<'a> ActivateTreeLoggingCommand<'a> {
-    pub fn new(tree_type: TreeType, player: &'a mut Player, facility_id: u64) -> Self {
+    pub fn new(player: &'a mut Player, facility_id: u64, facilities: &'a mut FacilityList) -> Self {
+        let facility = facilities
+            .get(facility_id)
+            .expect("unable to find facility");
+
+        let tree_type = match facility.class {
+            FacilityClass::AppleTree => TreeType::Apple,
+            FacilityClass::OliveTree => TreeType::Olive,
+            FacilityClass::PineTree => TreeType::Pine,
+            FacilityClass::OakTree => TreeType::Oak,
+            _ => panic!("unknown tree type"),
+        };
+
         Self {
             tree_type,
             player,

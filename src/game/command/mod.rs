@@ -369,7 +369,7 @@ fn can_use_at(
                     ActivateTreePickingCommand::can_perform(player, facility)
                         || ActivateTreeLoggingCommand::can_perform(player, facility)
                 }
-                FacilityClass::PineTree => {
+                FacilityClass::PineTree | FacilityClass::OakTree => {
                     ActivateTreeLoggingCommand::can_perform(player, facility)
                 }
                 FacilityClass::FruitPress => {
@@ -431,16 +431,16 @@ fn use_at<'a>(
                         )))
                     } else if ActivateTreeLoggingCommand::can_perform(player, facility) {
                         Some(Box::new(ActivateTreeLoggingCommand::new(
-                            tree_type,
                             player,
                             facility_id,
+                            facilities,
                         )))
                     } else {
                         panic!("Player cannot pick or log!")
                     }
                 }
                 FacilityClass::PineTree | FacilityClass::OakTree => Some(Box::new(
-                    ActivateTreeLoggingCommand::new(TreeType::Pine, player, facility_id),
+                    ActivateTreeLoggingCommand::new(player, facility_id, facilities),
                 )),
                 FacilityClass::FruitPress => match mode {
                     MoveCommandMode::Use => Some(Box::new(ActivateFruitPressCommand::new(
