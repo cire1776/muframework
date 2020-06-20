@@ -151,16 +151,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
     }
 
     fn is_able_to_fill(player: &Player, facility: &Facility, items: &ItemList) -> bool {
-        let possible_item = player.mounting_points.at(&MountingPoint::AtReady);
-        if let Some(equipped_item_id) = possible_item {
-            if items.does_item_match_description(equipped_item_id, "Glass Bottle") {
-                facility.get_property("output") > 0
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+        facility.get_property("output") > 0 && player.is_endorsed_with(":can_fill")
     }
 
     pub fn can_perform(

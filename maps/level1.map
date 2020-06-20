@@ -55,7 +55,9 @@ reed_basket tool "Reed Basket" {
 worn_bronze_axe tool "Worn Bronze Axe" {
     endorsement: :can_chop
 }
-glass_bottle material "Glass Bottle"
+glass_bottle material "Glass Bottle" {
+    endorsement: :can_fill
+}
 apple food "Apple"
 olive food "Olive"
 apple_juice food "Apple Juice"
