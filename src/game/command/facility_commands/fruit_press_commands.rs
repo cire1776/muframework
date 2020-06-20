@@ -1,5 +1,9 @@
 use super::*;
 
+enum FruitPressMode {
+    Pressing,
+    Filling,
+}
 pub struct FruitPressInventoryFilter {}
 
 impl FruitPressInventoryFilter {
@@ -118,6 +122,7 @@ pub struct ActivateFruitPressCommand<'a> {
     facilities: &'a mut FacilityList,
     items: &'a mut ItemList,
     inventory: &'a mut Inventory,
+    mode: FruitPressMode,
 }
 
 impl<'a> ActivateFruitPressCommand<'a> {
@@ -137,6 +142,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
             facilities,
             items,
             inventory,
+            mode: FruitPressMode::Filling,
         }
     }
 
@@ -223,6 +229,8 @@ impl<'a> ActivateFruitPressCommand<'a> {
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
+        self.mode = FruitPressMode::Pressing;
+
         let timer = timer::Timer::new();
 
         // unwrap senders to avoid thread sending problems
@@ -265,6 +273,8 @@ impl<'a> ActivateFruitPressCommand<'a> {
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) {
+        self.mode = FruitPressMode::Filling;
+
         let timer = timer::Timer::new();
 
         // unwrap senders to avoid thread sending problems
