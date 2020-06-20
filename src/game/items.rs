@@ -45,6 +45,7 @@ impl ItemClass {
             "tool" => Tool,
             "potion" => Potion,
             "food" => Food,
+            "material" => Material,
             _ => panic!("unknown item class"),
         }
     }

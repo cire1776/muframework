@@ -55,6 +55,11 @@ reed_basket tool "Reed Basket" {
 worn_bronze_axe tool "Worn Bronze Axe" {
     endorsement: :can_chop
 }
+glass_bottle material "Glass Bottle"
+apple food "Apple"
+olive food "Olive"
+apple_juice food "Apple Juice"
+olive_oil food "Olive Oil"
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -82,12 +87,15 @@ worn_bronze_axe tool "Worn Bronze Axe" {
     property: age => 36     // in months
 }
 #press 11,11 "A Rickety Fruit Press" {
-    item: 0
-    loaded: 0
-    output: 0
+    property: item => 0
+    property: output => 0
 }
 ===END OF FACILITIES===
 player amber_leather_cap
+player glass_bottle
+player glass_bottle
+player glass_bottle
+player glass_bottle
 chest1 shiny_dagger // a dagger
 chest1 sharp_short_sword
 chest1 pink_potion
