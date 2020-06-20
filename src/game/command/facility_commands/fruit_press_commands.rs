@@ -264,12 +264,9 @@ impl<'a> ActivateFruitPressCommand<'a> {
         let index = facility.get_property("item");
         let fruit_type = FruitType::from(index);
 
-        let guard = timer.schedule_repeating(
-            chrono::Duration::seconds(self.expiration() as i64),
-            move || {
-                Command::send(Some(&command_sender), Command::ActivityComplete);
-            },
-        );
+        let guard = timer.schedule_repeating(chrono::Duration::seconds(30), move || {
+            Command::send(Some(&command_sender), Command::ActivityComplete);
+        });
 
         let activity = self.create_fill_activity(
             fruit_type,
