@@ -200,6 +200,16 @@ impl SparseMap {
                 y: 0,
                 facing: Direction::Up,
             },
+            FacilityClass::Lumbermill => ui::Sprite {
+                style: SpriteStyle {
+                    glyph: '*' as u8, // '*'
+                    fg: RGB::named(rltk::BLUE),
+                    bg: RGB::named(rltk::LIGHTBLUE),
+                },
+                x: 0,
+                y: 0,
+                facing: Direction::Up,
+            },
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,

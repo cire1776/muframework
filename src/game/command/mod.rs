@@ -13,10 +13,7 @@ pub use item_commands::{
     UnequipCommand,
 };
 pub mod facility_commands;
-pub use facility_commands::{
-    ActivateFruitPressCommand, ActivateFruitPressFillCommand, ActivateTreeLoggingCommand,
-    ActivateTreePickingCommand, OpenChestCommand, OpenFruitPressCommand, TreeType,
-};
+pub use facility_commands::*;
 
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
@@ -384,6 +381,9 @@ fn can_use_at(
                             || ActivateFruitPressCommand::can_perform(facility, inventory)
                     }
                 }
+                FacilityClass::Lumbermill => {
+                    ActivateLumberMillCommand::can_perform(player, facility)
+                }
                 _ => false,
             }
         }
@@ -472,6 +472,10 @@ fn use_at<'a>(
                     ))),
                     _ => None,
                 },
+                FacilityClass::Lumbermill => Some(Box::new(ActivateLumberMillCommand::new(
+                    player,
+                    facility_id,
+                ))),
                 _ => None,
             }
         }

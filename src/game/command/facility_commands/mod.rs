@@ -12,3 +12,6 @@ pub use tree_commands::*;
 
 pub mod fruit_press_commands;
 pub use fruit_press_commands::*;
+
+pub mod lumbermill_commands;
+pub use lumbermill_commands::*;

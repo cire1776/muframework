@@ -62,6 +62,14 @@ apple food "Apple"
 olive food "Olive"
 apple_juice food "Apple Juice"
 olive_oil food "Olive Oil"
+softwood_log material "Softwood Log" {
+    endorsement: :wants_to_mill_softwood
+}
+hardwood_log material "Hardwood Log" {
+    endorsement: :wants_to_mill_hardwood
+}
+hardwood_board material "Hardwood Board"
+softwood_board material "Softwood Board"
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -92,12 +100,18 @@ olive_oil food "Olive Oil"
     property: item => 0
     property: output => 0
 }
+*lumbermill 12,11 "A Rickety Lumbermill"
+
 ===END OF FACILITIES===
 player amber_leather_cap
 player glass_bottle
 player glass_bottle
 player glass_bottle
 player glass_bottle
+player hardwood_log
+player hardwood_log
+player softwood_log
+player softwood_log
 chest1 shiny_dagger // a dagger
 chest1 sharp_short_sword
 chest1 pink_potion

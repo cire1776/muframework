@@ -13,6 +13,7 @@ pub enum FacilityClass {
     PineTree,
     OakTree,
     FruitPress,
+    Lumbermill,
 }
 
 impl FacilityClass {
@@ -24,6 +25,7 @@ impl FacilityClass {
             "▲pine" => FacilityClass::PineTree,
             "▲oak" => FacilityClass::OakTree,
             "#press" => FacilityClass::FruitPress,
+            "*lumbermill" => FacilityClass::Lumbermill,
             _ => panic!("unknown FacilityClass symbol"),
         }
     }
