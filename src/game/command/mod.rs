@@ -363,9 +363,6 @@ fn can_use_at(
         tile_map::Tile::ClosedDoor | tile_map::Tile::OpenDoor => true,
         tile_map::Tile::Facility(facility_id) => {
             let facility = facilities.get(facility_id).expect("facility not found");
-            let inventory = inventories
-                .get_mut(&facility.id)
-                .expect("unable to find inventory");
             match facility.class {
                 FacilityClass::ClosedChest => !facility.is_in_use(),
                 FacilityClass::AppleTree | FacilityClass::OliveTree => {
@@ -376,6 +373,10 @@ fn can_use_at(
                     ActivateTreeLoggingCommand::can_perform(player, facility)
                 }
                 FacilityClass::FruitPress => {
+                    let inventory = inventories
+                        .get_mut(&facility.id)
+                        .expect("unable to find inventory");
+
                     if mode == MoveCommandMode::SneakUse {
                         OpenFruitPressCommand::can_perform(player, facility)
                     } else {
