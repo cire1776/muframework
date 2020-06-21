@@ -173,7 +173,7 @@ impl UIState {
                         Command::None
                     }
                 }
-
+                VirtualKeyCode::Backslash => Command::DumpPlayer,
                 _ => Command::None,
             },
         }

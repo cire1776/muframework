@@ -13,6 +13,21 @@ pub struct Player {
     pub activity: Option<Box<dyn command::Activity>>,
 }
 
+impl std::fmt::Debug for Player {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Player")
+            .field("id", &self.x)
+            .field("x", &self.x)
+            .field("y", &self.y)
+            .field("facing", &self.facing)
+            .field("character_type", &self.character_type)
+            .field("mounting_points", &self.mounting_points)
+            .field("external_inventory", &self.external_inventory)
+            .field("endorsements", &self.endorsements)
+            .finish()
+    }
+}
+
 impl Player {
     pub fn new() -> Player {
         let mut player = Player {

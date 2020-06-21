@@ -42,6 +42,7 @@ pub enum MapLayer {
 pub enum Command {
     None,
     QuitGame,
+    DumpPlayer,
     Move(Direction, MoveCommandMode),
     Teleport(u64, i32, i32),
     SpawnItem(u64, ItemClass, String), // (inventory_id, ItemClass, Description)

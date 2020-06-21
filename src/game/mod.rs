@@ -201,6 +201,7 @@ impl GameState {
                 GameUpdate::send(update_tx, Exit);
                 return;
             }
+            Command::DumpPlayer => println!("{:?}", player),
             Command::Move(direction, mode) => Command::move_player(
                 *direction,
                 *mode,
