@@ -68,8 +68,8 @@ softwood_log material "Softwood Log" {
 hardwood_log material "Hardwood Log" {
     endorsement: :wants_to_mill_hardwood
 }
-hardwood_board material "Hardwood Board"
-softwood_board material "Softwood Board"
+hardwood_plank material "Hardwood Plank"
+softwood_plank material "Softwood Plank"
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
