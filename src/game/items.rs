@@ -96,9 +96,9 @@ impl ItemState {
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
 pub struct ItemType {
-    class: ItemClass,
-    description: String,
-    endorsements: Vec<String>,
+    pub class: ItemClass,
+    pub description: String,
+    pub endorsements: Vec<String>,
 }
 
 impl ItemType {
