@@ -463,10 +463,10 @@ impl Activity for FruitPressFillActivity {
     }
     fn on_completion(
         &self,
-        _player_inventory_id: u64,
+        player_inventory_id: u64,
         facility: &mut Facility,
-        _items: &mut ItemList,
-        _inventories: &mut InventoryList,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
         update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
     ) {
@@ -482,6 +482,11 @@ impl Activity for FruitPressFillActivity {
             Some(&command_sender),
             Command::SpawnItem(1, ItemClass::Food, product),
         );
+
+        let inventory = inventories.get_mut(&player_inventory_id).unwrap();
+        if !inventory.any_left_after_consuming(ItemClass::Material, "Glass Bottle", 1, items) {
+            Command::send(Some(&command_sender), Command::ActivityAbort);
+        }
 
         Command::send(Some(&command_sender), Command::RefreshInventory);
 

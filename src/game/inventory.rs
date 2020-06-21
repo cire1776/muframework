@@ -310,7 +310,7 @@ impl Inventory {
     /// ```
     pub fn accept_by_id(&mut self, item_id: u64, items: &mut ItemList) {
         let item = items.get_as_item(item_id).expect("Item not found.");
-        self.accept(&item, items);
+        self.accept_stack_unmut(&item, items);
     }
 
     fn accept_permissible(&mut self, item: &Item, items: &mut ItemList) {
@@ -422,30 +422,29 @@ impl Inventory {
         self.items.remove(&item_id);
     }
 
-    pub fn any_left_after_consuming<S: ToString, N: TryInto<u8>>(
+    pub fn consume<S: ToString, N: TryInto<u8>>(
         &mut self,
         class: ItemClass,
         description: S,
         quantity: N,
         items: &mut ItemList,
-    ) -> bool {
-        let quantity = quantity.try_into().ok().expect("must be convertible to u8");
+    ) {
+        let mut quantity = quantity.try_into().ok().expect("must be convertible to u8");
 
         if quantity > 1 {
             todo!("Not yet implemented for more than 1");
         }
 
-        let mut target = Item::new(NEXT_ITEM_ID(), ItemType::new(class, description), quantity);
+        let target_type = items.item_types.find(class, description).clone();
 
         for (_, v) in self.items.iter_mut() {
-            if target.quantity <= 0 {
-                target.quantity = 0;
+            if quantity <= 0 {
                 break;
             }
 
-            if v.is_same_type_as(&target) {
-                let delta = std::cmp::min(v.quantity, target.quantity);
-                target.quantity -= delta;
+            if v.item_type == target_type {
+                let delta = std::cmp::min(v.quantity, quantity);
+                quantity -= delta;
                 v.quantity -= delta;
 
                 if v.quantity > 0 {
@@ -455,10 +454,59 @@ impl Inventory {
                 }
             }
         }
-
-        self.items.iter().any(|(_, i)| i.is_same_type_as(&target))
     }
 
+    pub fn any_left_after_consuming<S: ToString, N: TryInto<u8>>(
+        &mut self,
+        class: ItemClass,
+        description: S,
+        quantity: N,
+        items: &mut ItemList,
+    ) -> bool {
+        let quantity = quantity
+            .try_into()
+            .ok()
+            .expect("must be convertible to u8.");
+
+        let target = items.item_types.find(class, description).clone();
+
+        self.consume(target.class, &target.description, quantity, items);
+
+        self.items.iter().any(|(_, i)| i.item_type == target)
+    }
+
+    pub fn split_stack<N: TryInto<u8>>(
+        &mut self,
+        quantity_to_transfer: N,
+        item_id: u64,
+        items: &mut ItemList,
+    ) -> Result<Item, &'static str> {
+        let quantity_to_transfer = quantity_to_transfer
+            .try_into()
+            .ok()
+            .expect("Must be convertible to u8");
+
+        let item = self[item_id].clone();
+
+        if item.quantity == quantity_to_transfer {
+            return Ok(item);
+        }
+
+        if quantity_to_transfer > item.quantity - 1 {
+            return Err("quantity to transfer must be less than the item's quantity");
+        }
+
+        let new_item = self.spawn_stack(
+            item.class(),
+            item.raw_description(),
+            quantity_to_transfer,
+            items,
+        );
+
+        self.update_item(item.id, item.quantity - quantity_to_transfer, items);
+
+        Ok(new_item)
+    }
     /// returns true if inventory holds an item_id.
     pub fn holds(&mut self, item_id: u64) -> bool {
         self.items.contains_key(&item_id)

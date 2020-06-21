@@ -120,30 +120,38 @@ impl MountingPointMap {
         inventory: &mut Inventory,
         items: &mut ItemList,
     ) {
-        let mounting_points = ItemClassSpecifier::mounting_points_for(&item, item_class_specifiers);
+        if let ItemState::Stored(item, _inventory_id) = items[item.id].clone() {
+            // inventory.consume(item.class(), item.raw_description(), 1, items);
 
-        if mounting_points.is_empty() {
-            return;
+            let item = inventory.split_stack(1, item.id, items).ok().unwrap();
+            inventory.release_item(&item.id);
+
+            let mounting_points =
+                ItemClassSpecifier::mounting_points_for(&item, item_class_specifiers);
+
+            if mounting_points.is_empty() {
+                return;
+            }
+
+            let previous = self
+                .mounts
+                .get(mounting_points[0])
+                .expect("previous not found");
+
+            if let Some(previous_id) = previous {
+                Self::unmount_previous_item(*previous_id, inventory, items)
+            }
+
+            self.mount_new_item(&item, &mounting_points, inventory, items)
+        } else {
+            panic!("item is not stored");
         }
-
-        let previous = self
-            .mounts
-            .get(mounting_points[0])
-            .expect("previous not found");
-
-        if let Some(previous_id) = previous {
-            Self::unmount_previous_item(*previous_id, inventory, items)
-        }
-
-        if let ItemState::Stored(new_item, _inventory_id) = items[item.id].clone() {
-            self.mount_new_item(&new_item, &mounting_points, inventory, items)
-        };
     }
 
     fn unmount_previous_item(previous_id: u64, inventory: &mut Inventory, items: &mut ItemList) {
         if let ItemState::Equipped(previous_item, inventory_id) = &items[previous_id].to_owned() {
             items[previous_id] = ItemState::Stored(previous_item.clone(), *inventory_id);
-            inventory.accept_stack_unmut(&previous_item, items)
+            inventory.accept_stack_unmut(previous_item, items)
         } else {
             panic!("Previous item not equipped.")
         }
@@ -169,15 +177,22 @@ impl MountingPointMap {
         items: &mut ItemList,
     ) {
         if self.mounts.iter().any(|(_mp, item)| item == &Some(item_id)) {
-            self.force_unmount_item_by_id(item_id);
+            self.force_unmount_item_by_id(item_id, inventory, items);
             inventory.accept_by_id(item_id, items);
         }
     }
 
-    fn force_unmount_item_by_id(&mut self, item_id: u64) {
+    fn force_unmount_item_by_id(
+        &mut self,
+        item_id: u64,
+        inventory: &mut Inventory,
+        items: &mut ItemList,
+    ) {
         for (_, id) in self.mounts.iter_mut() {
             // set item_id elements to None
             if *id == Some(item_id) {
+                let item = items.get_as_item(id.unwrap()).unwrap();
+                items.store(&item, inventory.id());
                 *id = None;
             }
         }

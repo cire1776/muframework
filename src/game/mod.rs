@@ -157,6 +157,7 @@ impl GameState {
         players_inventory.spawn_by_type("apple", 63, &item_types.clone(), &mut items);
         players_inventory.spawn_by_type("olive", 100, &item_types.clone(), &mut items);
         players_inventory.spawn_by_type("apple", 16, &item_types.clone(), &mut items);
+        players_inventory.spawn_by_type("glass_bottle", 64, &item_types.clone(), &mut items);
 
         // consider adding a function to level to do these things
         Level::introduce_player(&player, inventories, update_tx);
