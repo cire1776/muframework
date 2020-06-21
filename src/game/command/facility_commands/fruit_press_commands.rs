@@ -290,6 +290,9 @@ impl Activity for FruitPressActivity {
 
         let count = facility.get_property("output");
         facility.set_property("output", count + 1);
+        if count + 1 == 10 {
+            Command::send(Some(&command_sender), Command::ActivityAbort);
+        }
 
         let inventory = inventories
             .get_mut(&facility.id)
