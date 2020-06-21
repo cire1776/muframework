@@ -65,8 +65,8 @@ impl<'a> OpenFruitPressCommand<'a> {
         }
     }
 
-    pub fn can_perform(_player: &Player, facility: &Facility) -> bool {
-        facility.get_property("output") == 0
+    pub fn can_perform(_player: &Player, _facility: &Facility) -> bool {
+        true
     }
 }
 
