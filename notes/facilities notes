@@ -102,3 +102,23 @@ When the player uses the press
 The a 30 second timer starts
 And after 30 seconds
 Then a bottle of Apple Juice should be placed in the player's inventory.
+
+
+Well
+====
+well x, y "A water well" {
+    fluid: 0=dry, 1=water, 2=oil, 3=bedrock
+    depth: 100
+    chance_of_drying_up: 5000
+    chance_of_hitting_water: 100
+    chance_of_hitting_oil: 50_000
+    chance_of_hitting_bedrock: 50_000
+}
+    operational(fluid is 1): has hit water.  if user has :can_fill they will fill water with 30 second timer.
+    drilling: looking for water. each dig has a 1in x chance of hitting water.  if user has :can_drill they will dig
+        for 60 seconds which will deepen the well by 1 foot.
+
+    drilling wells uses engineering skill.  wells can be 1-3000 feet deep.  1 7 14 28 35 42 45
+        ordinary wells are less than 1000 feet deep.  Master wells are those deeper than 1000 feet.
+        once bedrock has been reached only a master engineer can drill further.
+

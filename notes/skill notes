@@ -62,10 +62,33 @@ Harvesting
 Lockpicking
 Locksmithing
 Construction (milling lumber)
-Cooking (fruit press)
-
+Cooking (fruit press, well filling)
+Engineering (well drilling/Mineshaft preparation)
 
 Skill
 SkillChart
 SkillChartLists
+
+Engineering
+===========
+          1-100 engineering 1  bonus xp: 100     no endorsement
+work 1                      4                    :mineshaft_work_1          
+        101-200 engineering 7  bonus xp: 1000    :drilling_1
+mine 1                      10 bonus xp: 1000    :mineshaft_1
+        201-300 engineering 14 bonus xp: 5000    :drilling_2
+mine 2                      18 bonus xp: 5000    :mineshaft_2
+work 2                      20                   :mineshaft_work_3          
+        301-400 engineering 21 bonus xp: 10000   :drilling_3
+mine 3                      25 bonus xp:10000    :mineshaft_3
+        401-599 engineering 28 bonus xp: 50000   :drilling_4
+work 3                      30                   :mineshaft_work_5          
+mine 4                      33 bonus xp: 50000   :mineshaft_4
+        601-800 engineering 36 bonus xp:100000   :drilling_5
+mine 5                      40 bonus xp:100000   :mineshaft_5
+        801-999 engineering 43 bonus xp:500000   :drilling_6
+        1000>   engineering 45 master points     :drilling_master
+                                                 :mineshaft_master
+
+Skill Levels
+============
 
