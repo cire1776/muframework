@@ -344,14 +344,33 @@ impl Inventory {
 
     /// creates an item and places it in the inventory generating
     ///   an appropriate id.
-    pub fn spawn_item<S: ToString>(
+    pub fn spawn_item<S: ToString, N: TryInto<u8>>(
         &mut self,
         class: ItemClass,
         description: S,
+        quantity: N,
         items: &mut ItemList,
     ) {
-        let mut item = Item::spawn(class, description);
+        let quantity = quantity.try_into().ok().expect("must be convertible to u8");
+        let mut item = Item::spawn_with_type(class, description, quantity, items);
         self.accept_stack(&mut item, items);
+    }
+
+    pub fn spawn_stack<S: ToString, N: TryInto<u8>>(
+        &mut self,
+        class: ItemClass,
+        description: S,
+        quantity: N,
+        items: &mut ItemList,
+    ) -> Item {
+        let quantity = quantity.try_into().ok().expect("must be convertible to u8");
+
+        let mut item = Item::spawn_with_type(class, description.to_string(), quantity, items);
+
+        items.store(&item, self.id());
+        self.force_accept(&mut item);
+
+        item
     }
 
     pub fn spawn_by_type<S: ToString, N: TryInto<u8>>(
@@ -360,9 +379,29 @@ impl Inventory {
         quantity: N,
         item_types: &ItemTypeList,
         items: &mut ItemList,
-    ) {
-        let mut item = Item::spawn_from_type(item_type_name.to_string(), quantity, item_types);
+    ) -> Item {
+        let mut quantity = quantity.try_into().ok().expect("must be convertible to u8");
+        let item_type_name = item_type_name.to_string();
+
+        let class = item_types[&item_type_name].class;
+        let limit = ItemClass::stack_limits(class);
+        if quantity > limit {
+            self.spawn_by_type(item_type_name.clone(), quantity - limit, item_types, items);
+            quantity = limit;
+        }
+
+        let mut item = Item::spawn_from_type(item_type_name, quantity, item_types);
         self.accept_stack(&mut item, items);
+        item
+    }
+
+    pub fn update_item(&mut self, item_id: u64, new_quantity: u8, items: &mut ItemList) {
+        let item = self
+            .items
+            .get_mut(&item_id)
+            .expect("unable to find item in inventory");
+        item.quantity = new_quantity;
+        items.update_item(item)
     }
 
     /// release item and bundle it at x,y
@@ -470,6 +509,8 @@ impl Index<u64> for Inventory {
 #[cfg(test)]
 mod test_inventory {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::test_support::*;
 
     #[test]
     fn to_iter() {
@@ -515,18 +556,16 @@ mod test_inventory {
 #[cfg(test)]
 mod inventory_spawn_item {
     use super::*;
+    use crate::test_support::*;
     use ItemClass::*;
 
     #[test]
     fn it_stacks_correctly() {
         let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
-        let item = Item::spawn(Potion, "Mtn Dew");
+        let item = spawn_item_into_inventory(Potion, "Mtn Dew", 1, &mut subject, &mut items);
 
-        items.store(&item, subject.id());
-        subject.accept(&item, &mut items);
-
-        subject.spawn_item(Potion, "Mtn Dew", &mut items);
+        subject.spawn_item(Potion, "Mtn Dew", 1, &mut items);
 
         assert_eq!(subject[item.id].quantity, 2);
     }
@@ -535,6 +574,7 @@ mod inventory_spawn_item {
 #[cfg(test)]
 mod accept_stack {
     use super::*;
+    use crate::test_support::*;
     use ItemClass::*;
 
     #[test]
@@ -542,11 +582,11 @@ mod accept_stack {
         let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
 
-        let mut item = Item::spawn(Headwear, "Mtn Dew Cap");
+        let mut item = test_item(Headwear, "Mtn Dew Cap", 1);
 
         subject.accept_stack(&mut item, &mut items);
 
-        let mut new_item = Item::spawn(Headwear, "Mtn Dew Cap");
+        let mut new_item = test_item(Headwear, "Mtn Dew Cap", 1);
 
         subject.accept_stack(&mut new_item, &mut items);
 
@@ -560,7 +600,7 @@ mod accept_stack {
     fn adds_1_to_the_stack_when_given_an_item_of_1() {
         let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
-        let item = Item::spawn(Potion, "Mtn Dew");
+        let item = test_item(Potion, "Mtn Dew", 1);
         let item_id = item.id;
 
         let mut new_item = Item::spawn_stack(Potion, "Mtn Dew", 7);
@@ -580,7 +620,7 @@ mod accept_stack {
     fn only_first_in_multiple_stacks_changed_if_it_can_fit() {
         let mut items = ItemList::new(None);
         let mut subject = Inventory::new(1);
-        let item1 = Item::spawn(Potion, "Mtn Dew");
+        let item1 = test_item(Potion, "Mtn Dew", 1);
         let item2 = Item::spawn_stack(Potion, "Mtn Dew", 2);
 
         let mut new_item = Item::spawn_stack(Potion, "Mtn Dew", 7);

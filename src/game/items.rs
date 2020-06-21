@@ -264,8 +264,20 @@ impl Item {
     }
 
     /// creates a new item assigning it its Id as appropriate.
-    pub fn spawn<S: ToString>(class: ItemClass, description: S) -> Item {
+    pub fn spawn<S: ToString>(class: ItemClass, description: S, item_types: &ItemTypeList) -> Item {
         Self::spawn_stack(class, description, 1)
+    }
+
+    pub fn spawn_with_type<S: ToString, N: TryInto<u8>>(
+        class: ItemClass,
+        description: S,
+        quantity: N,
+        items: &mut ItemList,
+    ) -> Item {
+        let item_types = &items.item_types;
+        let item_type = item_types.find(class, description);
+
+        Item::new(NEXT_ITEM_ID(), item_type.clone(), quantity)
     }
 
     pub fn spawn_from_type<S: ToString, N: TryInto<u8>>(
@@ -353,11 +365,13 @@ impl Item {
     /// # Examples:
     /// ```
     /// # use muframework::game::items::*;
-    /// let item = Item::spawn(ItemClass::BladeWeapon, "Broadsword");
+    /// let item_types = ItemTypeList::new();
+    /// let item = Item::spawn(ItemClass::BladeWeapon, "Broadsword",&item_types);
     /// assert!(!item.is_stackable());
     /// ```
     /// ```
     /// # use muframework::game::items::*;
+    /// let item_types = ItemTypeList::new();
     /// let item = Item::spawn_stack(ItemClass::Potion, "A Brown Potion",10);
     /// assert!(item.is_stackable());
     /// ```
@@ -369,13 +383,15 @@ impl Item {
     /// # Examples:
     /// ```
     /// use muframework::game::items::*;
-    /// let item1 = Item::spawn(ItemClass::Potion, "a bubbly brew");
-    /// let item2 = Item::spawn(ItemClass::Potion, "a pink potion");
+    /// let item_types = ItemTypeList::new();
+    /// let item1 = Item::spawn(ItemClass::Potion, "a bubbly brew", &item_types);
+    /// let item2 = Item::spawn(ItemClass::Potion, "a pink potion", &item_types);
     /// assert!(!item1.is_same_type_as(&item2));
     /// ```
     /// ```
     /// use muframework::game::items::*;
-    /// let item = Item::spawn(ItemClass::Potion, "a bubbly brew");
+    /// let item_types = ItemTypeList::new();
+    /// let item = Item::spawn(ItemClass::Potion, "a bubbly brew", &item_types);
     /// assert!(item.is_same_type_as(&item));
     /// ```
 
@@ -588,6 +604,7 @@ impl IndexMut<u64> for ItemList {
 #[cfg(test)]
 mod item_list_index_mut {
     use super::*;
+    use crate::test_support::*;
 
     #[test]
     fn test_returns_properly_when_given_a_non_existent_element() {
@@ -607,10 +624,13 @@ mod item_list_index_mut {
 #[cfg(test)]
 mod update_item {
     use super::*;
+    use crate::test_support::*;
+    #[allow(unused_imports)]
+    use ItemClass::*;
 
     #[test]
     fn it_updates_a_stored_item() {
-        let item = Item::spawn(Potion, "Coca-Cola");
+        let item = test_item(Potion, "Coca-Cola", 1);
         let item_id = item.id;
         let new_item = Item::new(item.id, ItemType::new(item.class(), item.description()), 8);
         let mut subject = ItemList::new(None);
@@ -624,7 +644,7 @@ mod update_item {
     }
     #[test]
     fn it_updates_a_bundle_item() {
-        let item = Item::spawn(Potion, "Coca-Cola");
+        let item = test_item(Potion, "Coca-Cola", 1);
         let item_id = item.id;
         let new_item = Item::new(item.id, ItemType::new(item.class(), item.description()), 8);
 

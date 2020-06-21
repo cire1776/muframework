@@ -69,20 +69,6 @@ impl MountingPointMap {
     /// let subject = MountingPointMap::new();
     /// assert!(subject.at(&MountingPoint::Head) == None);
     /// ```
-    /// ```
-    /// # use muframework::game::equipment::*;
-    /// # use muframework::game::items::*;
-    /// let mut subject = MountingPointMap::new();
-    /// let item_class_specifiers = ItemClassSpecifier::initialize();
-    /// let inventory = &mut Inventory::new(1002);
-    /// let items = &mut ItemList::new(None);
-    /// let hat = Item::new(958, ItemType::new(ItemClass::Headwear, "a trusty cap"),1);
-    /// items.store(&hat,1002);
-    ///
-    /// subject.mount(&hat, &item_class_specifiers, inventory, items);
-    ///
-    /// assert_eq!(subject.at(&MountingPoint::Head), Some(hat.id));
-    /// ```
     pub fn at(&self, mounting_point: &MountingPoint) -> Option<u64> {
         self.mounts[mounting_point]
     }
@@ -314,20 +300,18 @@ impl ItemClassSpecifier {
 #[cfg(test)]
 mod mounting_point_map {
     use super::*;
+    use crate::test_support::*;
+    use ItemClass::*;
 
     #[test]
     fn mount_mounts_item_at_specified_mounting_point() {
         let mut subject = MountingPointMap::new();
         let mut items = ItemList::new(None);
-        let item_class_specifiers = ItemClassSpecifier::initialize();
-        let item = Item {
-            id: 1,
-            quantity: 1,
-            item_type: ItemType::new(ItemClass::Headwear, "hat"),
-        };
-        items[1] = ItemState::Stored(item.clone(), 1);
-
         let mut inventory = Inventory::new(1);
+        let item_class_specifiers = ItemClassSpecifier::initialize();
+
+        let item =
+            spawn_item_into_inventory(ItemClass::Headwear, "hat", 1, &mut inventory, &mut items);
 
         subject.mount(&item, &item_class_specifiers, &mut inventory, &mut items);
 
@@ -339,22 +323,12 @@ mod mounting_point_map {
         let mut subject = MountingPointMap::new();
 
         let mut items = ItemList::new(None);
-
-        let item = Item {
-            id: 1,
-            quantity: 1,
-            item_type: ItemType::new(ItemClass::Headwear, "hat"),
-        };
-        items[1] = ItemState::Stored(item.clone(), 1);
-
-        let old_item = Item {
-            id: 2,
-            quantity: 1,
-            item_type: ItemType::new(ItemClass::Headwear, "old hat"),
-        };
-        items[2] = ItemState::Stored(old_item.clone(), 1);
-
         let mut inventory = Inventory::new(1);
+
+        let item = spawn_item_into_inventory(Headwear, "hat", 1, &mut inventory, &mut items);
+        let old_item =
+            spawn_item_into_inventory(Headwear, "old hat", 1, &mut inventory, &mut items);
+
         let item_class_specifiers = ItemClassSpecifier::initialize();
 
         subject.mount(
@@ -368,8 +342,8 @@ mod mounting_point_map {
 
         subject.mount(&item, &item_class_specifiers, &mut inventory, &mut items);
 
-        assert_eq!(items[1], ItemState::Equipped(item, 1));
-        assert_eq!(items[2], ItemState::Stored(old_item, 1));
+        assert_eq!(items[item.id], ItemState::Equipped(item, 1));
+        assert_eq!(items[old_item.id], ItemState::Stored(old_item, 1));
     }
 
     #[test]
@@ -591,6 +565,7 @@ mod mounting_point_map_unmount {
 #[cfg(test)]
 mod at_ready {
     use super::*;
+    use crate::test_support::*;
 
     #[test]
     fn all_mounting_points_has_at_ready() {
@@ -600,13 +575,11 @@ mod at_ready {
     #[test]
     fn food_mounts_at_at_ready() {
         let mut subject = MountingPointMap::new();
-        let item_class_specifiers = ItemClassSpecifier::initialize();
         let inventory = &mut Inventory::new(1114);
-        let mut item_types = ItemTypeList::new();
-        item_types.insert("Olive", ItemType::new(ItemClass::Food, "Olive"));
-        let items = &mut ItemList::new(Some(item_types.clone()));
-        let food_item = Item::spawn_from_type("Olive", 1, &item_types);
-        items.store(&food_item, 1114);
+        let items = &mut ItemList::new(None);
+        let item_class_specifiers = ItemClassSpecifier::initialize();
+
+        let food_item = spawn_item_into_inventory(ItemClass::Food, "Biscuit", 1, inventory, items);
         subject.mount(&food_item, &item_class_specifiers, inventory, items);
 
         assert_eq!(subject.at(&MountingPoint::AtReady), Some(food_item.id));

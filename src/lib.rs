@@ -125,3 +125,40 @@ impl GameUpdate {
 use GameUpdate::*;
 
 pub trait StaticData: 'static {}
+
+#[cfg(test)]
+pub mod test_support {
+    use super::*;
+    use game::inventory::*;
+    use game::items::{Item, ItemList, ItemType, ItemTypeList};
+    use game::NEXT_ITEM_ID;
+    use std::convert::TryInto;
+
+    pub fn test_item<S: ToString, N: TryInto<u8>>(
+        class: ItemClass,
+        description: S,
+        quantity: N,
+    ) -> Item {
+        Item::new(
+            NEXT_ITEM_ID(),
+            ItemType::new(class, description.to_string()),
+            quantity,
+        )
+    }
+
+    pub fn spawn_item_into_inventory<S: ToString, N: TryInto<u8>>(
+        class: ItemClass,
+        description: S,
+        quantity: N,
+        inventory: &mut Inventory,
+        items: &mut ItemList,
+    ) -> Item {
+        let description = description.to_string();
+        {
+            let item_types = &mut items.item_types;
+            item_types.lookup_or_insert(&description, class, &description);
+        }
+
+        inventory.spawn_by_type(&description, quantity, &items.item_types.clone(), items)
+    }
+}

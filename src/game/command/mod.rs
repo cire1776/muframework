@@ -79,7 +79,7 @@ impl Command {
             .get_mut(&inventory_id)
             .expect("unable to find inventory");
 
-        inventory.spawn_item(class, description, items);
+        inventory.spawn_item(class, description, 1, items);
     }
 
     pub fn pickup_item(
