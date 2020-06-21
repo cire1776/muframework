@@ -42,12 +42,12 @@ static GLOBAL_NEXT_ID: AtomicU64 = AtomicU64::new(2);
 static GLOBAL_NEXT_ITEM_ID: AtomicU64 = AtomicU64::new(1);
 
 #[allow(non_snake_case)]
-fn NEXT_ID() -> u64 {
+pub fn NEXT_ID() -> u64 {
     GLOBAL_NEXT_ID.fetch_add(1, Ordering::SeqCst)
 }
 
 #[allow(non_snake_case)]
-fn NEXT_ITEM_ID() -> u64 {
+pub fn NEXT_ITEM_ID() -> u64 {
     GLOBAL_NEXT_ITEM_ID.fetch_add(1, Ordering::SeqCst)
 }
 
