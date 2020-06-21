@@ -437,6 +437,8 @@ impl Inventory {
 
         let target_type = items.item_types.find(class, description).clone();
 
+        let mut items_to_be_removed: Vec<u64> = vec![];
+
         for (_, v) in self.items.iter_mut() {
             if quantity <= 0 {
                 break;
@@ -450,9 +452,14 @@ impl Inventory {
                 if v.quantity > 0 {
                     items.update_item(v);
                 } else {
+                    items_to_be_removed.push(v.id);
                     items.remove(v);
                 }
             }
+        }
+
+        for dead_item_id in items_to_be_removed {
+            self.release_item(&dead_item_id);
         }
     }
 
