@@ -188,6 +188,17 @@ impl ItemTypeList {
         }
         &self.item_types[&key]
     }
+
+    pub fn find<S: ToString>(&self, class: ItemClass, description: S) -> &ItemType {
+        let description = description.to_string();
+
+        let (_, result) = self
+            .item_types
+            .iter()
+            .find(|(_, c)| c.class == class && c.description == description)
+            .expect("unable to find item_type");
+        result
+    }
 }
 
 impl Index<&String> for ItemTypeList {
