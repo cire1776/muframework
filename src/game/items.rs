@@ -608,7 +608,6 @@ impl IndexMut<u64> for ItemList {
 #[cfg(test)]
 mod item_list_index_mut {
     use super::*;
-    use crate::test_support::*;
 
     #[test]
     fn test_returns_properly_when_given_a_non_existent_element() {

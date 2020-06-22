@@ -224,14 +224,14 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
 }
 
 pub struct FruitPressActivity {
-    player_inventory_id: u64,
+    _player_inventory_id: u64,
     fruit_type: FruitType,
     expiration: u32,
     facility_id: u64,
     _timer: timer::Timer,
     guard: Option<Guard>,
-    update_sender: GameUpdateSender,
-    command_sender: CommandSender,
+    _update_sender: GameUpdateSender,
+    _command_sender: CommandSender,
 }
 
 impl FruitPressActivity {
@@ -246,55 +246,40 @@ impl FruitPressActivity {
         command_sender: CommandSender,
     ) -> Self {
         Self {
-            player_inventory_id,
+            _player_inventory_id: player_inventory_id,
             fruit_type,
             expiration,
             facility_id,
             _timer: timer,
             guard,
-            update_sender,
-            command_sender,
+            _update_sender: update_sender,
+            _command_sender: command_sender,
         }
     }
 }
 
 impl Activity for FruitPressActivity {
-    fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(self.expiration * 1000, ui::pane::PaneTitle::Pressing),
-        );
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        ui::pane::PaneTitle::Pressing
     }
-    fn complete(
-        &mut self,
-        facilities: &mut FacilityList,
-        items: &mut ItemList,
-        inventories: &mut InventoryList,
-    ) {
-        let facility = facilities
-            .get_mut(self.facility_id)
-            .expect("can't find facility");
 
-        self.on_completion(
-            self.player_inventory_id,
-            facility,
-            items,
-            inventories,
-            &self.update_sender,
-            &self.command_sender,
-        );
+    fn expiration(&self) -> u32 {
+        self.expiration
     }
+
+    fn facility_id(&self) -> u64 {
+        self.facility_id
+    }
+
     fn on_completion(
         &self,
         _player_inventory_id: u64,
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-        update_sender: &GameUpdateSender,
+        _update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    ) {
-        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
-
+    ) -> RefreshInventoryFlag {
         if facility.increment_property("output") == 10 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
@@ -312,7 +297,7 @@ impl Activity for FruitPressActivity {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
-        self.start(&update_sender);
+        RefreshInventoryFlag::DontRefreshInventory
     }
 
     fn clear_guard(&mut self) {
@@ -409,12 +394,12 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
 pub struct FruitPressFillActivity {
     fruit_type: FruitType,
     expiration: u32,
-    player_inventory_id: u64,
+    _player_inventory_id: u64,
     facility_id: u64,
     _timer: timer::Timer,
     guard: Option<Guard>,
-    update_sender: GameUpdateSender,
-    command_sender: CommandSender,
+    _update_sender: GameUpdateSender,
+    _command_sender: CommandSender,
 }
 
 impl FruitPressFillActivity {
@@ -431,53 +416,38 @@ impl FruitPressFillActivity {
         Self {
             fruit_type,
             expiration,
-            player_inventory_id,
+            _player_inventory_id: player_inventory_id,
             facility_id,
             _timer: timer,
             guard,
-            update_sender,
-            command_sender,
+            _update_sender: update_sender,
+            _command_sender: command_sender,
         }
     }
 }
 
 impl Activity for FruitPressFillActivity {
-    fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(self.expiration * 1000, ui::pane::PaneTitle::Filling),
-        );
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        ui::pane::PaneTitle::Filling
     }
-    fn complete(
-        &mut self,
-        facilities: &mut FacilityList,
-        items: &mut ItemList,
-        inventories: &mut InventoryList,
-    ) {
-        let facility = facilities
-            .get_mut(self.facility_id)
-            .expect("can't find facility");
 
-        self.on_completion(
-            self.player_inventory_id,
-            facility,
-            items,
-            inventories,
-            &self.update_sender,
-            &self.command_sender,
-        );
+    fn expiration(&self) -> u32 {
+        self.expiration
     }
+
+    fn facility_id(&self) -> u64 {
+        self.facility_id
+    }
+
     fn on_completion(
         &self,
         player_inventory_id: u64,
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-        update_sender: &GameUpdateSender,
+        _update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    ) {
-        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
-
+    ) -> RefreshInventoryFlag {
         let product = match self.fruit_type {
             FruitType::Apple => "Apple Juice",
             FruitType::Olive => "Olive Oil",
@@ -494,13 +464,11 @@ impl Activity for FruitPressFillActivity {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
-        Command::send(Some(&command_sender), Command::RefreshInventory);
-
         if facility.decrement_property("output") == 0 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
-        self.start(&update_sender);
+        RefreshInventoryFlag::RefreshInventory
     }
 
     fn clear_guard(&mut self) {

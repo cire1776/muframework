@@ -202,7 +202,7 @@ impl GameState {
         let mut activity = activity;
         activity = self.abort_activity_if_necessary(activity, command, update_tx);
 
-        activity = match command {
+        match command {
             Command::QuitGame => {
                 GameUpdate::send(update_tx, Exit);
                 return None;
@@ -242,11 +242,7 @@ impl GameState {
                     update_tx,
                     command_tx,
                 );
-<<<<<<< HEAD
                 activity
-=======
-                None
->>>>>>> change to pass and return activity instead of using player as a holder.
             }
             Command::TakeItem(item_index) => {
                 Command::pickup_item(
@@ -312,49 +308,45 @@ impl GameState {
             Command::CloseExternalInventory => {
                 Command::close_external_inventory(update_tx);
                 None
-<<<<<<< HEAD
             }
             Command::RefreshInventory => {
                 Self::refresh_inventory(player, inventories, update_tx);
                 activity
             }
             Command::None => activity,
-            Command::ActivityComplete => {
-                self.complete_activity(activity, facilities, items, inventories)
-            }
+            Command::ActivityComplete => self.complete_activity(
+                player,
+                activity,
+                facilities,
+                items,
+                inventories,
+                update_tx,
+                command_tx,
+            ),
             Command::ActivityAbort => None,
         }
-=======
-            }
-            Command::RefreshInventory => {
-                Self::refresh_inventory(player, inventories, update_tx);
-                None
-            }
-            Command::ActivityAbort => None,
-            Command::None => activity,
-            Command::ActivityComplete => {
-                self.complete_activity(activity, facilities, items, inventories);
-                None
-            }
-        };
-        activity
->>>>>>> change to pass and return activity instead of using player as a holder.
     }
 
     fn complete_activity(
         &self,
+        player: &mut Player,
         activity: Option<Box<dyn Activity>>,
         facilities: &mut FacilityList,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-<<<<<<< HEAD
+        update_tx: Option<&GameUpdateSender>,
+        command_tx: Option<&CommandSender>,
     ) -> Option<Box<dyn Activity>> {
-=======
-    ) {
->>>>>>> change to pass and return activity instead of using player as a holder.
         let mut activity = activity;
         if let Some(ref mut activity) = &mut activity {
-            activity.complete(facilities, items, inventories);
+            activity.complete(
+                player,
+                facilities,
+                items,
+                inventories,
+                &update_tx.expect("update_tx is None."),
+                &command_tx.expect("command_tx is None"),
+            );
         }
 
         activity

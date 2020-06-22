@@ -127,37 +127,20 @@ impl<'a> TreePickingActivity {
 }
 
 impl<'a> Activity for TreePickingActivity {
-    fn start(&self, update_tx: &GameUpdateSender) {
-        let title = match self.tree_type {
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        match self.tree_type {
             TreeType::Apple => ui::pane::PaneTitle::PickingApples,
             TreeType::Olive => ui::pane::PaneTitle::PickingOlives,
             _ => panic!("Non-fruit tree specified"),
-        };
-
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(self.expiration * 1000, title),
-        );
+        }
     }
 
-    fn complete(
-        &mut self,
-        facilities: &mut FacilityList,
-        items: &mut ItemList,
-        inventories: &mut InventoryList,
-    ) {
-        let facility = facilities
-            .get_mut(self.facility_id)
-            .expect("can't find facility");
+    fn expiration(&self) -> u32 {
+        self.expiration
+    }
 
-        self.on_completion(
-            self.player_inventory_id,
-            facility,
-            items,
-            inventories,
-            &self.update_sender,
-            &self.command_sender,
-        );
+    fn facility_id(&self) -> u64 {
+        self.facility_id
     }
 
     fn on_completion(
@@ -166,11 +149,9 @@ impl<'a> Activity for TreePickingActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
-        update_sender: &GameUpdateSender,
+        _update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    ) {
-        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
-
+    ) -> RefreshInventoryFlag {
         let item_class: ItemClass;
         let item_description: &str;
 
@@ -191,13 +172,11 @@ impl<'a> Activity for TreePickingActivity {
             Command::SpawnItem(player_inventory_id, item_class, item_description.into()),
         );
 
-        Command::send(Some(&command_sender), Command::RefreshInventory);
-
         if facility.decrement_property("fruit") <= 0 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
-        self.start(&update_sender);
+        RefreshInventoryFlag::RefreshInventory
     }
 
     fn clear_guard(&mut self) {
@@ -255,6 +234,7 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
         let activity = TreeLoggingActivity::new(
             self.tree_type,
             self.player.inventory_id(),
+            self.expiration(),
             self.facility_id,
             timer,
             guard,
@@ -281,6 +261,7 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
 pub struct TreeLoggingActivity {
     tree_type: TreeType,
     player_inventory_id: u64,
+    expiration: u32,
     facility_id: u64,
     timer: timer::Timer,
     guard: Option<Guard>,
@@ -292,6 +273,7 @@ impl<'a> TreeLoggingActivity {
     pub fn new(
         tree_type: TreeType,
         player_inventory_id: u64,
+        expiration: u32,
         facility_id: u64,
         timer: timer::Timer,
         guard: Guard,
@@ -301,6 +283,7 @@ impl<'a> TreeLoggingActivity {
         Self {
             tree_type,
             player_inventory_id,
+            expiration,
             facility_id,
             timer,
             guard: Some(guard),
@@ -311,31 +294,16 @@ impl<'a> TreeLoggingActivity {
 }
 
 impl<'a> Activity for TreeLoggingActivity {
-    fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(60000, ui::pane::PaneTitle::Logging),
-        );
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        ui::pane::PaneTitle::Logging
     }
 
-    fn complete(
-        &mut self,
-        facilities: &mut FacilityList,
-        items: &mut ItemList,
-        inventories: &mut InventoryList,
-    ) {
-        let facility = facilities
-            .get_mut(self.facility_id)
-            .expect("can't find facility");
+    fn facility_id(&self) -> u64 {
+        self.facility_id
+    }
 
-        self.on_completion(
-            self.player_inventory_id,
-            facility,
-            items,
-            inventories,
-            &self.update_sender,
-            &self.command_sender,
-        );
+    fn expiration(&self) -> u32 {
+        self.expiration
     }
 
     fn on_completion(
@@ -344,11 +312,9 @@ impl<'a> Activity for TreeLoggingActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
-        update_sender: &GameUpdateSender,
+        _update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    ) {
-        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
-
+    ) -> RefreshInventoryFlag {
         #[allow(unreachable_patterns)]
         let wood_type = match self.tree_type {
             TreeType::Apple | TreeType::Olive | TreeType::Oak => "Hardwood Log",
@@ -361,13 +327,11 @@ impl<'a> Activity for TreeLoggingActivity {
             Command::SpawnItem(player_inventory_id, ItemClass::Material, wood_type.into()),
         );
 
-        Command::send(Some(&command_sender), Command::RefreshInventory);
-
         if facility.decrement_property("logs") == 0 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
-        self.start(&update_sender);
+        RefreshInventoryFlag::RefreshInventory
     }
 
     fn clear_guard(&mut self) {

@@ -95,12 +95,12 @@ impl<'a> CommandHandler<'a> for ActivateWellFillCommand<'a> {
 
 pub struct WellFillActivity {
     expiration: u32,
-    player_inventory_id: u64,
+    _player_inventory_id: u64,
     facility_id: u64,
     _timer: timer::Timer,
     guard: Option<Guard>,
-    update_sender: GameUpdateSender,
-    command_sender: CommandSender,
+    _update_sender: GameUpdateSender,
+    _command_sender: CommandSender,
 }
 
 impl WellFillActivity {
@@ -115,53 +115,38 @@ impl WellFillActivity {
     ) -> Self {
         Self {
             expiration,
-            player_inventory_id,
+            _player_inventory_id: player_inventory_id,
             facility_id,
             _timer: timer,
             guard,
-            update_sender,
-            command_sender,
+            _update_sender: update_sender,
+            _command_sender: command_sender,
         }
     }
 }
 
 impl Activity for WellFillActivity {
-    fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(self.expiration * 1000, ui::pane::PaneTitle::Filling),
-        );
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        ui::pane::PaneTitle::Filling
     }
-    fn complete(
-        &mut self,
-        facilities: &mut FacilityList,
-        items: &mut ItemList,
-        inventories: &mut InventoryList,
-    ) {
-        let facility = facilities
-            .get_mut(self.facility_id)
-            .expect("can't find facility");
 
-        self.on_completion(
-            self.player_inventory_id,
-            facility,
-            items,
-            inventories,
-            &self.update_sender,
-            &self.command_sender,
-        );
+    fn expiration(&self) -> u32 {
+        self.expiration
     }
+
+    fn facility_id(&self) -> u64 {
+        self.facility_id
+    }
+
     fn on_completion(
         &self,
         player_inventory_id: u64,
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-        update_sender: &GameUpdateSender,
+        _update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    ) {
-        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
-
+    ) -> RefreshInventoryFlag {
         let inventory = inventories
             .get_mut(&player_inventory_id)
             .expect("unable to find inventory");
@@ -181,9 +166,7 @@ impl Activity for WellFillActivity {
             ),
         );
 
-        Command::send(Some(&command_sender), Command::RefreshInventory);
-
-        self.start(&update_sender);
+        RefreshInventoryFlag::RefreshInventory
     }
 
     fn clear_guard(&mut self) {
@@ -251,12 +234,12 @@ impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
 
 pub struct WellDigActivity {
     expiration: u32,
-    player_inventory_id: u64,
+    _player_inventory_id: u64,
     facility_id: u64,
     _timer: timer::Timer,
     guard: Option<Guard>,
-    update_sender: GameUpdateSender,
-    command_sender: CommandSender,
+    _update_sender: GameUpdateSender,
+    _command_sender: CommandSender,
 }
 
 impl WellDigActivity {
@@ -271,54 +254,39 @@ impl WellDigActivity {
     ) -> Self {
         Self {
             expiration,
-            player_inventory_id,
+            _player_inventory_id: player_inventory_id,
             facility_id,
             _timer: timer,
             guard,
-            update_sender,
-            command_sender,
+            _update_sender: update_sender,
+            _command_sender: command_sender,
         }
     }
 }
 
 impl Activity for WellDigActivity {
-    fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(self.expiration * 1000, ui::pane::PaneTitle::Digging),
-        );
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        ui::pane::PaneTitle::Digging
     }
-    fn complete(
-        &mut self,
-        facilities: &mut FacilityList,
-        items: &mut ItemList,
-        inventories: &mut InventoryList,
-    ) {
-        let facility = facilities
-            .get_mut(self.facility_id)
-            .expect("can't find facility");
 
-        self.on_completion(
-            self.player_inventory_id,
-            facility,
-            items,
-            inventories,
-            &self.update_sender,
-            &self.command_sender,
-        );
+    fn expiration(&self) -> u32 {
+        self.expiration
     }
+
+    fn facility_id(&self) -> u64 {
+        self.facility_id
+    }
+
     fn on_completion(
         &self,
         _player_inventory_id: u64,
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
-        update_sender: &GameUpdateSender,
+        _update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    ) {
+    ) -> RefreshInventoryFlag {
         use rand::Rng;
-
-        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
         let mut rng = rand::thread_rng();
 
@@ -329,7 +297,7 @@ impl Activity for WellDigActivity {
         if random_result1 == 0 {
             facility.set_property("fluid", WellType::Water as u128);
             Command::send(Some(&command_sender), Command::ActivityAbort);
-            return;
+            return RefreshInventoryFlag::DontRefreshInventory;
         }
 
         let oil_chance = facility.get_property("chance_of_hitting_oil");
@@ -338,12 +306,10 @@ impl Activity for WellDigActivity {
         if random_result2 == 0 {
             facility.set_property("fluid", WellType::Oil as u128);
             Command::send(Some(&command_sender), Command::ActivityAbort);
-            return;
+            return RefreshInventoryFlag::DontRefreshInventory;
         }
 
-        println!("{},{}", random_result1, random_result2);
-
-        self.start(&update_sender);
+        RefreshInventoryFlag::DontRefreshInventory
     }
 
     fn clear_guard(&mut self) {

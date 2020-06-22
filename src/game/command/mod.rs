@@ -573,21 +573,72 @@ pub trait CommandHandler<'a> {
     }
 }
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum RefreshInventoryFlag {
+    RefreshInventory,
+    DontRefreshInventory,
+}
+
 pub trait Activity {
     fn description(&self) -> String {
         "Activity".into()
     }
 
-    fn start(&self, update_tx: &GameUpdateSender);
+    fn start(&self, update_tx: &GameUpdateSender) {
+        GameUpdate::send(
+            Some(update_tx),
+            GameUpdate::ActivityStarted(self.expiration() * 1000, self.activity_title()),
+        );
+    }
+
+    fn expiration(&self) -> u32 {
+        panic!("must implement expiration")
+    }
+
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        panic!("must implement activity_title");
+    }
+
+    fn facility_id(&self) -> u64 {
+        panic!("must implement facility_id");
+    }
 
     fn complete(
         &mut self,
+        player: &mut Player,
         facilities: &mut FacilityList,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-    );
+        update_sender: &GameUpdateSender,
+        command_sender: &CommandSender,
+    ) {
+        let facility = facilities
+            .get_mut(self.facility_id())
+            .expect("can't find facility");
+
+        self.restart_loop(
+            player.id,
+            facility,
+            items,
+            inventories,
+            update_sender,
+            command_sender,
+        );
+    }
 
     fn on_completion(
+        &self,
+        _player_inventory_id: u64,
+        _facility: &mut Facility,
+        _items: &mut ItemList,
+        _inventories: &mut InventoryList,
+        _update_sender: &GameUpdateSender,
+        _command_sender: &CommandSender,
+    ) -> RefreshInventoryFlag {
+        panic!("must implement on_completion");
+    }
+
+    fn restart_loop(
         &self,
         player_inventory_id: u64,
         facility: &mut Facility,
@@ -595,9 +646,27 @@ pub trait Activity {
         inventories: &mut InventoryList,
         update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    );
+    ) {
+        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
-    fn clear_guard(&mut self) {}
+        if self.on_completion(
+            player_inventory_id,
+            facility,
+            items,
+            inventories,
+            update_sender,
+            command_sender,
+        ) == RefreshInventoryFlag::RefreshInventory
+        {
+            Command::send(Some(&command_sender), Command::RefreshInventory);
+        }
+
+        self.start(&update_sender);
+    }
+
+    fn clear_guard(&mut self) {
+        panic!("must implement clear guard");
+    }
 }
 
 pub struct NullCommand {}

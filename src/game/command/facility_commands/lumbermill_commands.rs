@@ -89,12 +89,12 @@ impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
 pub struct LumbermillActivity {
     log_type: LogType,
     expiration: u32,
-    player_inventory_id: u64,
+    _player_inventory_id: u64,
     facility_id: u64,
     _timer: timer::Timer,
     guard: Option<Guard>,
-    update_sender: GameUpdateSender,
-    command_sender: CommandSender,
+    _update_sender: GameUpdateSender,
+    _command_sender: CommandSender,
 }
 
 impl LumbermillActivity {
@@ -111,54 +111,39 @@ impl LumbermillActivity {
         Self {
             log_type,
             expiration,
-            player_inventory_id,
+            _player_inventory_id: player_inventory_id,
             facility_id,
             _timer: timer,
             guard,
-            update_sender,
-            command_sender,
+            _update_sender: update_sender,
+            _command_sender: command_sender,
         }
     }
 }
 
 impl Activity for LumbermillActivity {
-    fn start(&self, update_tx: &GameUpdateSender) {
-        GameUpdate::send(
-            Some(update_tx),
-            GameUpdate::ActivityStarted(self.expiration * 1000, ui::pane::PaneTitle::Sawing),
-        );
+    fn activity_title(&self) -> ui::pane::PaneTitle {
+        ui::pane::PaneTitle::Sawing
     }
-    fn complete(
-        &mut self,
-        facilities: &mut FacilityList,
-        items: &mut ItemList,
-        inventories: &mut InventoryList,
-    ) {
-        let facility = facilities
-            .get_mut(self.facility_id)
-            .expect("can't find facility");
 
-        self.on_completion(
-            self.player_inventory_id,
-            facility,
-            items,
-            inventories,
-            &self.update_sender,
-            &self.command_sender,
-        );
+    fn facility_id(&self) -> u64 {
+        self.facility_id
     }
+
+    fn expiration(&self) -> u32 {
+        self.expiration
+    }
+
     fn on_completion(
         &self,
         player_inventory_id: u64,
         _facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-        update_sender: &GameUpdateSender,
+        _update_sender: &GameUpdateSender,
         command_sender: &CommandSender,
-    ) {
+    ) -> RefreshInventoryFlag {
         use inflector::Inflector;
-
-        GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
         let inventory = inventories
             .get_mut(&player_inventory_id)
@@ -184,9 +169,7 @@ impl Activity for LumbermillActivity {
             ),
         );
 
-        Command::send(Some(&command_sender), Command::RefreshInventory);
-
-        self.start(&update_sender);
+        RefreshInventoryFlag::RefreshInventory
     }
 
     fn clear_guard(&mut self) {
