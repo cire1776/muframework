@@ -152,6 +152,18 @@ impl<'a> Facility {
         }
     }
 
+    pub fn increment_property<S: ToString>(&mut self, property_name: S) -> i128 {
+        let value = self.get_property(property_name.to_string());
+        self.set_property(property_name, value + 1);
+        value + 1
+    }
+
+    pub fn decrement_property<S: ToString>(&mut self, property_name: S) -> i128 {
+        let value = self.get_property(property_name.to_string());
+        self.set_property(property_name, value - 1);
+        value - 1
+    }
+
     pub fn read_in_facilities(
         facilities: &Vec<String>,
         inventories: &mut InventoryList,
@@ -463,6 +475,50 @@ mod chests {
         }
     }
 }
+
+#[cfg(test)]
+mod properties {
+    use super::*;
+
+    #[test]
+    fn increment_increments() {
+        let mut inventories = InventoryList::new();
+
+        let mut subject = Facility::new(
+            NEXT_ID(),
+            10,
+            10,
+            FacilityClass::FruitPress,
+            "a fruit press".to_string(),
+            &mut inventories,
+        );
+
+        subject.enable_properties();
+
+        assert_eq!(subject.increment_property("test"), 1);
+        assert_eq!(subject.get_property("test"), 1);
+    }
+
+    #[test]
+    fn decrement_decrements() {
+        let mut inventories = InventoryList::new();
+
+        let mut subject = Facility::new(
+            NEXT_ID(),
+            10,
+            10,
+            FacilityClass::FruitPress,
+            "a fruit press".to_string(),
+            &mut inventories,
+        );
+
+        subject.enable_properties();
+        subject.set_property("test", 1);
+        assert_eq!(subject.decrement_property("test"), 0);
+        assert_eq!(subject.get_property("test"), 0);
+    }
+}
+
 #[cfg(test)]
 mod facility_list {
     use super::*;

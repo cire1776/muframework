@@ -295,9 +295,7 @@ impl Activity for FruitPressActivity {
     ) {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
-        let count = facility.get_property("output");
-        facility.set_property("output", count + 1);
-        if count + 1 == 10 {
+        if facility.increment_property("output") == 10 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
@@ -498,9 +496,7 @@ impl Activity for FruitPressFillActivity {
 
         Command::send(Some(&command_sender), Command::RefreshInventory);
 
-        let count = facility.get_property("output");
-        facility.set_property("output", count - 1);
-        if count - 1 == 0 {
+        if facility.decrement_property("output") == 0 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 

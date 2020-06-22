@@ -193,9 +193,7 @@ impl<'a> Activity for TreePickingActivity {
 
         Command::send(Some(&command_sender), Command::RefreshInventory);
 
-        let count = facility.get_property("fruit");
-        facility.set_property("fruit", count - 1);
-        if facility.get_property("fruit") <= 0 {
+        if facility.decrement_property("fruit") <= 0 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
@@ -365,9 +363,7 @@ impl<'a> Activity for TreeLoggingActivity {
 
         Command::send(Some(&command_sender), Command::RefreshInventory);
 
-        let count = facility.get_property("logs");
-        facility.set_property("logs", count - 1);
-        if facility.get_property("logs") <= 0 {
+        if facility.decrement_property("logs") == 0 {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
 
