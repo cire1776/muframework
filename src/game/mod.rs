@@ -8,7 +8,7 @@ pub mod blocking_map;
 use blocking_map::BlockingMap;
 
 pub mod command;
-pub use command::{CommandSender, GameUpdateSender};
+pub use command::{Activity, CommandSender, GameUpdateSender};
 
 pub mod character;
 pub use character::{Character, CharacterType, Player};
@@ -75,11 +75,13 @@ impl GameState {
         ) = &mut Self::initialize_game("maps/level1.map", Some(&update_tx));
 
         let game_state = &mut GameState::new();
+        let mut activity: Option<Box<dyn Activity>> = None;
+
         loop {
             let command = command_rx.recv();
 
             if let Ok(command) = command {
-                game_state.game_loop_iteration(
+                activity = game_state.game_loop_iteration(
                     player,
                     map,
                     obstacles,
@@ -88,6 +90,7 @@ impl GameState {
                     items,
                     facilities,
                     inventories,
+                    activity,
                     &command,
                     Some(&update_tx),
                     Some(&command_tx),
@@ -191,18 +194,23 @@ impl GameState {
         items: &mut ItemList,
         facilities: &mut FacilityList,
         inventories: &mut InventoryList,
+        activity: Option<Box<dyn Activity>>,
         command: &Command,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         command_tx: Option<&CommandSender>,
-    ) {
-        self.abort_activity_if_necessary(player, command, update_tx);
+    ) -> Option<Box<dyn Activity>> {
+        let mut activity = activity;
+        activity = self.abort_activity_if_necessary(activity, command, update_tx);
 
         match command {
             Command::QuitGame => {
                 GameUpdate::send(update_tx, Exit);
-                return;
+                return None;
             }
-            Command::DumpPlayer => println!("{:?}", player),
+            Command::DumpPlayer => {
+                println!("{:?}", player);
+                None
+            }
             Command::Move(direction, mode) => Command::move_player(
                 *direction,
                 *mode,
@@ -213,6 +221,7 @@ impl GameState {
                 &items.item_types.clone(),
                 items,
                 inventories,
+                activity,
                 update_tx,
                 command_tx,
             ),
@@ -233,34 +242,45 @@ impl GameState {
                     update_tx,
                     command_tx,
                 );
+                activity
             }
-            Command::TakeItem(item_index) => Command::pickup_item(
-                *item_index,
-                player,
-                items,
-                inventories,
-                update_tx,
-                command_tx,
-            ),
-            Command::DropItem(item_index) => Command::drop_item(
-                *item_index,
-                player,
-                items,
-                inventories,
-                update_tx,
-                command_tx,
-            ),
-            Command::EquipItem(item_id) => Command::equip_item(
-                *item_id,
-                player,
-                item_class_specifiers,
-                items,
-                inventories,
-                update_tx,
-                command_tx,
-            ),
+            Command::TakeItem(item_index) => {
+                Command::pickup_item(
+                    *item_index,
+                    player,
+                    items,
+                    inventories,
+                    update_tx,
+                    command_tx,
+                );
+                None
+            }
+            Command::DropItem(item_index) => {
+                Command::drop_item(
+                    *item_index,
+                    player,
+                    items,
+                    inventories,
+                    update_tx,
+                    command_tx,
+                );
+                None
+            }
+            Command::EquipItem(item_id) => {
+                Command::equip_item(
+                    *item_id,
+                    player,
+                    item_class_specifiers,
+                    items,
+                    inventories,
+                    update_tx,
+                    command_tx,
+                );
+                None
+            }
             Command::UnequipItem(item_id) => {
-                Command::unequip_item(*item_id, player, items, inventories, update_tx, command_tx)
+                Command::unequip_item(*item_id, player, items, inventories, update_tx, command_tx);
+                None
             }
             Command::TransferItem(item_id, src_inventory, dest_inventory) => {
                 Command::transfer_item(
@@ -272,6 +292,7 @@ impl GameState {
                     update_tx,
                     command_tx,
                 );
+                None
             }
             Command::TransferAllItems(src_inventory, dest_inventory) => {
                 Command::transfer_all_items(
@@ -281,36 +302,49 @@ impl GameState {
                     inventories,
                     update_tx,
                     command_tx,
-                )
+                );
+                None
             }
-            Command::CloseExternalInventory => Command::close_external_inventory(update_tx),
-            Command::RefreshInventory => Self::refresh_inventory(player, inventories, update_tx),
-            Command::ActivityAbort | Command::None => {}
+            Command::CloseExternalInventory => {
+                Command::close_external_inventory(update_tx);
+                None
+            }
+            Command::RefreshInventory => {
+                Self::refresh_inventory(player, inventories, update_tx);
+                activity
+            }
+            Command::None => activity,
             Command::ActivityComplete => {
-                self.complete_activity(player, facilities, items, inventories)
+                self.complete_activity(activity, facilities, items, inventories)
             }
+            Command::ActivityAbort => None,
         }
     }
 
     fn complete_activity(
         &self,
-        player: &mut Player,
+        activity: Option<Box<dyn Activity>>,
         facilities: &mut FacilityList,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-    ) {
-        if let Some(ref mut activity) = &mut player.activity {
+    ) -> Option<Box<dyn Activity>> {
+        let mut activity = activity;
+        if let Some(ref mut activity) = &mut activity {
             activity.complete(facilities, items, inventories);
         }
+
+        activity
     }
 
     fn abort_activity_if_necessary(
         &mut self,
-        player: &mut Player,
+        activity: Option<Box<dyn Activity>>,
         command: &Command,
         update_tx: Option<&GameUpdateSender>,
-    ) {
-        if let Some(ref mut activity) = player.activity {
+    ) -> Option<Box<dyn Activity>> {
+        let mut activity = activity;
+        let mut clear_activity = false;
+        if let Some(ref mut activity) = activity {
             match command {
                 // list commands that do not abort activities here
                 Command::None
@@ -322,10 +356,15 @@ impl GameState {
 
                 _ => {
                     activity.clear_guard();
-                    player.activity = None;
+                    clear_activity = true;
                     GameUpdate::send(update_tx, GameUpdate::ActivityAborted());
                 }
             };
+        }
+        if clear_activity {
+            None
+        } else {
+            activity
         }
     }
 

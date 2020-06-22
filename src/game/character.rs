@@ -1,6 +1,7 @@
 use super::*;
 use regex::Regex;
 
+#[derive(Debug, Clone)]
 pub struct Player {
     pub id: u64,
     pub x: i32,
@@ -10,22 +11,6 @@ pub struct Player {
     pub mounting_points: MountingPointMap,
     pub external_inventory: Option<Vec<Item>>,
     pub endorsements: HashMap<String, bool>,
-    pub activity: Option<Box<dyn command::Activity>>,
-}
-
-impl std::fmt::Debug for Player {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Player")
-            .field("id", &self.x)
-            .field("x", &self.x)
-            .field("y", &self.y)
-            .field("facing", &self.facing)
-            .field("character_type", &self.character_type)
-            .field("mounting_points", &self.mounting_points)
-            .field("external_inventory", &self.external_inventory)
-            .field("endorsements", &self.endorsements)
-            .finish()
-    }
 }
 
 impl Player {
@@ -39,7 +24,6 @@ impl Player {
             mounting_points: MountingPointMap::new(),
             external_inventory: None,
             endorsements: HashMap::new(),
-            activity: None,
         };
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");

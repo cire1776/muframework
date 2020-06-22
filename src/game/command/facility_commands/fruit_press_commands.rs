@@ -83,7 +83,11 @@ impl<'a> CommandHandler<'a> for OpenFruitPressCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &GameUpdateSender) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &GameUpdateSender,
+    ) -> Option<Box<dyn Activity>> {
         GameUpdate::send(
             Some(update_tx),
             GameUpdate::ExternalInventoryOpened(
@@ -91,6 +95,8 @@ impl<'a> CommandHandler<'a> for OpenFruitPressCommand<'a> {
                 self.external_inventory.id(),
             ),
         );
+
+        activity
     }
 }
 
@@ -188,10 +194,6 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
         Some(Box::new(activity))
     }
 
-    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
-        self.player.activity = activity;
-    }
-
     fn prepare_to_execute(&mut self) {
         self.mode = FruitPressMode::Pressing;
 
@@ -209,10 +211,15 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
         self.fruit_type = FruitType::from_string(item.raw_description());
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
-        if let Some(activity) = &self.player.activity {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
+        if let Some(activity) = &activity {
             activity.start(update_tx);
         }
+        activity
     }
 }
 
@@ -357,10 +364,6 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
         30
     }
 
-    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
-        self.player.activity = activity
-    }
-
     fn create_activity(
         &self,
         timer: timer::Timer,
@@ -393,10 +396,15 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
         self.fruit_type = FruitType::from(index);
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
-        if let Some(activity) = &self.player.activity {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
+        if let Some(activity) = &activity {
             activity.start(update_tx);
         }
+        activity
     }
 }
 

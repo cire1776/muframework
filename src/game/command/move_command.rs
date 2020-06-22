@@ -47,7 +47,11 @@ impl<'a> CommandHandler<'a> for MoveCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         GameUpdate::send(
             Some(update_tx),
             CharacterMoved(self.character.id, self.character.x, self.character.y),
@@ -58,7 +62,8 @@ impl<'a> CommandHandler<'a> for MoveCommand<'a> {
                 Some(update_tx),
                 CharacterFacingChanged(self.character.id, self.facing),
             )
-        }
+        };
+        activity
     }
 }
 
@@ -82,10 +87,15 @@ impl<'a> CommandHandler<'a> for ChangeFacingCommand<'a> {
         self.player.facing = self.facing;
         None
     }
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         GameUpdate::send(
             Some(update_tx),
             CharacterFacingChanged(self.player.id, self.facing),
-        )
+        );
+        activity
     }
 }
