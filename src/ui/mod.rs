@@ -95,80 +95,92 @@ impl GameState for UIState {
 impl UIState {
     /// public for testing purposes
     pub fn perform_tick(&mut self, context: Option<&mut BTerm>) {
-        use pane::PaneTitle::*;
-
         let received = self.update_rx.try_recv();
 
+        if let Ok(update) = received {
+            self.process_tick(update);
+        }
+
+        if let Some(context) = context {
+            self.draw_gui(context);
+            self.draw_map(context);
+            self.process_input(context);
+        }
+    }
+
+    fn process_tick(&mut self, received: GameUpdate) {
+        use pane::PaneTitle::*;
+
         match received {
-            Ok(Exit) => {
+            Exit => {
                 println!("exiting the game");
                 std::process::exit(0)
             }
-            Ok(SetBackground(tile_map)) => self.set_background(&tile_map),
-            Ok(TileChangedAt(x, y, new_tile)) => {
+            SetBackground(tile_map) => self.set_background(&tile_map),
+            TileChangedAt(x, y, new_tile) => {
                 let new_style = Self::style_from_tile(new_tile);
                 self.background.set_at(x, y, new_style);
             }
-            Ok(Message(m)) => println!("Message: {}", m),
-            Ok(CharacterTeleported(id, new_x, new_y)) => {
+            Message(m) => println!("Message: {}", m),
+            CharacterTeleported(id, new_x, new_y) => {
                 self.player.locate(new_x, new_y);
                 self.characters.reposition(id, new_x, new_y);
                 if id == 1 {
                     self.focus_on_player(new_x, new_y);
                 }
             }
-            Ok(CharacterEntered {
+            CharacterEntered {
                 id,
                 x,
                 y,
                 character_type,
-            }) => {
+            } => {
                 self.player.locate(x, y);
                 self.characters.add_character(id, character_type, x, y);
                 if id == 1 {
                     self.focus_on_player(x, y);
                 }
             }
-            Ok(CharacterMoved(id, new_x, new_y)) => {
+            CharacterMoved(id, new_x, new_y) => {
                 self.player.locate(new_x, new_y);
                 self.characters.reposition(id, new_x, new_y);
                 if id == 1 {
                     self.focus_on_player(new_x, new_y);
                 }
             }
-            Ok(CharacterFacingChanged(id, facing)) => {
+            CharacterFacingChanged(id, facing) => {
                 self.characters.change_facing(id, facing);
                 if id == 1 {
                     self.player.facing = facing;
                 }
             }
-            Ok(ItemAdded {
+            ItemAdded {
                 id,
                 x,
                 y,
                 description,
                 class,
-            }) => self.items.add_item(id, &description, class, x, y),
-            Ok(ItemRemoved(item_id)) => self.items.remove(item_id),
-            Ok(FacilityAdded {
+            } => self.items.add_item(id, &description, class, x, y),
+            ItemRemoved(item_id) => self.items.remove(item_id),
+            FacilityAdded {
                 id,
                 x,
                 y,
                 description,
                 class,
-            }) => self.facilities.add_facility(id, x, y, class, description),
-            Ok(FacilityUpdated {
+            } => self.facilities.add_facility(id, x, y, class, description),
+            FacilityUpdated {
                 id: _,
                 description: _,
                 class: _,
-            }) => {}
-            Ok(EquipmentUpdated(items)) => {
+            } => {}
+            EquipmentUpdated(items) => {
                 self.inventory_window.max_selection_equipment = items.len() as u8;
                 self.inventory_window
                     .set_max_equipment_selection(items.len() as u8);
                 self.update_equipment(items);
             }
-            Ok(InventoryUpdated(items)) => {
+            InventoryUpdated(items) => {
                 self.inventory = items;
                 self.inventory
                     .sort_by(|a, b| a.raw_description().cmp(&b.raw_description()));
@@ -176,7 +188,7 @@ impl UIState {
                 self.inventory_window
                     .set_max_item_selection(self.inventory.len() as u8);
             }
-            Ok(ExternalInventoryOpened(external_inventory, external_inventory_id)) => {
+            ExternalInventoryOpened(external_inventory, external_inventory_id) => {
                 self.input_state = InputState::ExternalInventoryOpen;
                 self.map_window.window_mode = MapWindowMode::ExternalInventory;
                 self.map_window.active_pane = Some(Pane::new(
@@ -190,14 +202,14 @@ impl UIState {
                 self.external_inventory = Some(external_inventory);
                 self.external_inventory_id = Some(external_inventory_id);
             }
-            Ok(ExternalInventoryClosed) => {
+            ExternalInventoryClosed => {
                 self.input_state = InputState::Normal;
                 self.map_window.window_mode = MapWindowMode::Normal;
                 self.map_window.active_pane = std::option::Option::None;
                 self.external_inventory = std::option::Option::None;
                 self.external_inventory_id = std::option::Option::None;
             }
-            Ok(ExternalInventoryUpdated(external_inventory)) => {
+            ExternalInventoryUpdated(external_inventory) => {
                 if self.input_state == InputState::ExternalInventoryOpen {
                     let mut pane = self.map_window.active_pane().unwrap();
                     pane.set_max_selection(external_inventory.len() as u8);
@@ -205,7 +217,7 @@ impl UIState {
                     self.external_inventory = Some(external_inventory);
                 }
             }
-            Ok(ActivityStarted(duration, description)) => {
+            ActivityStarted(duration, description) => {
                 self.activity_time = Some(time_in_millis() + duration as u64);
 
                 let width = std::cmp::max(11, description.to_string().len() + 1) as i32;
@@ -220,21 +232,14 @@ impl UIState {
                 ));
                 self.input_state = InputState::Activity;
             }
-            Ok(ActivityExpired()) => {
+            ActivityExpired() => {
                 self.input_state = InputState::Normal;
                 self.activity_time = std::option::Option::None;
             }
-            Ok(ActivityAborted()) => {
+            ActivityAborted() => {
                 self.input_state = InputState::Normal;
                 self.activity_time = std::option::Option::None;
             }
-            Err(_) => {}
-        }
-
-        if let Some(context) = context {
-            self.draw_gui(context);
-            self.draw_map(context);
-            self.process_input(context);
         }
     }
 
