@@ -18,6 +18,7 @@ pub enum ItemClass {
     Potion,
     Food,
     Material,
+    Ore,
 }
 
 impl ItemClass {
@@ -46,6 +47,7 @@ impl ItemClass {
             "potion" => Potion,
             "food" => Food,
             "material" => Material,
+            "ore" => Ore,
             _ => panic!("unknown item class"),
         }
     }
@@ -61,6 +63,7 @@ impl ItemClass {
             Food => MAX_STACK,
             Potion => LIMITED_STACK,
             Material => MAX_STACK,
+            Ore => LIMITED_STACK,
             _ => UNSTACKABLE,
         }
     }
@@ -196,7 +199,7 @@ impl ItemTypeList {
             .item_types
             .iter()
             .find(|(_, c)| c.class == class && c.description == description)
-            .expect("unable to find item_type");
+            .expect(&format!("unable to find item_type: ({:?} {})", class, description)[..]);
         result
     }
 }

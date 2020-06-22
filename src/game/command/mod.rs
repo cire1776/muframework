@@ -394,6 +394,7 @@ fn can_use_at(
                     ActivateWellFillCommand::can_perform(player, facility)
                         || ActivateWellDigCommand::can_perform(player, facility)
                 }
+                FacilityClass::Vein => ActivateVeinCommand::can_perform(player, facility),
 
                 _ => false,
             }
@@ -494,6 +495,11 @@ fn use_at<'a>(
                         Some(Box::new(ActivateWellFillCommand::new(player, facility_id)))
                     }
                 }
+                FacilityClass::Vein => Some(Box::new(ActivateVeinCommand::new(
+                    player,
+                    facility_id,
+                    facilities,
+                ))),
                 _ => None,
             }
         }

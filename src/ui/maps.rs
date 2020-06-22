@@ -220,6 +220,16 @@ impl SparseMap {
                 y: 0,
                 facing: Direction::Up,
             },
+            FacilityClass::Vein => ui::Sprite {
+                style: SpriteStyle {
+                    glyph: '#' as u8, // #
+                    fg: RGB::named(rltk::WHITE),
+                    bg: RGB::named(rltk::BROWN_42),
+                },
+                x: 0,
+                y: 0,
+                facing: Direction::Up,
+            },
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,

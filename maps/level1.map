@@ -75,7 +75,14 @@ bottle_of_oil material "Bottle of Oil"
 bronze_shovel tool "Bronze Shovel" {
     endorsement: :can_dig
 }
-
+bronze_pickaxe tool "Bronze Pickaxe" {
+    endorsement: :can_mine
+}
+dirt ore "Dirt"
+sand ore "Sand"
+stone ore "Stone"
+tin_ore ore "Tin Ore"
+copper_ore ore "Copper Ore"
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -131,6 +138,31 @@ bronze_shovel tool "Bronze Shovel" {
     property: chance_of_hitting_oil => 10000
     property: chance_of_hitting_bedrock => 50000
 }
+#vein 11, 8 "A vein of dirt" {
+    property: ore_type => 1
+    property: chance_of_exhaustion => 10
+    property: chance_of_gem => 10000
+}
+#vein 12, 8 "A vein of sand" {
+    property: ore_type => 2
+    property: chance_of_exhaustion => 10
+    property: chance_of_gem => 10000
+}
+#vein 13, 8 "A vein of stone" {
+    property: ore_type => 3
+    property: chance_of_exhaustion => 5
+    property: chance_of_gem => 10000
+}
+#vein 14, 8 "A vein of tin ore" {
+    property: ore_type => 4
+    property: chance_of_exhaustion => 2500
+    property: chance_of_gem => 10000
+}
+#vein 15, 8 "A vein of copper ore" {
+    property: ore_type => 5
+    property: chance_of_exhaustion => 2000
+    property: chance_of_gem => 10000
+}
 ===END OF FACILITIES===
 player amber_leather_cap
 player glass_bottle
@@ -150,4 +182,5 @@ chest1 reed_basket
 chest1 baseball_cap
 chest1 yellow_potion
 chest1 worn_bronze_axe
+chest1 bronze_pickaxe
 ===END OF STORED ITEMS===

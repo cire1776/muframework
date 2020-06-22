@@ -15,6 +15,7 @@ pub enum FacilityClass {
     FruitPress,
     Lumbermill,
     Well,
+    Vein,
 }
 
 impl FacilityClass {
@@ -28,6 +29,7 @@ impl FacilityClass {
             "#press" => FacilityClass::FruitPress,
             "*lumbermill" => FacilityClass::Lumbermill,
             "▼well" => FacilityClass::Well,
+            "#vein" => FacilityClass::Vein,
             _ => panic!("unknown FacilityClass symbol"),
         }
     }
