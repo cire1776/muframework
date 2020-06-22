@@ -150,17 +150,23 @@ fn opening_external_inventory() {
             item_type: ItemType::new(Potion, "pink potion"),
         },
     ];
-    if let ExternalInventoryOpened(inventory, 9) = update {
-        // assert given inventory is the appropriate external inventory
-        assert_eq!(inventory.clone().sort(), exp_inventory.clone().sort());
 
-        // assert player's external inventory is also appropriately set
-        assert_eq!(
-            player.external_inventory.map(|i| i.clone().sort()),
-            Some(exp_inventory.clone().sort())
-        );
-    } else {
-        panic!("unexpected update found: {:?}", update);
+    let exp_inventory_id = facilities.at(7, 7).unwrap().id;
+
+    match update {
+        ExternalInventoryOpened(inventory, inventory_id) if inventory_id == exp_inventory_id => {
+            // assert given inventory is the appropriate external inventory
+            assert_eq!(inventory.clone().sort(), exp_inventory.clone().sort());
+
+            // assert player's external inventory is also appropriately set
+            assert_eq!(
+                player.external_inventory.map(|i| i.clone().sort()),
+                Some(exp_inventory.clone().sort())
+            );
+        }
+        _ => {
+            panic!("unexpected update found: {:?}", update);
+        }
     }
 }
 
