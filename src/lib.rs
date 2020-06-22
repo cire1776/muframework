@@ -130,7 +130,7 @@ pub trait StaticData: 'static {}
 pub mod test_support {
     use super::*;
     use game::inventory::*;
-    use game::items::{Item, ItemList, ItemType, ItemTypeList};
+    use game::items::{Item, ItemList, ItemType};
     use game::NEXT_ITEM_ID;
     use std::convert::TryInto;
 

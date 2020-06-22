@@ -264,7 +264,11 @@ impl Item {
     }
 
     /// creates a new item assigning it its Id as appropriate.
-    pub fn spawn<S: ToString>(class: ItemClass, description: S, item_types: &ItemTypeList) -> Item {
+    pub fn spawn<S: ToString>(
+        class: ItemClass,
+        description: S,
+        __item_types: &ItemTypeList,
+    ) -> Item {
         Self::spawn_stack(class, description, 1)
     }
 
