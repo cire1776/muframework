@@ -38,7 +38,7 @@ pub enum MapLayer {
     Player,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum Command {
     None,
     QuitGame,
@@ -58,7 +58,7 @@ pub enum Command {
     ActivityComplete,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum MoveCommandMode {
     Normal,
     Sneak,
