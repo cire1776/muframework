@@ -202,7 +202,7 @@ impl GameState {
         let mut activity = activity;
         activity = self.abort_activity_if_necessary(activity, command, update_tx);
 
-        match command {
+        activity = match command {
             Command::QuitGame => {
                 GameUpdate::send(update_tx, Exit);
                 return None;
@@ -242,7 +242,11 @@ impl GameState {
                     update_tx,
                     command_tx,
                 );
+<<<<<<< HEAD
                 activity
+=======
+                None
+>>>>>>> change to pass and return activity instead of using player as a holder.
             }
             Command::TakeItem(item_index) => {
                 Command::pickup_item(
@@ -308,6 +312,7 @@ impl GameState {
             Command::CloseExternalInventory => {
                 Command::close_external_inventory(update_tx);
                 None
+<<<<<<< HEAD
             }
             Command::RefreshInventory => {
                 Self::refresh_inventory(player, inventories, update_tx);
@@ -319,6 +324,21 @@ impl GameState {
             }
             Command::ActivityAbort => None,
         }
+=======
+            }
+            Command::RefreshInventory => {
+                Self::refresh_inventory(player, inventories, update_tx);
+                None
+            }
+            Command::ActivityAbort => None,
+            Command::None => activity,
+            Command::ActivityComplete => {
+                self.complete_activity(activity, facilities, items, inventories);
+                None
+            }
+        };
+        activity
+>>>>>>> change to pass and return activity instead of using player as a holder.
     }
 
     fn complete_activity(
@@ -327,7 +347,11 @@ impl GameState {
         facilities: &mut FacilityList,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+<<<<<<< HEAD
     ) -> Option<Box<dyn Activity>> {
+=======
+    ) {
+>>>>>>> change to pass and return activity instead of using player as a holder.
         let mut activity = activity;
         if let Some(ref mut activity) = &mut activity {
             activity.complete(facilities, items, inventories);
