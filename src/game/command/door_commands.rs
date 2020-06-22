@@ -35,10 +35,15 @@ impl<'a> CommandHandler<'a> for OpenDoorCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         update_tx
             .send(TileChangedAt(self.x, self.y, tile_map::Tile::OpenDoor))
             .unwrap();
+        activity
     }
 }
 
@@ -77,9 +82,14 @@ impl<'a> CommandHandler<'a> for CloseDoorCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         update_tx
             .send(TileChangedAt(self.x, self.y, tile_map::Tile::ClosedDoor))
             .unwrap();
+        activity
     }
 }

@@ -39,13 +39,14 @@ impl Command {
         item_types: &'a ItemTypeList,
         items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
+        activity: Option<Box<dyn Activity>>,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         let (dx, dy) = get_deltas_from_direction(direction);
 
         let command = if mode == MoveCommandMode::Normal || mode == MoveCommandMode::Sneak {
-            attempt_to_enter(mode, direction, dx, dy, player, obstacles)
+            attempt_to_enter(mode, direction, dx, dy, player, obstacles, activity)
         } else {
             attempt_to_use(
                 mode,
@@ -59,10 +60,13 @@ impl Command {
                 item_types,
                 items,
                 inventories,
+                activity,
             )
         };
         if let Some(mut val) = command {
             val.deref_mut().execute(update_tx, command_tx)
+        } else {
+            None
         }
     }
 
@@ -278,6 +282,7 @@ fn attempt_to_enter<'a>(
     dy: i32,
     player: &'a mut Player,
     obstacles: &'a mut BlockingMap,
+    __activity: Option<Box<dyn Activity>>,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let new_x = player.x + dx;
     let new_y = player.y + dy;
@@ -309,6 +314,7 @@ fn attempt_to_use<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
+    activity: Option<Box<dyn Activity>>,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let mut mode = mode;
 
@@ -342,7 +348,7 @@ fn attempt_to_use<'a>(
         if mode == MoveCommandMode::SneakUse {
             mode = MoveCommandMode::Sneak;
         }
-        attempt_to_enter(mode, facing, dx, dy, player, obstacles)
+        attempt_to_enter(mode, facing, dx, dy, player, obstacles, activity)
     }
 }
 
@@ -511,13 +517,14 @@ pub trait CommandHandler<'a> {
         &mut self,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
-    ) {
+    ) -> Option<Box<dyn Activity>> {
         self.prepare_to_execute();
         let activity = self.perform_execute(update_tx, command_tx);
-        self.set_activity(activity);
 
         if let Some(update_tx) = update_tx {
-            self.announce(update_tx);
+            self.announce(activity, update_tx)
+        } else {
+            None
         }
     }
 
@@ -545,7 +552,13 @@ pub trait CommandHandler<'a> {
     }
 
     /// announce the results through GameUpdates
-    fn announce(&self, _update_tx: &std::sync::mpsc::Sender<GameUpdate>) {}
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        _update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
+        activity
+    }
 }
 
 pub trait Activity {

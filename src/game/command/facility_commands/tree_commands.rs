@@ -78,14 +78,15 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
         Some(Box::new(activity))
     }
 
-    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
-        self.player.activity = activity;
-    }
-
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
-        if let Some(activity) = &self.player.activity {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
+        if let Some(activity) = &activity {
             activity.start(update_tx);
         }
+        activity
     }
 }
 
@@ -243,10 +244,6 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
         60
     }
 
-    fn set_activity(&mut self, activity: Option<Box<dyn Activity>>) {
-        self.player.activity = activity
-    }
-
     fn create_activity(
         &self,
         timer: timer::Timer,
@@ -269,10 +266,16 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
         Some(Box::new(activity))
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
-        if let Some(activity) = &self.player.activity {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
+        if let Some(activity) = &activity {
             activity.start(update_tx);
         }
+
+        activity
     }
 }
 

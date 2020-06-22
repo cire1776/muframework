@@ -30,12 +30,17 @@ impl<'a> CommandHandler<'a> for PickupCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         GameUpdate::send(Some(update_tx), GameUpdate::ItemRemoved(self.item_id));
         GameUpdate::send(
             Some(update_tx),
             GameUpdate::InventoryUpdated(self.inventory.to_vec()),
-        )
+        );
+        activity
     }
 }
 
@@ -76,7 +81,11 @@ impl<'a> CommandHandler<'a> for DropCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         GameUpdate::send(
             Some(update_tx),
             GameUpdate::ItemAdded {
@@ -90,7 +99,8 @@ impl<'a> CommandHandler<'a> for DropCommand<'a> {
         GameUpdate::send(
             Some(update_tx),
             GameUpdate::InventoryUpdated(self.inventory.to_vec()),
-        )
+        );
+        activity
     }
 }
 
@@ -143,7 +153,11 @@ impl<'a> CommandHandler<'a> for EquipCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         let equipment_list: Vec<Item> = (&self.player.mounting_points).to_vec_of_items(&self.items);
 
         GameUpdate::send(
@@ -154,6 +168,7 @@ impl<'a> CommandHandler<'a> for EquipCommand<'a> {
             Some(update_tx),
             GameUpdate::InventoryUpdated(self.inventory.to_vec()),
         );
+        activity
     }
 }
 
@@ -198,7 +213,11 @@ impl<'a> CommandHandler<'a> for UnequipCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &GameUpdateSender) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &GameUpdateSender,
+    ) -> Option<Box<dyn Activity>> {
         let equipment_list: Vec<Item> = self.player.mounting_points.to_vec_of_items(&self.items);
 
         GameUpdate::send(
@@ -208,7 +227,8 @@ impl<'a> CommandHandler<'a> for UnequipCommand<'a> {
         GameUpdate::send(
             Some(update_tx),
             GameUpdate::InventoryUpdated(self.inventory.to_vec()),
-        )
+        );
+        activity
     }
 }
 
@@ -312,13 +332,18 @@ impl<'a> CommandHandler<'a> for TransferItemCommand<'a> {
         );
         None
     }
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         announce_transfer(
             self.inventories,
             self.source_id,
             self.destination_id,
             update_tx,
-        )
+        );
+        activity
     }
 }
 
@@ -366,13 +391,18 @@ impl<'a> CommandHandler<'a> for TransferAllCommand<'a> {
         }
         None
     }
-    fn announce(&self, update_tx: &std::sync::mpsc::Sender<GameUpdate>) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &std::sync::mpsc::Sender<GameUpdate>,
+    ) -> Option<Box<dyn Activity>> {
         announce_transfer(
             self.inventories,
             self.source_id,
             self.destination_id,
             update_tx,
-        )
+        );
+        activity
     }
 }
 

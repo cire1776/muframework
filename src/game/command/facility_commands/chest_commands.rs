@@ -42,7 +42,11 @@ impl<'a> CommandHandler<'a> for OpenChestCommand<'a> {
         None
     }
 
-    fn announce(&self, update_tx: &GameUpdateSender) {
+    fn announce(
+        &self,
+        activity: Option<Box<dyn Activity>>,
+        update_tx: &GameUpdateSender,
+    ) -> Option<Box<dyn Activity>> {
         GameUpdate::send(
             Some(update_tx),
             GameUpdate::ExternalInventoryOpened(
@@ -50,5 +54,6 @@ impl<'a> CommandHandler<'a> for OpenChestCommand<'a> {
                 self.external_inventory.id(),
             ),
         );
+        activity
     }
 }
