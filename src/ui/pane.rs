@@ -9,6 +9,7 @@ pub enum PaneTitle {
     Logging,
     Pressing,
     Filling,
+    Digging,
     Sawing,
     ChestContents,
 }
@@ -22,6 +23,7 @@ impl ToString for PaneTitle {
             PaneTitle::Logging => "Logging",
             PaneTitle::Pressing => "Pressing",
             PaneTitle::Filling => "Filling",
+            PaneTitle::Digging => "Digging",
             PaneTitle::Sawing => "Sawing",
             PaneTitle::ChestContents => "Chest Contents",
         };

@@ -70,6 +70,12 @@ hardwood_log material "Hardwood Log" {
 }
 hardwood_plank material "Hardwood Plank"
 softwood_plank material "Softwood Plank"
+bottle_of_water material "Bottle of Water"
+bottle_of_water material "Bottle of Oil"
+bronze_shovel tool "Bronze Shovel" {
+    endorsement: :can_dig
+}
+
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -101,7 +107,30 @@ softwood_plank material "Softwood Plank"
     property: output => 0
 }
 *lumbermill 12,11 "A Rickety Lumbermill"
-
+▼well 13, 11 "A dry well" {
+    property: fluid => 0
+    property: depth => 0
+    property: chance_of_drying_up => 5000
+    property: chance_of_hitting_water => 100
+    property: chance_of_hitting_oil => 10000
+    property: chance_of_hitting_bedrock => 50000
+}
+▼well 14, 11 "A water well" {
+    property: fluid => 1
+    property: depth => 100
+    property: chance_of_drying_up => 5000
+    property: chance_of_hitting_water => 100
+    property: chance_of_hitting_oil => 10000
+    property: chance_of_hitting_bedrock => 50000
+}
+▼well 15, 11 "A oil well" {
+    property: fluid => 2
+    property: depth => 256
+    property: chance_of_drying_up => 5000
+    property: chance_of_hitting_water => 100
+    property: chance_of_hitting_oil => 10000
+    property: chance_of_hitting_bedrock => 50000
+}
 ===END OF FACILITIES===
 player amber_leather_cap
 player glass_bottle
@@ -112,6 +141,7 @@ player hardwood_log
 player hardwood_log
 player softwood_log
 player softwood_log
+player bronze_shovel
 chest1 shiny_dagger // a dagger
 chest1 sharp_short_sword
 chest1 pink_potion

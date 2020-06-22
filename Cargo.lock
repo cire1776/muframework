@@ -847,6 +847,7 @@ dependencies = [
  "chrono",
  "lazy_static",
  "mut_static",
+ "rand",
  "regex",
  "rltk",
  "timer",

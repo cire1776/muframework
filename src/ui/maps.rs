@@ -210,6 +210,16 @@ impl SparseMap {
                 y: 0,
                 facing: Direction::Up,
             },
+            FacilityClass::Well => ui::Sprite {
+                style: SpriteStyle {
+                    glyph: 31 as u8, // ▼
+                    fg: RGB::named(rltk::BLACK),
+                    bg: RGB::named(rltk::LIGHTBLUE),
+                },
+                x: 0,
+                y: 0,
+                facing: Direction::Up,
+            },
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,

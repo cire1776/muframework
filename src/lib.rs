@@ -1,6 +1,7 @@
 // #[macro_use]
 // extern crate lazy_static;
 // use mut_static::MutStatic;
+extern crate rand;
 
 extern crate chrono;
 

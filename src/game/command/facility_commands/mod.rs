@@ -15,3 +15,6 @@ pub use fruit_press_commands::*;
 
 pub mod lumbermill_commands;
 pub use lumbermill_commands::*;
+
+pub mod well_commands;
+pub use well_commands::*;

@@ -390,6 +390,11 @@ fn can_use_at(
                 FacilityClass::Lumbermill => {
                     ActivateLumberMillCommand::can_perform(player, facility)
                 }
+                FacilityClass::Well => {
+                    ActivateWellFillCommand::can_perform(player, facility)
+                        || ActivateWellDigCommand::can_perform(player, facility)
+                }
+
                 _ => false,
             }
         }
@@ -482,6 +487,13 @@ fn use_at<'a>(
                     player,
                     facility_id,
                 ))),
+                FacilityClass::Well => {
+                    if ActivateWellDigCommand::can_perform(player, facility) {
+                        Some(Box::new(ActivateWellDigCommand::new(player, facility_id)))
+                    } else {
+                        Some(Box::new(ActivateWellFillCommand::new(player, facility_id)))
+                    }
+                }
                 _ => None,
             }
         }
