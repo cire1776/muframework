@@ -289,6 +289,14 @@ impl FacilityList {
                 .expect("Must be able to convert to i32"),
         )
     }
+
+    pub fn at(&self, x: i32, y: i32) -> Option<&Facility> {
+        self.facilities
+            .iter()
+            .find(|(_, f)| f.x == x && f.y == y)
+            .map(|(_, f)| f)
+    }
+
     /// adds a facility to the list.
     /// # Examples:
     /// ```
@@ -453,5 +461,26 @@ mod chests {
         } else {
             panic!("inventory not found");
         }
+    }
+}
+#[cfg(test)]
+mod facility_list {
+    use super::*;
+
+    #[test]
+    fn at_returns_the_facility_at_its_coordinates() {
+        let mut inventories = InventoryList::new();
+        let mut subject = FacilityList::new();
+        let facility = Facility::new(
+            2,
+            10,
+            10,
+            FacilityClass::LockedChest,
+            "description".to_string(),
+            &mut inventories,
+        );
+        subject.add(facility.clone());
+
+        assert_eq!(subject.at(10, 10), Some(&facility));
     }
 }
