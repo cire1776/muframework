@@ -16,13 +16,13 @@ use window::MapWindowMode;
 pub mod pane;
 pub use pane::*;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct SpriteStyle {
     pub glyph: u8,
     pub fg: RGB,
     pub bg: RGB,
 }
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Sprite {
     pub style: SpriteStyle,
     pub x: i32,
