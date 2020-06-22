@@ -71,7 +71,7 @@ hardwood_log material "Hardwood Log" {
 hardwood_plank material "Hardwood Plank"
 softwood_plank material "Softwood Plank"
 bottle_of_water material "Bottle of Water"
-bottle_of_water material "Bottle of Oil"
+bottle_of_oil material "Bottle of Oil"
 bronze_shovel tool "Bronze Shovel" {
     endorsement: :can_dig
 }
