@@ -79,6 +79,10 @@ impl UIState {
 
     fn process_keyboard_input(&mut self, input: &Input) {
         let command = self.get_command_from_keyboard_input(input);
+
+        if command == Command::None {
+            return;
+        }
         &self.command_tx.send(command);
     }
 
