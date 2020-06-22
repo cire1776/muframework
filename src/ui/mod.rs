@@ -174,6 +174,7 @@ impl UIState {
                 description: _,
                 class: _,
             } => {}
+            FacilityRemoved { id: facility_id } => self.facilities.remove(facility_id),
             EquipmentUpdated(items) => {
                 self.inventory_window.max_selection_equipment = items.len() as u8;
                 self.inventory_window
@@ -595,4 +596,29 @@ pub fn time_in_millis() -> u64 {
         .duration_since(std::time::UNIX_EPOCH)
         .expect("No time")
         .as_millis() as u64
+}
+
+#[cfg(test)]
+mod facility {
+    use super::*;
+
+    #[test]
+    fn facility_removed_causes_the_facility_to_be_removed() {
+        let (_, update_rx) = std::sync::mpsc::channel();
+        let (command_tx, _) = std::sync::mpsc::channel();
+
+        let mut subject = UIState::new(update_rx, command_tx);
+
+        subject.process_tick(GameUpdate::FacilityAdded {
+            id: 1776,
+            description: "foo".into(),
+            x: 10,
+            y: 10,
+            class: FacilityClass::Well,
+        });
+
+        subject.process_tick(GameUpdate::FacilityRemoved { id: 1776 });
+
+        assert_eq!(subject.facilities.lookup(1776), None)
+    }
 }

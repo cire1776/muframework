@@ -325,6 +325,10 @@ impl FacilityList {
     pub fn add(&mut self, facility: Facility) {
         self.facilities.insert(facility.id, facility.clone());
     }
+
+    pub fn remove(&mut self, facility_id: u64) {
+        self.facilities.remove(&facility_id);
+    }
 }
 
 impl Index<u64> for FacilityList {
@@ -540,5 +544,30 @@ mod facility_list {
         subject.add(facility.clone());
 
         assert_eq!(subject.at(10, 10), Some(&facility));
+    }
+
+    #[test]
+    fn remove_does_nothing_if_given_a_bogus_id() {
+        let mut subject = FacilityList::new();
+        subject.remove(1776);
+    }
+
+    #[test]
+    fn remove_removes_an_existing_facility() {
+        let mut inventories = InventoryList::new();
+        let mut subject = FacilityList::new();
+        let facility = Facility::new(
+            1776,
+            10,
+            10,
+            FacilityClass::Well,
+            "description".to_string(),
+            &mut inventories,
+        );
+        subject.add(facility.clone());
+
+        subject.remove(1776);
+
+        assert!(subject.get(1776).is_none());
     }
 }

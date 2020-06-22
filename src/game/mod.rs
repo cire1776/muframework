@@ -313,6 +313,11 @@ impl GameState {
                 Self::refresh_inventory(player, inventories, update_tx);
                 activity
             }
+            Command::DestroyFacility(facility_id) => {
+                facilities.remove(*facility_id);
+                GameUpdate::send(update_tx, GameUpdate::FacilityRemoved { id: *facility_id });
+                activity
+            }
             Command::None => activity,
             Command::ActivityComplete => self.complete_activity(
                 player,

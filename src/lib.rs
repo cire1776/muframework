@@ -57,6 +57,7 @@ pub enum Command {
     RefreshInventory,
     ActivityAbort,
     ActivityComplete,
+    DestroyFacility(u64), // (facility_id)
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -100,6 +101,9 @@ pub enum GameUpdate {
         id: u64,
         description: String,
         class: FacilityClass,
+    },
+    FacilityRemoved {
+        id: u64,
     },
     EquipmentUpdated(Vec<Item>),
     InventoryUpdated(Vec<Item>),
