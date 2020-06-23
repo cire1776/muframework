@@ -147,7 +147,7 @@ impl GameState {
 
         let inventories = &mut InventoryList::new();
 
-        let (facilities, aliases) = Facility::read_in_facilities(&facility_vec, inventories);
+        let (mut facilities, aliases) = Facility::read_in_facilities(&facility_vec, inventories);
 
         // create the player's inventory
         Inventory::new_into_inventory_list(player.id, inventories);
@@ -166,7 +166,7 @@ impl GameState {
         Level::introduce_player(&player, inventories, update_tx);
         Level::introduce_other_characters(&characters, &mut obstacles, update_tx);
         Level::introduce_items(&items, update_tx);
-        Level::introduce_facilities(&facilities, &mut map, &mut obstacles, update_tx);
+        Level::introduce_facilities(&mut facilities, &mut map, &mut obstacles, update_tx);
 
         // TODO: consider moving this to a function
         GameUpdate::send(update_tx, SetBackground(map.clone()));
@@ -314,6 +314,14 @@ impl GameState {
                 activity
             }
             Command::DestroyFacility(facility_id) => {
+                let facility = facilities
+                    .get(*facility_id)
+                    .expect("cannot locate facility.");
+                map.set_tile_at(facility.x, facility.y, facility.background_tile);
+                GameUpdate::send(
+                    update_tx,
+                    GameUpdate::TileChangedAt(facility.x, facility.y, facility.background_tile),
+                );
                 facilities.remove(*facility_id);
                 GameUpdate::send(update_tx, GameUpdate::FacilityRemoved { id: *facility_id });
                 activity

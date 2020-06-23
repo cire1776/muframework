@@ -46,6 +46,7 @@ pub struct Facility {
     pub description: String,
     pub inventory: Option<u64>,
     properties: Option<NumericPropertyList>,
+    pub background_tile: tile_map::Tile,
 }
 
 impl StaticData for Facility {}
@@ -78,6 +79,7 @@ impl<'a> Facility {
             description,
             inventory: inventory_id,
             properties: None,
+            background_tile: tile_map::Tile::Empty,
         }
     }
 
@@ -130,6 +132,7 @@ impl<'a> Facility {
             description,
             inventory: Some(inventory_id),
             properties: None,
+            background_tile: tile_map::Tile::Empty,
         }
     }
 
@@ -364,6 +367,7 @@ impl IndexMut<u64> for FacilityList {
                     description: "".into(),
                     inventory: Some(u64::MAX),
                     properties: None,
+                    background_tile: tile_map::Tile::Empty,
                 },
             );
         }

@@ -62,12 +62,12 @@ impl Level {
     }
 
     pub fn introduce_facilities(
-        facilities: &FacilityList,
+        facilities: &mut FacilityList,
         map: &mut TileMap,
         obstacles: &mut BlockingMap,
         update_tx: Option<&GameUpdateSender>,
     ) {
-        for (index, facility) in facilities.iter() {
+        for (index, facility) in facilities.iter_mut() {
             GameUpdate::send(
                 update_tx,
                 FacilityAdded {
@@ -80,7 +80,12 @@ impl Level {
                 },
             );
             obstacles.block_at(facility.x, facility.y);
-            map.set_tile_at(facility.x, facility.y, tile_map::Tile::Facility(*index));
+
+            {
+                // will eventually need to move to facility.
+                facility.background_tile = map.at(facility.x, facility.y);
+                map.set_tile_at(facility.x, facility.y, tile_map::Tile::Facility(*index));
+            }
         }
     }
 }
