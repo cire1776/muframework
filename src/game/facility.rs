@@ -375,6 +375,12 @@ impl FacilityList {
     pub fn iter(&self) -> std::collections::hash_map::Iter<'_, u64, Facility> {
         self.facilities.iter()
     }
+
+    pub fn iter_mut(
+        &mut self,
+    ) -> std::collections::hash_map::IterMut<'_, u64, game::facility::Facility> {
+        self.facilities.iter_mut()
+    }
 }
 
 #[cfg(test)]
