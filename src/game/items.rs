@@ -18,6 +18,7 @@ pub enum ItemClass {
     Potion,
     Food,
     Material,
+    Ingredient,
     Ore,
 }
 
@@ -47,6 +48,7 @@ impl ItemClass {
             "potion" => Potion,
             "food" => Food,
             "material" => Material,
+            "ingredient" => Ingredient,
             "ore" => Ore,
             _ => panic!("unknown item class"),
         }
@@ -63,6 +65,7 @@ impl ItemClass {
             Food => MAX_STACK,
             Potion => LIMITED_STACK,
             Material => MAX_STACK,
+            Ingredient => LIMITED_STACK,
             Ore => LIMITED_STACK,
             _ => UNSTACKABLE,
         }

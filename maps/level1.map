@@ -61,7 +61,7 @@ glass_bottle material "Glass Bottle" {
 apple food "Apple"
 olive food "Olive"
 apple_juice food "Apple Juice"
-olive_oil food "Olive Oil"
+olive_oil ingredient "Olive Oil"
 softwood_log material "Softwood Log" {
     endorsement: :wants_to_mill_softwood
 }
@@ -70,7 +70,7 @@ hardwood_log material "Hardwood Log" {
 }
 hardwood_plank material "Hardwood Plank"
 softwood_plank material "Softwood Plank"
-bottle_of_water material "Bottle of Water"
+bottle_of_water ingredient "Bottle of Water"
 bottle_of_oil material "Bottle of Oil"
 bronze_shovel tool "Bronze Shovel" {
     endorsement: :can_dig
