@@ -138,7 +138,7 @@ impl SparseMap {
         }
     }
 
-    fn lookup_sprite_for_facility_class(class: FacilityClass) -> ui::Sprite {
+    fn lookup_sprite_for_facility_class(class: FacilityClass, variant: u8) -> ui::Sprite {
         match class {
             FacilityClass::ClosedChest => ui::Sprite {
                 style: SpriteStyle {
@@ -210,26 +210,92 @@ impl SparseMap {
                 y: 0,
                 facing: Direction::Up,
             },
-            FacilityClass::Well => ui::Sprite {
-                style: SpriteStyle {
-                    glyph: 31 as u8, // ▼
-                    fg: RGB::named(rltk::BLACK),
-                    bg: RGB::named(rltk::LIGHTBLUE),
+            FacilityClass::Well => {
+                [
+                    ui::Sprite {
+                        style: SpriteStyle {
+                            glyph: 31 as u8, // ▼
+                            fg: RGB::named(rltk::BLACK),
+                            bg: RGB::named(rltk::SADDLE_BROWN),
+                        },
+                        x: 0,
+                        y: 0,
+                        facing: Direction::Up,
+                    },
+                    ui::Sprite {
+                        style: SpriteStyle {
+                            glyph: 31 as u8, // ▼
+                            fg: RGB::named(rltk::BLACK),
+                            bg: RGB::named(rltk::BLUE),
+                        },
+                        x: 0,
+                        y: 0,
+                        facing: Direction::Up,
+                    },
+                    ui::Sprite {
+                        style: SpriteStyle {
+                            glyph: 31 as u8, // ▼
+                            fg: RGB::named(rltk::BLACK),
+                            bg: RGB::named(rltk::LIGHTGRAY),
+                        },
+                        x: 0,
+                        y: 0,
+                        facing: Direction::Up,
+                    },
+                ][variant as usize]
+            }
+            FacilityClass::Vein => [
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '#' as u8, // #
+                        fg: RGB::named(rltk::WHITE),
+                        bg: RGB::named(rltk::SADDLEBROWN),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
                 },
-                x: 0,
-                y: 0,
-                facing: Direction::Up,
-            },
-            FacilityClass::Vein => ui::Sprite {
-                style: SpriteStyle {
-                    glyph: '#' as u8, // #
-                    fg: RGB::named(rltk::WHITE),
-                    bg: RGB::named(rltk::BROWN_42),
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '#' as u8, // #
+                        fg: RGB::named(rltk::WHITE),
+                        bg: RGB::named(rltk::WHEAT),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
                 },
-                x: 0,
-                y: 0,
-                facing: Direction::Up,
-            },
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '#' as u8, // #
+                        fg: RGB::named(rltk::WHITE),
+                        bg: RGB::named(rltk::BLACK),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '%' as u8, // #
+                        fg: RGB::named(rltk::WHITE),
+                        bg: RGB::named(rltk::SILVER),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '%' as u8, // #
+                        fg: RGB::named(rltk::WHITE),
+                        bg: RGB::from_hex("#B87333").ok().unwrap(),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+            ][variant as usize],
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,
@@ -276,8 +342,9 @@ impl SparseMap {
         y: i32,
         class: FacilityClass,
         _description: String,
+        variant: u8,
     ) {
-        let mut sprite = Self::lookup_sprite_for_facility_class(class);
+        let mut sprite = Self::lookup_sprite_for_facility_class(class, variant);
         sprite.x = x;
         sprite.y = y;
 

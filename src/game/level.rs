@@ -76,6 +76,7 @@ impl Level {
                     y: facility.y,
                     class: facility.class.clone(),
                     description: facility.description.clone(),
+                    variant: facility.variant(),
                 },
             );
             obstacles.block_at(facility.x, facility.y);

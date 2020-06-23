@@ -168,11 +168,15 @@ impl UIState {
                 y,
                 description,
                 class,
-            } => self.facilities.add_facility(id, x, y, class, description),
+                variant,
+            } => self
+                .facilities
+                .add_facility(id, x, y, class, description, variant),
             FacilityUpdated {
                 id: _,
                 description: _,
                 class: _,
+                variant: _,
             } => {}
             FacilityRemoved { id: facility_id } => self.facilities.remove(facility_id),
             EquipmentUpdated(items) => {
@@ -615,6 +619,7 @@ mod facility {
             x: 10,
             y: 10,
             class: FacilityClass::Well,
+            variant: 0,
         });
 
         subject.process_tick(GameUpdate::FacilityRemoved { id: 1776 });

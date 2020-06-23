@@ -96,11 +96,13 @@ pub enum GameUpdate {
         y: i32,
         description: String,
         class: FacilityClass,
+        variant: u8,
     },
     FacilityUpdated {
         id: u64,
         description: String,
         class: FacilityClass,
+        variant: u8,
     },
     FacilityRemoved {
         id: u64,

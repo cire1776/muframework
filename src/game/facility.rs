@@ -81,6 +81,16 @@ impl<'a> Facility {
         }
     }
 
+    pub fn variant(&self) -> u8 {
+        use FacilityClass::*;
+
+        match self.class {
+            Well => self.get_property("fluid") as u8,
+            Vein => (self.get_property("ore_type") - 1) as u8,
+            _ => 0,
+        }
+    }
+
     pub fn has_inventory(class: FacilityClass) -> bool {
         [
             FacilityClass::ClosedChest,
