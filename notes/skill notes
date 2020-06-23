@@ -89,6 +89,89 @@ mine 5                      40 bonus xp:100000   :mineshaft_5
         1000>   engineering 45 master points     :drilling_master
                                                  :mineshaft_master
 
+Construction
+============
+
+Saw blades                 Con    Table
+----------                 Lvl     Lvl                 XP     Lifespan
+Stone     20   +30 secs    1      Simple    +10 secs   5       1000->rubble
+Copper    20   +20 secs    1      Simple               5
+Bronze    100  +10 secs    5      Simple               5
+Iron      1000 +5 secs    10      Common    +0 secs    10      5000->0.75 breaks
+Steel     2000 -0 secs    15      Common               10            0.25 rubble
+Stellite  4000 -2 secs    20      Advanced  -5 secs*   20      20000->breaks
+Titanium  3000 -8 secs    25      Advanced             20
+*including min time
+
+
+Fishing
+=======                     Lvl
+Shrimp          net          1  45 second timer
+Frog            net          1  45 second timer
+Mackeral        rod          1  60 second timer
+Crab            trap         1  180 second timer
+                                540 second cooldown
+                                1-5 spawns
+
+Catfish         net          5  50 second timer
+Salmon          rod          5  65 second timer
+
+Bass            rod         10  70 second timer
+Oyster          trap        10  210 second timer
+                                540 second cooldown
+                                1-5 spawns
+                                1000 chance of spawning pearl
+                                100000 chance of spawning black pearl
+
+Flounder        rod         15  75 second timer
+Haddock         rod         15  240 second timer
+                                540 second cooldown
+                                1-5 spawns
+
+Swordfish       boat,rod    20  80 second timer 
+Eel             trap        20  270 second timer
+                                540 second cooldown
+                                1-5 spawns
+
+Sardine                     25
+Sandbar Shark               25
+
+Pike                        30
+Lobster         trap        30
+
+Tuna            boat,net    35
+Striped Marlin  rod         35
+
+Herring         net         40
+Trout           rod         40
+
+Snapper         rod         45
+Red Trout       rod         45
+Red Herring     net         45
+Cod             rod         45
+
+Sturgeon        rod        master
+Giant Catfish   net        master
+Grouper                    master
+Black Sea Bass  trap       master
+
+Making Bait (Bass, Mackeral)
+
+
+Tools
+
+net
+rod
+lobster trap
+sm. fishing boat
+sloop
+boat
+trawler
+long boat and rod
+long boat and net
+canoe and rod
+canoe and net
+
 Skill Levels
 ============
 
