@@ -14,7 +14,10 @@ use game::character::CharacterType;
 use game::tile_map::TileMap;
 
 use game::facility::FacilityClass;
-use game::items::{Item, ItemClass};
+use game::{
+    equipment::MountingPoint,
+    items::{Item, ItemClass},
+};
 pub mod ui;
 use ui::window::{BasicWindow, InventoryWindow, MapWindow, MouseReceiver, Window};
 
@@ -53,6 +56,7 @@ pub enum Command {
     UnequipItem(u64),
     TransferItem(u64, u64, u64), // (item_id, src_inventory_id, dest_inventory_id)
     TransferAllItems(u64, u64),  // (src_inventory_id, dest_inventory_id )
+    TransferEquipmentToInventory(MountingPoint, u64), // (mounting point, dest_inventory_id)
     CloseExternalInventory,
     RefreshInventory,
     ActivityAbort,

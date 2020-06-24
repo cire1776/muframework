@@ -218,6 +218,39 @@ impl Command {
         command.execute(update_tx, None);
     }
 
+    pub fn transfer_equipment_to_inventory(
+        mounting_point: &MountingPoint,
+        inventory_id: u64,
+        player: &mut Player,
+        items: &mut ItemList,
+        inventories: &mut InventoryList,
+        update_tx: Option<&GameUpdateSender>,
+        _command_tx: Option<&CommandSender>,
+    ) {
+        let item_id = player
+            .mounting_points
+            .at(&mounting_point)
+            .expect("unable to find equipment");
+
+        let inventory = inventories
+            .get_mut(&inventory_id)
+            .expect("unable to find inventory");
+
+        player
+            .mounting_points
+            .unmount_item_by_id(item_id, inventory, items);
+
+        player.clear_endorsements();
+        player.mounting_points.clone().endorse(player, items);
+
+        let equipment_list: Vec<Item> = player.mounting_points.to_vec_of_items(items);
+
+        GameUpdate::send(
+            Some(update_tx.expect("unable to find command_tx")),
+            GameUpdate::EquipmentUpdated(equipment_list),
+        )
+    }
+
     pub fn close_external_inventory(update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>) {
         GameUpdate::send(update_tx, GameUpdate::ExternalInventoryClosed);
     }
@@ -396,6 +429,13 @@ fn can_use_at(
                 }
                 FacilityClass::Vein => ActivateVeinCommand::can_perform(player, facility),
 
+                FacilityClass::FishingSpot => {
+                    ActivateNetFishingCommand::can_perform(player, facility)
+                        || ActivateFishingCommand::can_perform(player, facility)
+                        || ActivatePlaceFishingTrapCommand::can_perform(player, facility)
+                        || ActivateCollectFishingTrapCommand::can_perform(player, facility)
+                }
+
                 _ => false,
             }
         }
@@ -500,6 +540,33 @@ fn use_at<'a>(
                     facility_id,
                     facilities,
                 ))),
+                FacilityClass::FishingSpot => {
+                    if ActivateNetFishingCommand::can_perform(player, facility) {
+                        Some(Box::new(ActivateNetFishingCommand::new(
+                            player,
+                            facility_id,
+                            facilities,
+                        )))
+                    } else if ActivateFishingCommand::can_perform(player, facility) {
+                        Some(Box::new(ActivateFishingCommand::new(
+                            player,
+                            facility_id,
+                            facilities,
+                        )))
+                    } else if ActivatePlaceFishingTrapCommand::can_perform(player, facility) {
+                        Some(Box::new(ActivatePlaceFishingTrapCommand::new(
+                            player,
+                            facility_id,
+                            facilities,
+                        )))
+                    } else {
+                        Some(Box::new(ActivateCollectFishingTrapCommand::new(
+                            player,
+                            facility_id,
+                            facilities,
+                        )))
+                    }
+                }
                 _ => None,
             }
         }

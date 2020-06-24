@@ -12,6 +12,10 @@ pub enum PaneTitle {
     Digging,
     Mining,
     Sawing,
+    NetFishing,
+    Fishing,
+    PlacingTrap,
+    CollectingTrap,
     ChestContents,
 }
 
@@ -27,6 +31,10 @@ impl ToString for PaneTitle {
             PaneTitle::Digging => "Digging",
             PaneTitle::Mining => "Mining",
             PaneTitle::Sawing => "Sawing",
+            PaneTitle::NetFishing => "Net Fishing",
+            PaneTitle::Fishing => "Fishing",
+            PaneTitle::PlacingTrap => "Placing Trap",
+            PaneTitle::CollectingTrap => "Collecting Trap",
             PaneTitle::ChestContents => "Chest Contents",
         };
 

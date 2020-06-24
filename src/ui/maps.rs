@@ -296,6 +296,28 @@ impl SparseMap {
                     facing: Direction::Up,
                 },
             ][variant as usize],
+            FacilityClass::FishingSpot => [
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: ' ' as u8, // #
+                        fg: RGB::named(rltk::WHITE),
+                        bg: RGB::named(rltk::LIGHTBLUE),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '#' as u8, // #
+                        fg: RGB::named(rltk::WHITE),
+                        bg: RGB::named(rltk::BLUE),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+            ][variant as usize],
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,

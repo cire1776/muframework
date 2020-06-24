@@ -21,3 +21,6 @@ pub use well_commands::*;
 
 pub mod vein_commands;
 pub use vein_commands::*;
+
+pub mod fishing_spot_commands;
+pub use fishing_spot_commands::*;

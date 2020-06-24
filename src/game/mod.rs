@@ -305,6 +305,19 @@ impl GameState {
                 );
                 None
             }
+
+            Command::TransferEquipmentToInventory(mounting_point, inventory_id) => {
+                Command::transfer_equipment_to_inventory(
+                    mounting_point,
+                    *inventory_id,
+                    player,
+                    items,
+                    inventories,
+                    update_tx,
+                    command_tx,
+                );
+                None
+            }
             Command::CloseExternalInventory => {
                 Command::close_external_inventory(update_tx);
                 None

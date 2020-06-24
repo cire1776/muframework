@@ -78,11 +78,48 @@ bronze_shovel tool "Bronze Shovel" {
 bronze_pickaxe tool "Bronze Pickaxe" {
     endorsement: :can_mine
 }
+simple_fishing_net tool "Simple Fishing Net" {
+    endorsement: :can_net_fish
+}
+simple_fishing_rod tool "Simple Fishing Rod" {
+    endorsement: :can_fish
+}
+simple_fishing_trap tool "Simple Fishing Trap" {
+    endorsement: :can_place_fishing_trap
+}
 dirt ore "Dirt"
 sand ore "Sand"
 stone ore "Stone"
 tin_ore ore "Tin Ore"
 copper_ore ore "Copper Ore"
+shrimp ingredient "Shrimp"
+frog ingredient "Frog"
+mackeral ingredient "Mackeral"
+crab ingredient "Crab"
+catfish ingredient "Catfish"
+salmon ingredient "Salmon"
+bass ingredient "Bass"
+oyster ingredient "Oyster"
+flounder ingredient "Flounder"
+haddock ingredient "Haddock"
+swordfish ingredient "Swordfish"
+eel ingredient "Eel"
+sardines ingredient "Sardine"
+sandbar_shark ingredient "Sandbar Shark"
+pike ingredient "Pike"
+lobster ingredient "Lobster"
+tuna ingredient "Tuna"
+striped_marlin ingredient "Striped Marlin"
+herring ingredient "Herring"
+trout ingredient "Trout"
+snapper ingredient "Snapper"
+red_trout ingredient "Red Trout"
+red_herring ingredient "Red Herring"
+cod ingredient "Cod"
+sturgeon ingredient "Sturgeon"
+giant_catfish ingredient "Giant Catfish"
+grouper ingredient "Grouper"
+black_see_bass ingredient "Black Sea Bass"q
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -163,6 +200,19 @@ copper_ore ore "Copper Ore"
     property: chance_of_exhaustion => 2000
     property: chance_of_gem => 10000
 }
+~fishing_spot 15, 1 "A quiet coastline" {
+    property: body_of_waster => 1
+    property: net_1_product => 1
+    property: net_2_product => 2
+    property: net_2_chance => 50
+    property: net_timer => 45
+    property: rod_1_product => 3
+    property: rod_timer => 60
+    property: trap_1_product => 4
+    property: trap_spawn => 5
+    property: trap_timer => 30
+    property: trap_cooldown => 30
+}
 ===END OF FACILITIES===
 player amber_leather_cap
 player glass_bottle
@@ -178,9 +228,11 @@ chest1 shiny_dagger // a dagger
 chest1 sharp_short_sword
 chest1 pink_potion
 chest1 old_leather_cap
-chest1 reed_basket
-chest1 baseball_cap
 chest1 yellow_potion
+chest1 reed_basket
 chest1 worn_bronze_axe
 chest1 bronze_pickaxe
+chest1 simple_fishing_net
+chest1 simple_fishing_rod
+chest1 simple_fishing_trap
 ===END OF STORED ITEMS===

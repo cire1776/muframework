@@ -16,6 +16,7 @@ pub enum FacilityClass {
     Lumbermill,
     Well,
     Vein,
+    FishingSpot,
 }
 
 impl FacilityClass {
@@ -30,6 +31,7 @@ impl FacilityClass {
             "*lumbermill" => FacilityClass::Lumbermill,
             "▼well" => FacilityClass::Well,
             "#vein" => FacilityClass::Vein,
+            "~fishing_spot" => FacilityClass::FishingSpot,
             _ => panic!("unknown FacilityClass symbol"),
         }
     }
@@ -98,6 +100,7 @@ impl<'a> Facility {
             FacilityClass::ClosedChest,
             FacilityClass::OpenChest,
             FacilityClass::FruitPress,
+            FacilityClass::FishingSpot,
         ]
         .contains(&class)
     }
