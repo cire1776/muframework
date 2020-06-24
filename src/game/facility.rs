@@ -237,7 +237,7 @@ impl<'a> Facility {
     }
 
     pub fn is_in_use(&self) -> bool {
-        false
+        self.get_property("is_in_use") != 0
     }
 }
 
