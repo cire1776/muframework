@@ -1,0 +1,105 @@
+buff( "fishing_time",-3,u128,"item128")  // (tag, property, buff value, buff expiration, 0 = permanent)
+
+'skill'_time
+fortune
+'skill'_chance
+spell_cast_period
+spell_damage
+
+defense: 
+attack:
+magic_defense:
+
+max_hp
+max_mp
+inventory_capacity
+agility
+
+
+stats
+-----
+hp
+MP
+
+
+
+Racial Characteristics: permanent
+Temp racial buffs: temporary
+Nationality Characteristics: permanent (as long as you belong to that nation)
+Temp Nationality buffs: temporary
+Guild buffs: permanent (as long as you belong to that guild)
+Temp Guild Buffs: temporary
+Permanent buffs based on character level
+Permanent buffs based on equipment: (as long as they are equipped)
+Inventory buffs: permanent (as long as item is in inventory)
+Magic buffs: temporary
+Potion buffs: temporary
+Food buffs: temporary
+Age buffs: permanent
+
+
+pub enum BuffTag {
+    Equipment(u64),
+    Inventory(u64),
+    Race(String),
+    Nationality(String),
+    Guild(String),
+    Base(),
+    Effect(),
+    Level(),
+}
+
+pub enum BuffType {
+    SkillTime(String),
+    SkillChance(String),
+    Fortune(),
+    SpellCastPeriod(),
+    SpellDamage(),
+    Defense(),
+    MaxHP(),
+    MaxMP(),
+}
+
+pub type buff = (i8, u128, BuffTag);
+
+
+
+
+
+// unaltered newb character looks like:
+base_attributes = { "MaxHP" => 6, "MaxMP => 6 },
+buffs = {}
+
+// same character with Level2 fishing_time
+atttributes = {
+    MaxHP() => [ (6,0,Base()) ]
+    MaxMP() => [ (6,0,Base()) ]
+    SkillTime("fishing") => [  (-1, 0, Level) ]
+}
+
+// with -3 fishers buff
+atttributes = {
+    MaxHP() => [ (6,0,Base()) ]
+    MaxMP() => [ (6,0,Base()) ]
+    SkillTime("fishing") => [  (-1, 0, Level), (-3, 30sec, Effect) ]
+}
+
+// with -3 fishers buff and a fisherman's ring(1054)
+atttributes = {
+    MaxHP() => [ (6,0,Base()) ],
+    MaxMP() => [ (6,0,Base()) ],
+    Fortune => [ (5,0,Equipment(1054))],
+    SkillTime("fishing") => [  (-1, 0, Level), (-3, 30sec, Effect), (-3, 0, Equipment(1054)) ]
+}
+
+
+// fisherman's ring(1054) looks like
+attribute_modifiers = {
+    Fortune => (5,0, Equipment(1054)),
+    Skilltime("fishing") => (-3, 0, Equipment(1054))
+}
+
+
+
+
+
