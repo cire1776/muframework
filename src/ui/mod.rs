@@ -335,6 +335,16 @@ impl UIState {
                 fg: RGB::named(rltk::WHITE),
                 bg: RGB::named(rltk::BLACK),
             },
+            Tile::DeepWater => SpriteStyle {
+                glyph: ' ' as u8,
+                fg: RGB::named(rltk::BLUE),
+                bg: RGB::named(rltk::BLUE),
+            },
+            Tile::Coastline => SpriteStyle {
+                glyph: ' ' as u8,
+                fg: RGB::named(rltk::LIGHTBLUE),
+                bg: RGB::named(rltk::LIGHTBLUE),
+            },
             Tile::Facility(_) => SpriteStyle {
                 glyph: '\u{ff}' as u8,
                 fg: RGB::named(rltk::BLACK),

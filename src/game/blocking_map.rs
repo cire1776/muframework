@@ -1,4 +1,5 @@
-use super::{tile_map, TileMap};
+use super::tile_map::Tile::*;
+use super::TileMap;
 use std::fmt;
 
 /*
@@ -60,9 +61,7 @@ impl BlockingMap {
 
         for (index, tile) in tiles.to_iter().enumerate() {
             match tile {
-                tile_map::Tile::StoneWall | tile_map::Tile::Empty | tile_map::Tile::ClosedDoor => {
-                    self.map[index] = true
-                }
+                StoneWall | Empty | ClosedDoor | DeepWater | Coastline => self.map[index] = true,
                 _ => {}
             }
         }

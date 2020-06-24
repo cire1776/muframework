@@ -11,6 +11,8 @@ pub enum Tile {
     DirtFloor,
     ClosedDoor,
     OpenDoor,
+    DeepWater,
+    Coastline,
     Facility(u64),
 }
 
@@ -22,6 +24,8 @@ impl Tile {
             Tile::DirtFloor => ".",
             Tile::ClosedDoor => "|",
             Tile::OpenDoor => "/",
+            Tile::DeepWater => "W",
+            Tile::Coastline => "w",
             Tile::Facility(_) => "\u{ff}",
         }
     }
@@ -216,6 +220,8 @@ impl TileMap {
                     ' ' => Tile::Empty,
                     '|' => Tile::ClosedDoor,
                     '/' => Tile::OpenDoor,
+                    'W' => Tile::DeepWater,
+                    'w' => Tile::Coastline,
                     char => panic!("unrecognized character: {}", char),
                 };
                 map.map[index] = tile;
