@@ -10,6 +10,9 @@ use blocking_map::BlockingMap;
 pub mod command;
 pub use command::{Activity, CommandSender, GameUpdateSender};
 
+pub mod attributes;
+pub use attributes::*;
+
 pub mod character;
 pub use character::{Character, CharacterType, Player};
 

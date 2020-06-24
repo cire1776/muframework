@@ -11,6 +11,7 @@ pub struct Player {
     pub mounting_points: MountingPointMap,
     pub external_inventory: Option<Vec<Item>>,
     pub endorsements: HashMap<String, bool>,
+    pub attributes: AttributeList,
 }
 
 impl Player {
@@ -24,6 +25,7 @@ impl Player {
             mounting_points: MountingPointMap::new(),
             external_inventory: None,
             endorsements: HashMap::new(),
+            attributes: AttributeList::new(),
         };
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");
