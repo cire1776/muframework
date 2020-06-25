@@ -8,9 +8,9 @@ Items to be completed
 - √ unequpping items
 - inventory capacity by weight
 - tooltips
-- first facility
-- use of facility
-- endorsements/enablements
+- √ first facility
+- √ use of facility
+- √ endorsements/enablements
 - quests
 - npc characters
 - npc AIs
@@ -18,6 +18,11 @@ Items to be completed
 - RT action
 - chests
 - √ facing
+- xp
+- levelling
+- min time
+- drinking and eating
+- 
 
 Faciltiies
 ===
