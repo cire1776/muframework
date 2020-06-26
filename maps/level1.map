@@ -211,7 +211,7 @@ black_see_bass ingredient "Black Sea Bass"q
     property: trap_1_product => 4
     property: trap_spawn => 5
     property: trap_timer => 30
-    property: trap_cooldown => 30
+    property: trap_cooldown => 180
 }
 ===END OF FACILITIES===
 player amber_leather_cap
