@@ -92,7 +92,7 @@ impl SmeltingSkill {
 
     pub fn can_produce(product: SmeltingSkill, inventory: &Inventory) -> bool {
         match product {
-            Tin | Copper | Lead | Mercury | Iron | Tungsten | Cobalt | Nickel => {
+            Tin | Copper | Lead | Iron | Tungsten | Cobalt | Nickel => {
                 if !inventory.has_sufficient(
                     ItemClass::Ore,
                     format!("{} Ore", product.to_string()),
@@ -115,6 +115,19 @@ impl SmeltingSkill {
                 }
 
                 if !inventory.has_sufficient(ItemClass::Ore, "Copper Ore", 2) {
+                    return false;
+                }
+
+                if !inventory.has_sufficient(ItemClass::Material, "Softwood Log", 1)
+                    && !inventory.has_sufficient(ItemClass::Material, "Hardwood Log", 1)
+                    && !inventory.has_sufficient(ItemClass::Material, "Coal", 1)
+                {
+                    return false;
+                }
+                true
+            }
+            Mercury => {
+                if !inventory.has_sufficient(ItemClass::Ore, "Cinnabar", 4) {
                     return false;
                 }
 
@@ -205,7 +218,7 @@ impl SmeltingSkill {
         items: &mut ItemList,
     ) {
         match product {
-            Tin | Copper | Lead | Mercury | Iron | Tungsten | Cobalt | Nickel => {
+            Tin | Copper | Lead | Iron | Tungsten | Cobalt | Nickel => {
                 inventory.consume(
                     ItemClass::Ore,
                     format!("{} Ore", product.to_string()),
@@ -226,6 +239,19 @@ impl SmeltingSkill {
             Bronze => {
                 inventory.consume(ItemClass::Ore, "Tin Ore", 2, items);
                 inventory.consume(ItemClass::Ore, "Copper Ore", 2, items);
+
+                if !inventory.has_sufficient(ItemClass::Material, "Softwood Log", 1) {
+                    inventory.consume(ItemClass::Material, "Softwood Log", 1, items);
+                } else if inventory.has_sufficient(ItemClass::Material, "Hardwood Log", 1) {
+                    inventory.consume(ItemClass::Material, "Hardwood Log", 1, items);
+                } else if inventory.has_sufficient(ItemClass::Material, "Coal", 1) {
+                    inventory.consume(ItemClass::Ore, "Coal", 1, items);
+                } else {
+                    panic!("didn't have fuel")
+                }
+            }
+            Mercury => {
+                inventory.consume(ItemClass::Ore, "Cinnabar", 4, items);
 
                 if !inventory.has_sufficient(ItemClass::Material, "Softwood Log", 1) {
                     inventory.consume(ItemClass::Material, "Softwood Log", 1, items);
