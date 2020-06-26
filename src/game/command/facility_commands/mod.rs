@@ -1,5 +1,5 @@
 extern crate chrono;
-extern crate timer;
+extern crate extern_timer;
 
 pub use super::*;
 pub use std::sync::mpsc::channel;

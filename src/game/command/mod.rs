@@ -588,7 +588,7 @@ pub trait CommandHandler<'a> {
 
     fn create_activity(
         &self,
-        _timer: timer::Timer,
+        _timer: extern_timer::Timer,
         _guard: Guard,
         _update_sender: GameUpdateSender,
         _command_sender: CommandSender,
@@ -626,7 +626,7 @@ pub trait CommandHandler<'a> {
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) -> Option<Box<dyn Activity>> {
-        let timer = timer::Timer::new();
+        let timer = extern_timer::Timer::new();
 
         // unwrap senders to avoid thread sending problems
         let command_sender = command_tx.unwrap().clone();

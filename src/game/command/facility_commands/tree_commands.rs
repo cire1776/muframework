@@ -62,7 +62,7 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
     }
     fn create_activity(
         &self,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -98,7 +98,7 @@ pub struct TreePickingActivity {
     expiration: u32,
     player_inventory_id: u64,
     facility_id: u64,
-    timer: timer::Timer,
+    timer: extern_timer::Timer,
     guard: Option<Guard>,
     update_sender: GameUpdateSender,
     command_sender: CommandSender,
@@ -110,7 +110,7 @@ impl<'a> TreePickingActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -227,7 +227,7 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -267,7 +267,7 @@ pub struct TreeLoggingActivity {
     player_inventory_id: u64,
     expiration: u32,
     facility_id: u64,
-    timer: timer::Timer,
+    timer: extern_timer::Timer,
     guard: Option<Guard>,
     update_sender: GameUpdateSender,
     command_sender: CommandSender,
@@ -279,7 +279,7 @@ impl<'a> TreeLoggingActivity {
         player_inventory_id: u64,
         expiration: u32,
         facility_id: u64,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,

@@ -1,6 +1,6 @@
 use super::*;
+use extern_timer::Guard;
 use std::convert::*;
-use timer::Guard;
 
 use character::CharacterList;
 // use geometry::Point;

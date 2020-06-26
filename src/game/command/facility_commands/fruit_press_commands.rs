@@ -178,7 +178,7 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -230,7 +230,7 @@ pub struct FruitPressActivity {
     fruit_type: FruitType,
     expiration: u32,
     facility_id: u64,
-    _timer: timer::Timer,
+    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -242,7 +242,7 @@ impl FruitPressActivity {
         fruit_type: FruitType,
         expiration: u32,
         facility_id: u64,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -353,7 +353,7 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -400,7 +400,7 @@ pub struct FruitPressFillActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: timer::Timer,
+    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -412,7 +412,7 @@ impl FruitPressFillActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,

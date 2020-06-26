@@ -84,7 +84,7 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -119,7 +119,7 @@ pub struct VeinActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: timer::Timer,
+    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -131,7 +131,7 @@ impl VeinActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: timer::Timer,
+        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
