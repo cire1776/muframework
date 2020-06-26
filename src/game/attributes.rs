@@ -1,7 +1,8 @@
 use super::*;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum BuffTag {
+    None,
     Equipment(u64),
     Inventory(u64),
     Race(String),
@@ -12,16 +13,66 @@ pub enum BuffTag {
     Level,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub enum Attribute {
     SkillTime(String),
     SkillChance(String),
     Fortune,
     SpellCastPeriod,
     SpellDamage,
+    Attack,
     Defense,
     MaxHP,
     MaxMP,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub enum AttributeBuff {
+    SkillTime(String, i8, u128),
+    SkillChance(String, i8, u128),
+    Fortune(i8, u128),
+    SpellCastPeriod(i8, u128),
+    SpellDamage(i8, u128),
+    Attack(i8, u128),
+    Defense(i8, u128),
+    MaxHP(i8, u128),
+    MaxMP(i8, u128),
+}
+
+impl AttributeBuff {
+    pub fn to_attribute_and_buff(&self, tag: BuffTag) -> (Attribute, Buff) {
+        match self {
+            AttributeBuff::SkillTime(label, value, expiration) => (
+                Attribute::SkillTime(label.clone()),
+                (*value, *expiration, tag),
+            ),
+            AttributeBuff::SkillChance(label, value, expiration) => (
+                Attribute::SkillChance(label.clone()),
+                (*value, *expiration, tag),
+            ),
+            AttributeBuff::Fortune(value, expiration) => {
+                (Attribute::Fortune, (*value, *expiration, tag))
+            }
+            AttributeBuff::SpellCastPeriod(value, expiration) => {
+                (Attribute::SpellCastPeriod, (*value, *expiration, tag))
+            }
+            AttributeBuff::SpellDamage(value, expiration) => {
+                (Attribute::SpellDamage, (*value, *expiration, tag))
+            }
+            AttributeBuff::Attack(value, expiration) => {
+                (Attribute::Attack, (*value, *expiration, tag))
+            }
+            AttributeBuff::Defense(value, expiration) => {
+                (Attribute::Defense, (*value, *expiration, tag))
+            }
+            AttributeBuff::MaxHP(value, expiration) => {
+                (Attribute::MaxHP, (*value, *expiration, tag))
+            }
+            AttributeBuff::MaxMP(value, expiration) => {
+                (Attribute::MaxMP, (*value, *expiration, tag))
+            }
+        }
+    }
 }
 
 pub type Buff = (i8, u128, BuffTag);
@@ -49,7 +100,7 @@ impl AttributeList {
             }
         }
     }
-    pub fn get(&mut self, index: &Attribute, current_time: u128) -> i8 {
+    pub fn get(&self, index: &Attribute, current_time: u128) -> i8 {
         let possible_attribute_set = &self.attributes.get(index);
         match possible_attribute_set {
             Some(ref attribute_set) => {
@@ -58,11 +109,7 @@ impl AttributeList {
                     .filter(|a| a.1 == 0 || a.1 > current_time)
                     .map(|a| a.clone())
                     .collect();
-                let result = new_set.iter().fold(0, |accum, a| accum + a.0);
-
-                self.attributes.insert(index.clone(), new_set);
-
-                result
+                new_set.iter().fold(0, |accum, a| accum + a.0)
             }
             None => 0,
         }
@@ -128,21 +175,6 @@ mod attribute_list {
         subject.add(SkillChance("bogus_skill".into()), (2, 0, Base));
 
         assert_eq!(subject.get(&SkillChance("bogus_skill".into()), 0), 5);
-    }
-
-    #[test]
-    fn get_removes_expired_buffs() {
-        let mut subject = AttributeList::new();
-
-        subject.add(SkillChance("bogus_skill".into()), (3, 30000, Base));
-        subject.add(SkillChance("bogus_skill".into()), (2, 0, Base));
-
-        assert_eq!(subject.get(&SkillChance("bogus_skill".into()), 31000), 2);
-        assert_eq!(subject.attributes.len(), 1);
-        assert_eq!(
-            subject.attributes[&SkillChance("bogus_skill".into())].len(),
-            1
-        );
     }
 
     #[test]

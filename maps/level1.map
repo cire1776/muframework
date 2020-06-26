@@ -41,8 +41,13 @@ S 28,23 // spider at 28,23
 ===END OF CHARACTERS===
 crusty_dagger dagger "Crusty Dagger"
 shiny_dagger dagger "Shiny Dagger" // a shiny dagger
-very_old_leather_cap headwear "Very Old Leather Cap"
-old_leather_cap headwear "Old Leather Cap"
+very_old_leather_cap headwear "Very Old Leather Fishermans Cap" {
+    endorsement: :can_net_fish
+    buff: SkillTime("fishing") => -3
+}
+old_leather_cap headwear "Old Leather Cap" {
+    buff: MaxHP => 5
+}
 baseball_cap headwear "Baseball Cap"
 amber_leather_cap headwear "Amber Leather Cap"
 warped_short_sword bladeweapon "Warped Short Sword"
@@ -227,7 +232,9 @@ player bronze_shovel
 chest1 shiny_dagger // a dagger
 chest1 sharp_short_sword
 chest1 pink_potion
-chest1 old_leather_cap
+chest1 very_old_leather_cap
+chest1 reed_basket
+chest1 baseball_cap
 chest1 yellow_potion
 chest1 reed_basket
 chest1 worn_bronze_axe

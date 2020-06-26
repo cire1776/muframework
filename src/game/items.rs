@@ -100,11 +100,12 @@ impl ItemState {
     }
 }
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Ord, PartialOrd)]
 pub struct ItemType {
     pub class: ItemClass,
     pub description: String,
     pub endorsements: Vec<String>,
+    pub buffs: Vec<AttributeBuff>,
 }
 
 impl ItemType {
@@ -113,11 +114,16 @@ impl ItemType {
             class,
             description: description.to_string(),
             endorsements: vec![],
+            buffs: vec![],
         }
     }
 
     pub fn add_endorsement<S: ToString>(&mut self, endorsement: S) {
         self.endorsements.push(endorsement.to_string());
+    }
+
+    pub fn add_buff(&mut self, buff: AttributeBuff) {
+        self.buffs.push(buff);
     }
 
     pub fn read_in_item_types(items: &mut Vec<String>) -> ItemTypeList {
@@ -148,16 +154,43 @@ impl ItemType {
             return;
         }
 
-        let re = Regex::new(r#"^(endorsement):\s+(:\w+|\d+)(?:\s*//.*)?$"#).unwrap();
+        let re = Regex::new(r#"(?m)^\s*(?:(endorsement|buff)\s*:\s*)(?:(:\w+|\d+)|(?:(SkillTime|SkillChance|Fortune|SpellCastPeriod|SpellDamage|Defense|Attack|MaxHP|MaxMP)(?:\("(\w+)"\))?\s*=>\s*(-?\d+)))(?:\s*//.*)?$"#).unwrap();
 
-        let captures = re.captures(attributes).expect("unable to parse attribute");
+        for captures in re.captures_iter(attributes) {
+            let attribute_type = capture_string(&captures, 1);
 
-        let attribute_name = capture_string(&captures, 1);
-        let attribute_value = capture_string(&captures, 2);
+            match attribute_type {
+                "endorsement" => {
+                    let endorsement = capture_string(&captures, 2);
+                    new_type.add_endorsement(endorsement)
+                }
+                "buff" => {
+                    let attribute_name = capture_optional_string(&captures, 3);
+                    let attribute_subname = capture_optional_string(&captures, 4);
+                    let attribute_value = capture_optional_string(&captures, 5)
+                        .parse::<i8>()
+                        .expect("unable to get value");
 
-        match attribute_name {
-            "endorsement" => new_type.add_endorsement(attribute_value),
-            _ => panic!("unrecognized attribute: {}", attribute_name),
+                    let buff = match attribute_name {
+                        "SkillTime" => {
+                            AttributeBuff::SkillTime(attribute_subname.into(), attribute_value, 0)
+                        }
+                        "SkillChance" => {
+                            AttributeBuff::SkillChance(attribute_subname.into(), attribute_value, 0)
+                        }
+                        "Fortune" => AttributeBuff::Fortune(attribute_value, 0),
+                        "SpellCastPeriod" => AttributeBuff::SpellCastPeriod(attribute_value, 0),
+                        "SpellDamage" => AttributeBuff::SpellDamage(attribute_value, 0),
+                        "Defense" => AttributeBuff::Defense(attribute_value, 0),
+                        "Attack" => AttributeBuff::Attack(attribute_value, 0),
+                        "MaxHP" => AttributeBuff::MaxHP(attribute_value, 0),
+                        "MaxMP" => AttributeBuff::MaxMP(attribute_value, 0),
+                        _ => panic!("unrecognized attribute buff"),
+                    };
+                    new_type.add_buff(buff);
+                }
+                _ => panic!("unrecognized attribute: {}", attribute_type),
+            }
         }
     }
 }
@@ -263,12 +296,30 @@ impl Item {
         format!("{} {}", prefix, inflected_description).clone()
     }
 
+    pub fn has_been_equipped(&self, player: &mut Player) {
+        self.endorse(player);
+        for buff in self.item_type.buffs.iter() {
+            let (attribute, buff) = buff.to_attribute_and_buff(BuffTag::Equipment(self.id));
+            player.add_buff(attribute, buff)
+        }
+    }
+
+    pub fn has_been_unequipped(&self, player: &mut Player) {
+        self.unendorse(player);
+        player.remove_buff(BuffTag::Equipment(self.id));
+    }
+
     pub fn endorse(&self, player: &mut Player) {
         for endorsement in &self.item_type.endorsements {
             player.endorse_with(endorsement);
         }
     }
 
+    pub fn unendorse(&self, player: &mut Player) {
+        for endorsement in &self.item_type.endorsements {
+            player.unendorse_with(endorsement);
+        }
+    }
     /// creates a new item assigning it its Id as appropriate.
     pub fn spawn<S: ToString>(
         class: ItemClass,

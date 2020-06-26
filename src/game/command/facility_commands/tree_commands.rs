@@ -52,11 +52,13 @@ impl<'a> ActivateTreePickingCommand<'a> {
 
 impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
     fn expiration(&self) -> u32 {
-        match self.tree_type {
+        (match self.tree_type {
             TreeType::Apple => 60,
             TreeType::Olive => 90,
             _ => panic!("Non-fruit tree supplied"),
-        }
+        } + self
+            .player
+            .get_attribute(Attribute::SkillTime("logging".into()), 0)) as u32
     }
     fn create_activity(
         &self,
@@ -218,7 +220,9 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
 
 impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
     fn expiration(&self) -> u32 {
-        60
+        (60 + self
+            .player
+            .get_attribute(Attribute::SkillTime("logging".into()), 0)) as u32
     }
 
     fn create_activity(

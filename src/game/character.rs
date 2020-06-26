@@ -10,8 +10,8 @@ pub struct Player {
     pub character_type: CharacterType,
     pub mounting_points: MountingPointMap,
     pub external_inventory: Option<Vec<Item>>,
-    pub endorsements: HashMap<String, bool>,
-    pub attributes: AttributeList,
+    endorsements: HashMap<String, u32>,
+    attributes: AttributeList,
 }
 
 impl Player {
@@ -41,15 +41,43 @@ impl Player {
     }
 
     pub fn endorse_with<S: ToString>(&mut self, endorsement: S) {
-        self.endorsements.insert(endorsement.to_string(), true);
-    }
+        let endorsement = endorsement.to_string();
+        let possible = self.endorsements.get_mut(&endorsement);
 
-    pub fn clear_endorsements(&mut self) {
-        self.endorsements.clear();
+        match possible {
+            Some(count) => *count += 1,
+            None => {
+                self.endorsements.insert(endorsement.to_string(), 1);
+                ()
+            }
+        };
     }
 
     pub fn unendorse_with<S: ToString>(&mut self, endorsement: S) {
-        self.endorsements.remove(&endorsement.to_string());
+        let endorsement = endorsement.to_string();
+        let possible = self.endorsements.get_mut(&endorsement);
+
+        match possible {
+            Some(count) => {
+                *count -= 1;
+                if *count == 0 {
+                    self.endorsements.remove(&endorsement);
+                }
+            }
+            None => {}
+        };
+    }
+
+    pub fn get_attribute(&self, attribute: Attribute, current_time: u128) -> i8 {
+        self.attributes.get(&attribute, current_time)
+    }
+
+    pub fn add_buff(&mut self, attribute: Attribute, buff: Buff) {
+        self.attributes.add(attribute, buff);
+    }
+
+    pub fn remove_buff(&mut self, tag: BuffTag) {
+        self.attributes.remove(tag);
     }
 }
 
@@ -199,5 +227,48 @@ mod endorsements {
         subject.unendorse_with(":an_endorsement");
 
         assert!(!subject.is_endorsed_with(":an_endorsement"));
+    }
+}
+
+#[cfg(test)]
+mod attributes {
+    use super::*;
+    use game::attributes::Attribute::*;
+    use game::attributes::BuffTag::*;
+
+    #[test]
+    fn get_attribute_returns_the_value_of_the_attribute_as_set() {
+        let mut subject = Player::new();
+
+        subject
+            .attributes
+            .add(SkillTime("fishing".into()), (-3, 0, Level));
+        subject
+            .attributes
+            .add(SkillTime("fishing".into()), (-2, 30000, Effect));
+
+        assert_eq!(subject.get_attribute(SkillTime("fishing".into()), 0), -5);
+    }
+
+    #[test]
+    fn add_attributes_adds_an_attribute() {
+        let mut subject = Player::new();
+
+        subject.add_buff(SkillTime("fishing".into()), (-3, 0, Level));
+        subject.add_buff(SkillTime("fishing".into()), (-2, 30000, Effect));
+
+        assert_eq!(subject.get_attribute(SkillTime("fishing".into()), 0), -5);
+    }
+
+    #[test]
+    fn remove_buff_removes_a_buff_with_a_particular_tag() {
+        let mut subject = Player::new();
+
+        subject.add_buff(SkillTime("fishing".into()), (-3, 0, Level));
+        subject.add_buff(SkillTime("fishing".into()), (-2, 30000, Effect));
+
+        subject.remove_buff(Effect);
+
+        assert_eq!(subject.get_attribute(SkillTime("fishing".into()), 0), -3);
     }
 }

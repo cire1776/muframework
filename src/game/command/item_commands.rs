@@ -148,8 +148,7 @@ impl<'a> CommandHandler<'a> for EquipCommand<'a> {
         }
         let player_mounting_points = self.player.mounting_points.clone();
 
-        self.player.clear_endorsements();
-        player_mounting_points.endorse(self.player, &self.items);
+        self.item.has_been_equipped(self.player);
         None
     }
 
@@ -205,11 +204,12 @@ impl<'a> CommandHandler<'a> for UnequipCommand<'a> {
             .mounting_points
             .unmount_item_by_id(self.item_id, self.inventory, self.items);
 
-        self.player.clear_endorsements();
-        self.player
-            .mounting_points
-            .clone()
-            .endorse(&mut self.player, self.items);
+        let item = self
+            .items
+            .get_as_item(self.item_id)
+            .expect("unable to get item");
+
+        item.has_been_unequipped(self.player);
         None
     }
 

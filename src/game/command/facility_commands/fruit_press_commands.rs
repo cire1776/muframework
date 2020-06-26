@@ -171,7 +171,9 @@ impl<'a> ActivateFruitPressCommand<'a> {
 
 impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
     fn expiration(&self) -> u32 {
-        60
+        (60 + self
+            .player
+            .get_attribute(Attribute::SkillTime("cooking".into()), 0)) as u32
     }
 
     fn create_activity(
@@ -344,7 +346,9 @@ impl<'a> ActivateFruitPressFillCommand<'a> {
 
 impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
     fn expiration(&self) -> u32 {
-        30
+        (30 + self
+            .player
+            .get_attribute(Attribute::SkillTime("cooking".into()), 0)) as u32
     }
 
     fn create_activity(

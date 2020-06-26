@@ -48,10 +48,12 @@ impl<'a> ActivateLumberMillCommand<'a> {
 
 impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
     fn expiration(&self) -> u32 {
-        match self.log_type {
+        (match self.log_type {
             LogType::Softwood => 40,
             LogType::Hardwood => 60,
-        }
+        } + self
+            .player
+            .get_attribute(Attribute::SkillTime("construction".into()), 0)) as u32
     }
 
     fn create_activity(

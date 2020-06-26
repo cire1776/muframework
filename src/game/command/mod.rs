@@ -240,8 +240,8 @@ impl Command {
             .mounting_points
             .unmount_item_by_id(item_id, inventory, items);
 
-        player.clear_endorsements();
-        player.mounting_points.clone().endorse(player, items);
+        let item = items.get_as_item(item_id).expect("unable to find item");
+        item.has_been_unequipped(player);
 
         let equipment_list: Vec<Item> = player.mounting_points.to_vec_of_items(items);
 
