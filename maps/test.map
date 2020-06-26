@@ -1,9 +1,9 @@
 ####################           #########################
-#..................#           #.......................#
-#..................#           #.......................#
-#..................#           #.......................#
-#..................#           #.......................#
-#..................#           #.......................#
+#..............wWWW#           #.......................#
+#...............wWW#           #.......................#
+#...............wWW#           #.......................#
+#................wW#           #.......................#
+#.................w#           #.......................#
 #..................#############.......................#
 #................../.........../.......................#
 #..................#############.......................#
@@ -41,8 +41,13 @@ S 28,23 // spider at 28,23
 ===END OF CHARACTERS===
 crusty_dagger dagger "Crusty Dagger"
 shiny_dagger dagger "Shiny Dagger" // a shiny dagger
-very_old_leather_cap headwear "Very Old Leather Cap"
-old_leather_cap headwear "Old Leather Cap"
+very_old_leather_cap headwear "Very Old Leather Fishermans Cap" {
+    endorsement: :can_net_fish
+    buff: SkillTime("fishing") => -3
+}
+old_leather_cap headwear "Old Leather Cap" {
+    buff: MaxHP => 5
+}
 baseball_cap headwear "Baseball Cap"
 amber_leather_cap headwear "Amber Leather Cap"
 warped_short_sword bladeweapon "Warped Short Sword"
@@ -55,11 +60,107 @@ reed_basket tool "Reed Basket" {
 worn_bronze_axe tool "Worn Bronze Axe" {
     endorsement: :can_chop
 }
-glass_bottle material "Glass Bottle"
+glass_bottle material "Glass Bottle" {
+    endorsement: :can_fill
+}
 apple food "Apple"
 olive food "Olive"
 apple_juice food "Apple Juice"
-olive_oil food "Olive Oil"
+olive_oil ingredient "Olive Oil"
+bottle_of_water ingredient "Bottle of Water"
+
+softwood_log material "Softwood Log" {
+    endorsement: :wants_to_mill_softwood
+}
+hardwood_log material "Hardwood Log" {
+    endorsement: :wants_to_mill_hardwood
+}
+hardwood_plank material "Hardwood Plank"
+softwood_plank material "Softwood Plank"
+bottle_of_oil material "Bottle of Oil"
+
+bronze_shovel tool "Bronze Shovel" {
+    endorsement: :can_dig
+}
+bronze_pickaxe tool "Bronze Pickaxe" {
+    endorsement: :can_mine
+}
+simple_fishing_net tool "Simple Fishing Net" {
+    endorsement: :can_net_fish
+}
+simple_fishing_rod tool "Simple Fishing Rod" {
+    endorsement: :can_fish
+}
+simple_fishing_trap tool "Simple Fishing Trap" {
+    endorsement: :can_place_fishing_trap
+}
+dirt ore "Dirt"
+sand ore "Sand"
+stone ore "Stone"
+tin_ore ore "Tin Ore"
+copper_ore ore "Copper Ore"
+lead_ore ore "Lead Ore"
+cinnabar ore "Cinnabar"
+iron_ore ore "Iron Ore"
+tungsten_ore ore "Tungsten Ore"
+cobalt_ore ore "Cobalt Ore"
+nickel_ore ore "Nickel Ore"
+gold_ore ore "Gold Ore"
+aluminum_ore ore "Aluminum Ore"
+silver_ore ore "Silver Ore"
+zinc_ore ore "Zinc Ore"
+platinum_ore ore "Platinum Ore"
+titanium_ore ore "Titanium Ore"
+mythral_ore ore "Mythral Ore"
+
+tin_bar material "Tin Bar"
+copper_bar material "Copper Bar"
+bronze_bar material "Bronze Bar"
+lead_bar material "Lead Bar"
+mercury material "Mercury"
+iron_bar material "Iron Bar"
+tungsten_bar material "Tungsten Bar"
+cobalt_bar material "Cobalt Bar"
+nickel_bar material "Nickel Bar"
+steel_bar material "Steel Bar"
+gold_bar material "Gold Bar"
+aluminum_bar material "Aluminum Bar"
+silver_bar material "Silver Bar"
+zinc_bar material "Zinc Bar"
+platinum_bar material "Platinum Bar"
+stainless_steel_bar material "Stainless Steel Bar"
+stellite_bar material "Stellite Bar"
+titanium_bar material "Titanium Bar"
+mythral_bar material "Mythral Bar"
+
+shrimp ingredient "Shrimp"
+frog ingredient "Frog"
+mackeral ingredient "Mackeral"
+crab ingredient "Crab"
+catfish ingredient "Catfish"
+salmon ingredient "Salmon"
+bass ingredient "Bass"
+oyster ingredient "Oyster"
+flounder ingredient "Flounder"
+haddock ingredient "Haddock"
+swordfish ingredient "Swordfish"
+eel ingredient "Eel"
+sardines ingredient "Sardine"
+sandbar_shark ingredient "Sandbar Shark"
+pike ingredient "Pike"
+lobster ingredient "Lobster"
+tuna ingredient "Tuna"
+striped_marlin ingredient "Striped Marlin"
+herring ingredient "Herring"
+trout ingredient "Trout"
+snapper ingredient "Snapper"
+red_trout ingredient "Red Trout"
+red_herring ingredient "Red Herring"
+cod ingredient "Cod"
+sturgeon ingredient "Sturgeon"
+giant_catfish ingredient "Giant Catfish"
+grouper ingredient "Grouper"
+black_see_bass ingredient "Black Sea Bass"q
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -68,6 +169,7 @@ olive_oil food "Olive Oil"
 ^ 28,7 baseball_cap
 ===END OF ITEMS===
 ≡ 7,7 "An unlocked chest made of wood" chest1
+≡ 5,12 "An testing chest" test_chest
 ▲r 9,9 "An old Apple Tree" {
     property: fruit => 35
     property: logs => 1000
@@ -90,18 +192,92 @@ olive_oil food "Olive Oil"
     property: item => 0
     property: output => 0
 }
+*lumbermill 12,11 "A Rickety Lumbermill"
+▼well 13, 11 "A dry well" {
+    property: fluid => 0
+    property: depth => 0
+    property: chance_of_drying_up => 5000
+    property: chance_of_hitting_water => 100
+    property: chance_of_hitting_oil => 10000
+    property: chance_of_hitting_bedrock => 50000
+}
+▼well 14, 11 "A water well" {
+    property: fluid => 1
+    property: depth => 100
+    property: chance_of_drying_up => 5000
+    property: chance_of_hitting_water => 100
+    property: chance_of_hitting_oil => 10000
+    property: chance_of_hitting_bedrock => 50000
+}
+▼well 15, 11 "A oil well" {
+    property: fluid => 2
+    property: depth => 256
+    property: chance_of_drying_up => 5000
+    property: chance_of_hitting_water => 100
+    property: chance_of_hitting_oil => 10000
+    property: chance_of_hitting_bedrock => 50000
+}
+#vein 11, 8 "A vein of dirt" {
+    property: ore_type => 1
+    property: chance_of_exhaustion => 10
+    property: chance_of_gem => 10000
+}
+#vein 12, 8 "A vein of sand" {
+    property: ore_type => 2
+    property: chance_of_exhaustion => 10
+    property: chance_of_gem => 10000
+}
+#vein 13, 8 "A vein of stone" {
+    property: ore_type => 3
+    property: chance_of_exhaustion => 5
+    property: chance_of_gem => 10000
+}
+#vein 14, 8 "A vein of tin ore" {
+    property: ore_type => 4
+    property: chance_of_exhaustion => 2500
+    property: chance_of_gem => 10000
+}
+#vein 15, 8 "A vein of copper ore" {
+    property: ore_type => 5
+    property: chance_of_exhaustion => 2000
+    property: chance_of_gem => 10000
+}
+~fishing_spot 15, 1 "A quiet coastline" {
+    property: body_of_waster => 1
+    property: net_1_product => 1
+    property: net_2_product => 2
+    property: net_2_chance => 50
+    property: net_timer => 45
+    property: rod_1_product => 3
+    property: rod_timer => 60
+    property: trap_1_product => 4
+    property: trap_spawn => 5
+    property: trap_timer => 30
+    property: trap_cooldown => 180
+}
++smeltery 10,5 "An old smeltery"
 ===END OF FACILITIES===
 player amber_leather_cap
-player glass_bottle
-player glass_bottle
-player glass_bottle
-player glass_bottle
-chest1 shiny_dagger // a dagger
-chest1 sharp_short_sword
-chest1 pink_potion
-chest1 old_leather_cap
+player hardwood_log
+player hardwood_log
+player softwood_log
+player softwood_log
+player tin_ore
+player tin_ore
+player tin_ore
+player tin_ore
+player bronze_shovel
+test_chest shiny_dagger // a dagger
+test_chest sharp_short_sword
+test_chest pink_potion
+chest1 very_old_leather_cap
 chest1 reed_basket
 chest1 baseball_cap
 chest1 yellow_potion
+chest1 reed_basket
 chest1 worn_bronze_axe
+chest1 bronze_pickaxe
+chest1 simple_fishing_net
+chest1 simple_fishing_rod
+chest1 simple_fishing_trap
 ===END OF STORED ITEMS===

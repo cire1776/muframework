@@ -169,6 +169,7 @@ black_see_bass ingredient "Black Sea Bass"q
 ^ 28,7 baseball_cap
 ===END OF ITEMS===
 ≡ 7,7 "An unlocked chest made of wood" chest1
+≡ 5,12 "An testing chest" test_chest
 ▲r 9,9 "An old Apple Tree" {
     property: fruit => 35
     property: logs => 1000
@@ -257,10 +258,6 @@ black_see_bass ingredient "Black Sea Bass"q
 +smeltery 10,5 "An old smeltery"
 ===END OF FACILITIES===
 player amber_leather_cap
-player glass_bottle
-player glass_bottle
-player glass_bottle
-player glass_bottle
 player hardwood_log
 player hardwood_log
 player softwood_log
@@ -270,9 +267,9 @@ player tin_ore
 player tin_ore
 player tin_ore
 player bronze_shovel
-chest1 shiny_dagger // a dagger
-chest1 sharp_short_sword
-chest1 pink_potion
+test_chest shiny_dagger // a dagger
+test_chest sharp_short_sword
+test_chest pink_potion
 chest1 very_old_leather_cap
 chest1 reed_basket
 chest1 baseball_cap
