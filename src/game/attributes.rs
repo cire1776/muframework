@@ -17,6 +17,7 @@ pub enum BuffTag {
 pub enum Attribute {
     SkillTime(String),
     SkillChance(String),
+    SkillLevel(String),
     Fortune,
     SpellCastPeriod,
     SpellDamage,
@@ -30,6 +31,7 @@ pub enum Attribute {
 pub enum AttributeBuff {
     SkillTime(String, i8, u128),
     SkillChance(String, i8, u128),
+    SkillLevel(String, i8, u128),
     Fortune(i8, u128),
     SpellCastPeriod(i8, u128),
     SpellDamage(i8, u128),
@@ -48,6 +50,10 @@ impl AttributeBuff {
             ),
             AttributeBuff::SkillChance(label, value, expiration) => (
                 Attribute::SkillChance(label.clone()),
+                (*value, *expiration, tag),
+            ),
+            AttributeBuff::SkillLevel(label, value, expiration) => (
+                Attribute::SkillLevel(label.clone()),
                 (*value, *expiration, tag),
             ),
             AttributeBuff::Fortune(value, expiration) => {
