@@ -128,7 +128,7 @@ pub enum GameUpdate {
     ActivityStarted(u32, ui::pane::PaneTitle),
     ActivityExpired(),
     ActivityAborted(),
-    DisplayOptions(Vec<&'static str>, ActionContinuation, u64),
+    DisplayOptions(Vec<String>, ActionContinuation, u64),
     Exit,
 }
 impl GameUpdate {

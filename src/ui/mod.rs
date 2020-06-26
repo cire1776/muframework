@@ -78,7 +78,7 @@ pub struct UIState {
     pub external_inventory: Option<Vec<Item>>,
     pub external_inventory_id: Option<u64>,
 
-    pub options: Option<Vec<&'static str>>,
+    pub options: Option<Vec<String>>,
     pub continuation: Option<ActionContinuation>,
     pub continuation_ref: Option<u64>,
 

@@ -25,6 +25,9 @@ pub use items::{Item, ItemClass, ItemList, ItemState, ItemType, ItemTypeList};
 pub mod inventory;
 pub use inventory::{AliasList, Inventory, InventoryList};
 
+pub mod skills;
+pub use skills::*;
+
 pub mod facility;
 pub use facility::{Facility, FacilityList};
 

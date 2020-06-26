@@ -48,7 +48,7 @@ impl<'a> CommandHandler<'a> for OpenSmelteryCommand<'a> {
 }
 
 pub struct ActivateSmelteryCommand<'a> {
-    product: String,
+    product: SmeltingSkill,
     player: &'a mut Player,
     inventories: &'a mut InventoryList,
     facility_id: u64,
@@ -61,9 +61,7 @@ impl<'a> ActivateSmelteryCommand<'a> {
         product_index: u8,
         inventories: &'a mut InventoryList,
     ) -> Self {
-        let product = SmeltingSkill::products()[(product_index - 1) as usize]
-            .0
-            .to_string();
+        let product = SmeltingSkill::products()[(product_index - 1) as usize].0;
 
         Self {
             product,
@@ -93,7 +91,7 @@ impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
         command_sender: CommandSender,
     ) -> Option<Box<dyn Activity>> {
         let activity = SmeltingActivity::new(
-            self.product.clone(),
+            self.product,
             self.expiration(),
             self.player.id,
             self.facility_id,
@@ -108,7 +106,7 @@ impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
             .get(&self.player.id)
             .expect("unable to get inventory.");
 
-        if SmeltingSkill::can_produce(self.product.clone(), inventory) {
+        if SmeltingSkill::can_produce(self.product, inventory) {
             Some(Box::new(activity))
         } else {
             None
@@ -128,7 +126,7 @@ impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
 }
 
 pub struct SmeltingActivity {
-    product: String,
+    product: SmeltingSkill,
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
@@ -140,7 +138,7 @@ pub struct SmeltingActivity {
 
 impl SmeltingActivity {
     fn new(
-        product: String,
+        product: SmeltingSkill,
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
@@ -188,7 +186,12 @@ impl Activity for SmeltingActivity {
             .get_mut(&player_inventory_id)
             .expect("unable to find inventory");
 
-        inventory.consume(ItemClass::Ore, format!("{} Ore", self.product), 4, items);
+        inventory.consume(
+            ItemClass::Ore,
+            format!("{} Ore", self.product.to_string()),
+            4,
+            items,
+        );
 
         let wood_type = if inventory.count_of(ItemClass::Material, "Softwood Log") >= 1 {
             "Softwood Log"
@@ -205,11 +208,11 @@ impl Activity for SmeltingActivity {
             Command::SpawnItem(
                 player_inventory_id,
                 ItemClass::Material,
-                format!("{} Bar", self.product),
+                format!("{} Bar", self.product.to_string()),
             ),
         );
 
-        if !SmeltingSkill::can_produce(self.product.clone(), inventory) {
+        if !SmeltingSkill::can_produce(self.product, inventory) {
             Command::send(Some(&command_sender), Command::ActivityAbort);
         }
         RefreshInventoryFlag::RefreshInventory
