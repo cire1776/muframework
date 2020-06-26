@@ -1,9 +1,9 @@
 pub use super::*;
 use regex::Regex;
 use std::collections::HashMap;
+use std::hash::*;
 use std::ops::{Index, IndexMut};
 use ItemClass::*;
-
 #[derive(Debug, Hash, Eq, PartialEq, Copy, Clone, Ord, PartialOrd)]
 pub enum ItemClass {
     BladeWeapon,
@@ -100,12 +100,25 @@ impl ItemState {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Ord, PartialOrd)]
+#[derive(Debug, Eq, Clone, Ord, PartialOrd)]
 pub struct ItemType {
     pub class: ItemClass,
     pub description: String,
     pub endorsements: Vec<String>,
     pub buffs: Vec<AttributeBuff>,
+}
+
+impl Hash for ItemType {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.class.hash(state);
+        self.description.hash(state);
+    }
+}
+
+impl PartialEq for ItemType {
+    fn eq(&self, other: &Self) -> bool {
+        self.class == other.class && self.description == other.description
+    }
 }
 
 impl ItemType {
