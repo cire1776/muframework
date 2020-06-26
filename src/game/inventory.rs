@@ -193,6 +193,24 @@ impl Inventory {
             .fold(0, |accum, (_, i)| accum + i.quantity as u16)
     }
 
+    pub fn count_all(&self) -> Vec<(ItemType, u16)> {
+        let counts: HashMap<ItemType, u16> = HashMap::new();
+
+        let counts = self.items.iter().fold(counts, |mut accum, (_, i)| {
+            let lineitem = accum.get_mut(&i.item_type);
+            if let Some(quantity) = lineitem {
+                *quantity += i.quantity as u16;
+                accum
+            } else {
+                accum.insert(i.item_type.clone(), i.quantity as u16);
+                accum
+            }
+        });
+
+        let result = counts.iter().map(|i| (i.0.clone(), *i.1)).collect();
+        result
+    }
+
     pub fn set_item_filter(&mut self, filter: Option<Box<dyn game::inventory::InventoryFilter>>) {
         let result = if filter.is_some() {
             Some(filter.unwrap())
@@ -794,5 +812,63 @@ mod accept_stack {
         assert!(!subject.holds(new_item.id));
         assert_eq!(new_item.quantity, 0);
         assert!(!items.holds(new_item.id));
+    }
+}
+
+#[cfg(test)]
+mod count_all {
+    use super::*;
+    use ItemClass::*;
+
+    #[test]
+    fn returns_an_empty_array_when_inventory_is_empty() {
+        let subject = Inventory::new(1);
+
+        assert!(subject.count_all().is_empty());
+    }
+
+    #[test]
+    fn returns_an_array_with_elements_when_the_inventory_has_more_than_one_item() {
+        let mut item_types = ItemTypeList::new();
+        item_types.lookup_or_insert("funky_hat", Headwear, "funky hat");
+        item_types.lookup_or_insert("magic_ore", Ore, "Magic Ore");
+        let mut items = ItemList::new(Some(item_types));
+        let mut subject = Inventory::new(1);
+
+        let mut exp_items = vec![
+            (ItemType::new(Headwear, "funky hat"), 1),
+            (ItemType::new(Ore, "Magic Ore"), 10),
+        ];
+
+        subject.spawn_stack(Headwear, "funky hat", 1, &mut items);
+        subject.spawn_stack(Ore, "Magic Ore", 10, &mut items);
+
+        let mut result = subject.count_all();
+        assert_eq!(result.len(), 2);
+
+        result.sort();
+        exp_items.sort();
+        assert_eq!(result, exp_items);
+    }
+
+    #[test]
+    fn returns_the_sum_of_multiple_stacks_of_the_same_type() {
+        let mut item_types = ItemTypeList::new();
+        item_types.lookup_or_insert("funky_hat", Headwear, "funky hat");
+        item_types.lookup_or_insert("magic_ore", Ore, "Magic Ore");
+        let mut items = ItemList::new(Some(item_types));
+        let mut subject = Inventory::new(1);
+
+        let mut exp_items = vec![(ItemType::new(Ore, "Magic Ore"), 30)];
+
+        subject.spawn_stack(Ore, "Magic Ore", 10, &mut items);
+        subject.spawn_stack(Ore, "Magic Ore", 20, &mut items);
+
+        let mut result = subject.count_all();
+        assert_eq!(result.len(), exp_items.len());
+
+        result.sort();
+        exp_items.sort();
+        assert_eq!(result, exp_items);
     }
 }
