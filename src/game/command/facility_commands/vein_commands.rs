@@ -39,10 +39,16 @@ pub struct ActivateVeinCommand<'a> {
     vein_type: VeinType,
     player: &'a mut Player,
     facility_id: u64,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateVeinCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, facilities: &mut FacilityList) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &mut FacilityList,
+        timer: &'a mut extern_timer::Timer,
+    ) -> Self {
         let facility = facilities
             .get(facility_id)
             .expect("unable to locate facility.");
@@ -51,6 +57,7 @@ impl<'a> ActivateVeinCommand<'a> {
             vein_type: Self::determine_vein_type(facility),
             player,
             facility_id,
+            timer,
         }
     }
 
@@ -72,6 +79,10 @@ impl<'a> ActivateVeinCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (match self.vein_type {
             Dirt => 40,

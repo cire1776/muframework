@@ -29,14 +29,21 @@ pub struct ActivateTreePickingCommand<'a> {
     tree_type: TreeType,
     player: &'a mut Player,
     facility_id: u64,
+    timer: &'a extern_timer::Timer,
 }
 
 impl<'a> ActivateTreePickingCommand<'a> {
-    pub fn new(tree_type: TreeType, player: &'a mut Player, facility_id: u64) -> Self {
+    pub fn new(
+        tree_type: TreeType,
+        player: &'a mut Player,
+        facility_id: u64,
+        timer: &'a extern_timer::Timer,
+    ) -> Self {
         Self {
             tree_type,
             player,
             facility_id,
+            timer,
         }
     }
 
@@ -51,6 +58,10 @@ impl<'a> ActivateTreePickingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (match self.tree_type {
             TreeType::Apple => 60,
@@ -190,10 +201,16 @@ pub struct ActivateTreeLoggingCommand<'a> {
     tree_type: TreeType,
     player: &'a mut Player,
     facility_id: u64,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateTreeLoggingCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, facilities: &'a mut FacilityList) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &'a mut FacilityList,
+        timer: &'a mut extern_timer::Timer,
+    ) -> Self {
         let facility = facilities
             .get(facility_id)
             .expect("unable to find facility");
@@ -210,6 +227,7 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
             tree_type,
             player,
             facility_id,
+            timer,
         }
     }
 
@@ -219,6 +237,10 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (60 + self
             .player

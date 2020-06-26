@@ -20,14 +20,20 @@ pub struct ActivateLumberMillCommand<'a> {
     log_type: LogType,
     player: &'a mut Player,
     facility_id: u64,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateLumberMillCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        timer: &'a mut extern_timer::Timer,
+    ) -> Self {
         Self {
             log_type: Self::determine_log_type(player),
             player,
             facility_id,
+            timer,
         }
     }
 
@@ -47,6 +53,10 @@ impl<'a> ActivateLumberMillCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (match self.log_type {
             LogType::Softwood => 40,

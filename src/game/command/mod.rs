@@ -39,6 +39,7 @@ impl Command {
         item_types: &'a ItemTypeList,
         items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
+        timer: &'a mut extern_timer::Timer,
         activity: Option<Box<dyn Activity>>,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
@@ -46,7 +47,7 @@ impl Command {
         let (dx, dy) = get_deltas_from_direction(direction);
 
         let command = if mode == MoveCommandMode::Normal || mode == MoveCommandMode::Sneak {
-            attempt_to_enter(mode, direction, dx, dy, player, obstacles, activity)
+            attempt_to_enter(mode, direction, dx, dy, player, obstacles, timer, activity)
         } else {
             attempt_to_use(
                 mode,
@@ -60,6 +61,7 @@ impl Command {
                 item_types,
                 items,
                 inventories,
+                timer,
                 activity,
             )
         };
@@ -316,6 +318,7 @@ fn attempt_to_enter<'a>(
     dy: i32,
     player: &'a mut Player,
     obstacles: &'a mut BlockingMap,
+    __timer: &'a extern_timer::Timer,
     __activity: Option<Box<dyn Activity>>,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let new_x = player.x + dx;
@@ -348,6 +351,7 @@ fn attempt_to_use<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
+    timer: &'a mut extern_timer::Timer,
     activity: Option<Box<dyn Activity>>,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let mut mode = mode;
@@ -377,12 +381,13 @@ fn attempt_to_use<'a>(
             item_types,
             items,
             inventories,
+            timer,
         )
     } else {
         if mode == MoveCommandMode::SneakUse {
             mode = MoveCommandMode::Sneak;
         }
-        attempt_to_enter(mode, facing, dx, dy, player, obstacles, activity)
+        attempt_to_enter(mode, facing, dx, dy, player, obstacles, timer, activity)
     }
 }
 
@@ -457,6 +462,7 @@ fn use_at<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
+    timer: &'a mut extern_timer::Timer,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     match map.at(x, y) {
         tile_map::Tile::ClosedDoor => Some(Box::new(OpenDoorCommand::new(x, y, obstacles, map))),
@@ -483,19 +489,21 @@ fn use_at<'a>(
                             tree_type,
                             player,
                             facility_id,
+                            timer,
                         )))
                     } else if ActivateTreeLoggingCommand::can_perform(player, facility) {
                         Some(Box::new(ActivateTreeLoggingCommand::new(
                             player,
                             facility_id,
                             facilities,
+                            timer,
                         )))
                     } else {
                         panic!("Player cannot pick or log!")
                     }
                 }
                 FacilityClass::PineTree | FacilityClass::OakTree => Some(Box::new(
-                    ActivateTreeLoggingCommand::new(player, facility_id, facilities),
+                    ActivateTreeLoggingCommand::new(player, facility_id, facilities, timer),
                 )),
                 FacilityClass::FruitPress => match mode {
                     MoveCommandMode::Use => {
@@ -506,6 +514,7 @@ fn use_at<'a>(
                                 facilities,
                                 items,
                                 inventories,
+                                timer,
                             )))
                         } else {
                             Some(Box::new(ActivateFruitPressCommand::new(
@@ -514,6 +523,7 @@ fn use_at<'a>(
                                 facilities,
                                 items,
                                 inventories,
+                                timer,
                             )))
                         }
                     }
@@ -529,18 +539,28 @@ fn use_at<'a>(
                 FacilityClass::Lumbermill => Some(Box::new(ActivateLumberMillCommand::new(
                     player,
                     facility_id,
+                    timer,
                 ))),
                 FacilityClass::Well => {
                     if ActivateWellDigCommand::can_perform(player, facility) {
-                        Some(Box::new(ActivateWellDigCommand::new(player, facility_id)))
+                        Some(Box::new(ActivateWellDigCommand::new(
+                            player,
+                            facility_id,
+                            timer,
+                        )))
                     } else {
-                        Some(Box::new(ActivateWellFillCommand::new(player, facility_id)))
+                        Some(Box::new(ActivateWellFillCommand::new(
+                            player,
+                            facility_id,
+                            timer,
+                        )))
                     }
                 }
                 FacilityClass::Vein => Some(Box::new(ActivateVeinCommand::new(
                     player,
                     facility_id,
                     facilities,
+                    timer,
                 ))),
                 FacilityClass::FishingSpot => {
                     if ActivateNetFishingCommand::can_perform(player, facility) {
@@ -548,24 +568,28 @@ fn use_at<'a>(
                             player,
                             facility_id,
                             facilities,
+                            timer,
                         )))
                     } else if ActivateFishingCommand::can_perform(player, facility) {
                         Some(Box::new(ActivateFishingCommand::new(
                             player,
                             facility_id,
                             facilities,
+                            timer,
                         )))
                     } else if ActivatePlaceFishingTrapCommand::can_perform(player, facility) {
                         Some(Box::new(ActivatePlaceFishingTrapCommand::new(
                             player,
                             facility_id,
                             facilities,
+                            timer,
                         )))
                     } else {
                         Some(Box::new(ActivateCollectFishingTrapCommand::new(
                             player,
                             facility_id,
                             facilities,
+                            timer,
                         )))
                     }
                 }
@@ -611,13 +635,17 @@ pub trait CommandHandler<'a> {
         command_tx: Option<&std::sync::mpsc::Sender<Command>>,
     ) -> Option<Box<dyn Activity>> {
         self.prepare_to_execute();
-        let activity = self.perform_execute(update_tx, command_tx);
 
         if let Some(update_tx) = update_tx {
+            let activity = self.perform_execute(Some(update_tx), command_tx);
             self.announce(activity, update_tx)
         } else {
             None
         }
+    }
+
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        None
     }
 
     /// perform the actions of the command
@@ -633,12 +661,15 @@ pub trait CommandHandler<'a> {
         let update_sender = update_tx.unwrap().clone();
         let command_tx = command_tx.unwrap().clone();
 
-        let guard = timer.schedule_repeating(
-            chrono::Duration::seconds(self.expiration() as i64),
-            move || {
-                Command::send(Some(&command_sender), Command::ActivityComplete);
-            },
-        );
+        let guard = self
+            .timer()
+            .expect("unable to get timer")
+            .schedule_repeating(
+                chrono::Duration::seconds(self.expiration() as i64),
+                move || {
+                    Command::send(Some(&command_sender), Command::ActivityComplete);
+                },
+            );
 
         let activity = self.create_activity(timer, guard, update_sender, command_tx);
         activity

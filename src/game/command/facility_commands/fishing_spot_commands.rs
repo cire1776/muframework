@@ -191,10 +191,16 @@ pub struct ActivateNetFishingCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
+    timer: &'a extern_timer::Timer,
 }
 
 impl<'a> ActivateNetFishingCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, facilities: &'a mut FacilityList) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &'a mut FacilityList,
+        timer: &'a mut extern_timer::Timer,
+    ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
             .expect("unable to find facility");
@@ -202,6 +208,7 @@ impl<'a> ActivateNetFishingCommand<'a> {
             fishing_spot_properties: FishingSpotProperties::new(facility.clone()),
             player,
             facility,
+            timer,
         }
     }
 
@@ -211,6 +218,10 @@ impl<'a> ActivateNetFishingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         let base_time = self.fishing_spot_properties.net_timer();
         let modifier = self
@@ -343,10 +354,16 @@ pub struct ActivateFishingCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
+    timer: &'a extern_timer::Timer,
 }
 
 impl<'a> ActivateFishingCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, facilities: &'a mut FacilityList) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &'a mut FacilityList,
+        timer: &'a extern_timer::Timer,
+    ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
             .expect("unable to find facility");
@@ -354,6 +371,7 @@ impl<'a> ActivateFishingCommand<'a> {
             fishing_spot_properties: FishingSpotProperties::new(facility.clone()),
             player,
             facility,
+            timer,
         }
     }
 
@@ -363,6 +381,10 @@ impl<'a> ActivateFishingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         let base_time = self.fishing_spot_properties.rod_timer();
         let modifier = self
@@ -495,10 +517,16 @@ pub struct ActivatePlaceFishingTrapCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
+    timer: &'a extern_timer::Timer,
 }
 
 impl<'a> ActivatePlaceFishingTrapCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, facilities: &'a mut FacilityList) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &'a mut FacilityList,
+        timer: &'a extern_timer::Timer,
+    ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
             .expect("unable to find facility");
@@ -506,6 +534,7 @@ impl<'a> ActivatePlaceFishingTrapCommand<'a> {
             fishing_spot_properties: FishingSpotProperties::new(facility.clone()),
             player,
             facility,
+            timer,
         }
     }
 
@@ -515,6 +544,10 @@ impl<'a> ActivatePlaceFishingTrapCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivatePlaceFishingTrapCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         let base_time = self.fishing_spot_properties.trap_timer();
         let modifier = self
@@ -644,10 +677,16 @@ pub struct ActivateCollectFishingTrapCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
+    timer: &'a extern_timer::Timer,
 }
 
 impl<'a> ActivateCollectFishingTrapCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, facilities: &'a mut FacilityList) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &'a mut FacilityList,
+        timer: &'a extern_timer::Timer,
+    ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
             .expect("unable to find facility");
@@ -655,6 +694,7 @@ impl<'a> ActivateCollectFishingTrapCommand<'a> {
             fishing_spot_properties: FishingSpotProperties::new(facility.clone()),
             player,
             facility,
+            timer,
         }
     }
 
@@ -677,6 +717,10 @@ impl<'a> ActivateCollectFishingTrapCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateCollectFishingTrapCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         let base_time = self.fishing_spot_properties.trap_timer();
         let modifier = self

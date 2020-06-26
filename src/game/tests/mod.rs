@@ -14,14 +14,24 @@ pub fn initialize_game_system() -> (
     ItemList,
     FacilityList,
     InventoryList,
+    extern_timer::Timer,
     Sender<GameUpdate>,
     Receiver<GameUpdate>,
     GameState,
 ) {
     let (update_tx, update_rx) = channel();
 
-    let (player, map, obstacles, characters, item_class_specifiers, items, facilities, inventories) =
-        game::GameState::initialize_game("maps/test.map", None);
+    let (
+        player,
+        map,
+        obstacles,
+        characters,
+        item_class_specifiers,
+        items,
+        facilities,
+        inventories,
+        timer,
+    ) = game::GameState::initialize_game("maps/test.map", None);
 
     let game_state = GameState::new();
 
@@ -34,6 +44,7 @@ pub fn initialize_game_system() -> (
         items,
         facilities,
         inventories,
+        timer,
         update_tx,
         update_rx,
         game_state,

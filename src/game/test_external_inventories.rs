@@ -107,6 +107,7 @@ fn opening_external_inventory() {
         mut items,
         mut facilities,
         mut inventories,
+        mut timer,
     ) = game::GameState::initialize_game("maps/test.map", None);
 
     let mut game_state = GameState::new();
@@ -121,6 +122,7 @@ fn opening_external_inventory() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
         Some(&update_tx),
@@ -185,6 +187,7 @@ fn game_state_closing_external_inventory() {
         mut items,
         mut facilities,
         mut inventories,
+        mut timer,
     ) = game::GameState::initialize_game("maps/test.map", None);
 
     subject.game_loop_iteration(
@@ -196,6 +199,7 @@ fn game_state_closing_external_inventory() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut timer,
         None,
         &Command::CloseExternalInventory,
         Some(&update_tx),

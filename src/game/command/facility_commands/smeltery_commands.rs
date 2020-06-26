@@ -52,6 +52,7 @@ pub struct ActivateSmelteryCommand<'a> {
     player: &'a mut Player,
     inventories: &'a mut InventoryList,
     facility_id: u64,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateSmelteryCommand<'a> {
@@ -60,6 +61,7 @@ impl<'a> ActivateSmelteryCommand<'a> {
         facility_id: u64,
         product_index: u8,
         inventories: &'a mut InventoryList,
+        timer: &'a mut extern_timer::Timer,
     ) -> Self {
         let product = SmeltingSkill::products()[(product_index - 1) as usize].0;
 
@@ -68,6 +70,7 @@ impl<'a> ActivateSmelteryCommand<'a> {
             player,
             facility_id,
             inventories,
+            timer,
         }
     }
 
@@ -77,6 +80,10 @@ impl<'a> ActivateSmelteryCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (60 + self
             .player

@@ -37,13 +37,19 @@ impl WellType {
 pub struct ActivateWellFillCommand<'a> {
     player: &'a mut Player,
     facility_id: u64,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateWellFillCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        timer: &'a mut extern_timer::Timer,
+    ) -> Self {
         Self {
             player,
             facility_id,
+            timer,
         }
     }
 
@@ -58,6 +64,10 @@ impl<'a> ActivateWellFillCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateWellFillCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (30 + self
             .player
@@ -179,13 +189,19 @@ impl Activity for WellFillActivity {
 pub struct ActivateWellDigCommand<'a> {
     player: &'a mut Player,
     facility_id: u64,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateWellDigCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        timer: &'a mut extern_timer::Timer,
+    ) -> Self {
         Self {
             player,
             facility_id,
+            timer,
         }
     }
 
@@ -199,6 +215,10 @@ impl<'a> ActivateWellDigCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (60 + self
             .player

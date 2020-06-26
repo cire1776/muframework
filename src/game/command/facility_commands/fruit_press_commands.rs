@@ -133,13 +133,14 @@ impl FruitType {
 }
 
 pub struct ActivateFruitPressCommand<'a> {
-    player: &'a mut Player,
+    mode: FruitPressMode,
     fruit_type: FruitType,
+    player: &'a mut Player,
     facility_id: u64,
     facilities: &'a mut FacilityList,
     __items: &'a mut ItemList,
     inventory: &'a mut Inventory,
-    mode: FruitPressMode,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateFruitPressCommand<'a> {
@@ -149,6 +150,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
         facilities: &'a mut FacilityList,
         items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
+        timer: &'a mut extern_timer::Timer,
     ) -> Self {
         let inventory = inventories
             .get_mut(&facility_id)
@@ -160,6 +162,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
             facilities,
             __items: items,
             inventory,
+            timer,
             mode: FruitPressMode::Filling,
         }
     }
@@ -170,6 +173,10 @@ impl<'a> ActivateFruitPressCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (60 + self
             .player
@@ -315,6 +322,7 @@ pub struct ActivateFruitPressFillCommand<'a> {
     __items: &'a mut ItemList,
     __inventory: &'a mut Inventory,
     mode: FruitPressMode,
+    timer: &'a mut extern_timer::Timer,
 }
 
 impl<'a> ActivateFruitPressFillCommand<'a> {
@@ -324,6 +332,7 @@ impl<'a> ActivateFruitPressFillCommand<'a> {
         facilities: &'a mut FacilityList,
         __items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
+        timer: &'a mut extern_timer::Timer,
     ) -> Self {
         let inventory = inventories
             .get_mut(&facility_id)
@@ -336,6 +345,7 @@ impl<'a> ActivateFruitPressFillCommand<'a> {
             __items,
             __inventory: inventory,
             mode: FruitPressMode::Filling,
+            timer,
         }
     }
 
@@ -345,6 +355,10 @@ impl<'a> ActivateFruitPressFillCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
+    fn timer(&self) -> Option<&extern_timer::Timer> {
+        return Some(self.timer);
+    }
+
     fn expiration(&self) -> u32 {
         (30 + self
             .player

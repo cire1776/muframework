@@ -78,6 +78,7 @@ impl GameState {
             items,
             facilities,
             inventories,
+            timer,
         ) = &mut Self::initialize_game("maps/level1.map", Some(&update_tx));
 
         let game_state = &mut GameState::new();
@@ -96,6 +97,7 @@ impl GameState {
                     items,
                     facilities,
                     inventories,
+                    timer,
                     activity,
                     &command,
                     Some(&update_tx),
@@ -123,6 +125,7 @@ impl GameState {
         ItemList,
         FacilityList,
         InventoryList,
+        extern_timer::Timer,
     ) {
         let (
             mut map,
@@ -177,6 +180,8 @@ impl GameState {
         // TODO: consider moving this to a function
         GameUpdate::send(update_tx, SetBackground(map.clone()));
 
+        let timer = extern_timer::Timer::new();
+
         (
             player,
             map,
@@ -186,6 +191,7 @@ impl GameState {
             items,
             facilities,
             inventories.clone(),
+            timer,
         )
     }
 
@@ -200,6 +206,7 @@ impl GameState {
         items: &mut ItemList,
         facilities: &mut FacilityList,
         inventories: &mut InventoryList,
+        timer: &mut extern_timer::Timer,
         activity: Option<Box<dyn Activity>>,
         command: &Command,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
@@ -227,6 +234,7 @@ impl GameState {
                 &items.item_types.clone(),
                 items,
                 inventories,
+                timer,
                 activity,
                 update_tx,
                 command_tx,
@@ -363,6 +371,7 @@ impl GameState {
                         *facility_id,
                         *selection,
                         inventories,
+                        timer,
                     )
                     .execute(update_tx, command_tx)
                 }
