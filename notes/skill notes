@@ -104,51 +104,53 @@ Titanium  3000 -8 secs    25      Advanced             20
 *including min time
 
 
-Fishing
-=======                     Lvl
-Shrimp          net          1  45 second timer
-Frog            net          1  45 second timer
-Mackeral        rod          1  60 second timer
-Crab            trap         1  180 second timer
+Fishing                                                                 
+=======                     Lvl                         Cooking                                                 HP
+Shrimp          net          1  45 second timer         1               Cooked Shrimp   Burnt Shrimp            2
+Frog            net          1  45 second timer         2               Frog Legs       Burnt Frog Legs         2
+Mackeral        rod          1  60 second timer         3               Cooked Mackeral Burnt mackeral          3
+Crab            trap         1  180 second timer        5               Crab Legs       Burnt Crab Legs         3
                                 540 second cooldown
                                 1-5 spawns
 
-Catfish         net          5  50 second timer
-Salmon          rod          5  65 second timer
+Catfish         net          5  50 second timer         7               Grilled Catfish Burnt Catfish           4
+Salmon          rod          5  65 second timer         8               Grilled Salmon  Burnt Salmon            4
 
-Bass            rod         10  70 second timer
-Oyster          trap        10  210 second timer
+Bass            rod         10  70 second timer         11              Cooked Bass     Burnt Bass              5
+Oyster          trap        10  210 second timer   *can be eaten raw
                                 540 second cooldown
                                 1-5 spawns
-                                1000 chance of spawning pearl
-                                100000 chance of spawning black pearl
+                                1000 chance of
+                                spawning pearl
+                                100000 chance of
+                                spawning black pearl
 
-Flounder        rod         15  75 second timer
-Haddock         rod         15  240 second timer
-                                540 second cooldown
-                                1-5 spawns
-
-Swordfish       boat,rod    20  80 second timer 
-Eel             trap        20  270 second timer
+Flounder        rod         15  75 second timer         15              Cooked Flounder Burnt Flounder          5
+Haddock         rod         15  240 second timer        17              Cooked Haddock  Burnt Haddock           6
                                 540 second cooldown
                                 1-5 spawns
 
-Sardine                     25
-Sandbar Shark               25
+Swordfish       boat,rod    20  80 second timer         19              Swordfish Steak Burnt Swordfish         6
+Eel             trap        20  270 second timer        21              Cooked Eel      Burnt Eel               7
+                                540 second cooldown
+                                1-5 spawns
 
-Pike                        30
-Lobster         trap        30
+Sardine                     25                          23              Canned Sardines                         7
+Sandbar Shark               25                          25              Shark Steaks    Burnt Shark             8
 
-Tuna            boat,net    35
-Striped Marlin  rod         35
+Pike                        30                          27              Cooked Pike     Burnt Pike              8
+Lobster         trap        30                          29              Steamed Lobster Burnt Lobster           9
 
-Herring         net         40
-Trout           rod         40
+Tuna            boat,net    35                          31              Tuna Steaks     Burnt Tuna              9
+Striped Marlin  rod         35                          33              
 
-Snapper         rod         45
-Red Trout       rod         45
-Red Herring     net         45
-Cod             rod         45
+Herring         net         40                          35              Pickled Herring Rotten Herring          10
+Trout           rod         40                          37              Grilled Trout   Burnt Trout             11
+
+Snapper         rod         45                          39              Grilled Snapper Burnt Snapper           12
+Red Trout       rod         45                          41              Grilled Trout   Burnt Trout             13
+Red Herring     net         45                          43              Pickled Herring Rotten Herring          14
+Cod             rod         45                          45              Fishsticks      Burnt Cod               15
 
 Sturgeon        rod        master
 Giant Catfish   net        master
