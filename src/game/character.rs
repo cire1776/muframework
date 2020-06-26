@@ -29,6 +29,14 @@ impl Player {
         };
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");
+        player.add_buff(
+            Attribute::SkillLevel("smelting".into()),
+            (45, 0, BuffTag::Level),
+        );
+        player.add_buff(
+            Attribute::SkillTime("smelting".into()),
+            (-45, 0, BuffTag::Level),
+        );
         player
     }
 

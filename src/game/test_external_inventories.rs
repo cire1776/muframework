@@ -110,7 +110,7 @@ fn opening_external_inventory() {
     ) = game::GameState::initialize_game("maps/test.map", None);
 
     let mut game_state = GameState::new();
-    game_state.teleport_player(8, 7, &mut player, &mut obstacles, None, None);
+    game_state.teleport_player(8, 7, &mut player, &mut obstacles, &inventories, None, None);
 
     game_state.game_loop_iteration(
         &mut player,

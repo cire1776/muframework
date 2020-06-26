@@ -8,7 +8,7 @@ pub mod blocking_map;
 use blocking_map::BlockingMap;
 
 pub mod command;
-pub use command::{Activity, CommandSender, GameUpdateSender};
+pub use command::{Activity, CommandHandler, CommandSender, GameUpdateSender};
 
 pub mod attributes;
 pub use attributes::*;
@@ -353,6 +353,18 @@ impl GameState {
                 command_tx,
             ),
             Command::ActivityAbort => None,
+            Command::ChoiceSelected(selection, continuation, facility_id) => match continuation {
+                ActionContinuation::Smeltery => {
+                    command::facility_commands::smeltery_commands::ActivateSmelteryCommand::new(
+                        player,
+                        *facility_id,
+                        *selection,
+                        inventories,
+                    )
+                    .execute(update_tx, command_tx)
+                }
+                _ => panic!("unknown continuation"),
+            },
         }
     }
 
@@ -436,11 +448,10 @@ impl GameState {
         new_y: U,
         player: &mut Player,
         obstacles: &mut BlockingMap,
+        _inventories: &InventoryList,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<&CommandSender>,
     ) {
-        use crate::game::command::CommandHandler;
-
         let character = player;
         let facing = character.facing;
 

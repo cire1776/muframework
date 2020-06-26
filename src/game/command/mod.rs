@@ -63,6 +63,7 @@ impl Command {
                 activity,
             )
         };
+
         if let Some(mut val) = command {
             val.deref_mut().execute(update_tx, command_tx)
         } else {
@@ -435,6 +436,7 @@ fn can_use_at(
                         || ActivatePlaceFishingTrapCommand::can_perform(player, facility)
                         || ActivateCollectFishingTrapCommand::can_perform(player, facility)
                 }
+                FacilityClass::Smeltery => OpenSmelteryCommand::can_perform(player, facility),
 
                 _ => false,
             }
@@ -567,6 +569,11 @@ fn use_at<'a>(
                         )))
                     }
                 }
+                FacilityClass::Smeltery => Some(Box::new(OpenSmelteryCommand::new(
+                    player,
+                    facility.id,
+                    facilities,
+                ))),
                 _ => None,
             }
         }
@@ -633,7 +640,8 @@ pub trait CommandHandler<'a> {
             },
         );
 
-        self.create_activity(timer, guard, update_sender, command_tx)
+        let activity = self.create_activity(timer, guard, update_sender, command_tx);
+        activity
     }
 
     /// announce the results through GameUpdates
@@ -657,11 +665,20 @@ pub trait Activity {
         "Activity".into()
     }
 
-    fn start(&self, update_tx: &GameUpdateSender) {
+    fn can_start(&self, _inventory: &Inventory) -> bool {
+        true
+    }
+
+    fn on_start(&self) {}
+
+    fn start(&self, update_tx: &GameUpdateSender) -> bool {
+        self.on_start();
+
         GameUpdate::send(
             Some(update_tx),
             GameUpdate::ActivityStarted(self.expiration() * 1000, self.activity_title()),
         );
+        true
     }
 
     fn expiration(&self) -> u32 {
@@ -733,8 +750,6 @@ pub trait Activity {
         {
             Command::send(Some(&command_sender), Command::RefreshInventory);
         }
-
-        self.start(&update_sender);
     }
 
     fn clear_guard(&mut self) {

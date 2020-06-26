@@ -271,6 +271,10 @@ impl Item {
         self.item_type.description.clone()
     }
 
+    pub fn is_of_type<S: ToString>(&self, class: ItemClass, description: S) -> bool {
+        self.class() == class && self.raw_description() == description.to_string()
+    }
+
     pub fn description(&self) -> String {
         use inflector::string::pluralize::to_plural;
         use inflector::string::singularize::to_singular;

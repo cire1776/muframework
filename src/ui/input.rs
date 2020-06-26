@@ -7,6 +7,7 @@ pub enum InputState {
     PickupSelection,
     ExternalInventoryOpen,
     Activity,
+    DisplayOptions,
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
@@ -95,6 +96,7 @@ impl UIState {
                 self.process_external_inventory_selection_keyboard_input(input)
             }
             InputState::Activity => self.process_activity_keyboard_input(input),
+            InputState::DisplayOptions => self.process_display_options_input(input),
         }
     }
 
@@ -268,6 +270,30 @@ impl UIState {
             _ => Command::None,
         };
 
+        command
+    }
+
+    fn process_display_options_input(&mut self, input: &Input) -> Command {
+        let command: Command = match input.key {
+            Some(VirtualKeyCode::Escape) => {
+                self.input_state = InputState::Normal;
+                self.map_window.window_mode = MapWindowMode::Normal;
+                self.map_window.active_pane = None;
+                Command::None
+            }
+            Some(VirtualKeyCode::Return) => {
+                self.input_state = InputState::Normal;
+                self.map_window.window_mode = MapWindowMode::Normal;
+                let command = Command::ChoiceSelected(
+                    self.map_window.active_pane.unwrap().selection.unwrap(),
+                    self.continuation.unwrap(),
+                    self.continuation_ref.unwrap(),
+                );
+                self.map_window.active_pane = None;
+                command
+            }
+            _ => Command::None,
+        };
         command
     }
 

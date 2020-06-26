@@ -281,6 +281,7 @@ pub enum MapWindowMode {
     Normal,
     ExternalInventory,
     ToolTip,
+    DisplayOptions,
 }
 pub struct MapWindow {
     x: i32,

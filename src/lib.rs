@@ -42,6 +42,14 @@ pub enum MapLayer {
     Player,
 }
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub enum ActionContinuation {
+    Smeltery,
+    Firepit,
+    Smithy,
+    CraftingStation,
+}
+
 #[derive(Debug, Eq, PartialEq)]
 pub enum Command {
     None,
@@ -62,6 +70,7 @@ pub enum Command {
     ActivityAbort,
     ActivityComplete,
     DestroyFacility(u64), // (facility_id)
+    ChoiceSelected(u8, ActionContinuation, u64),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -119,6 +128,7 @@ pub enum GameUpdate {
     ActivityStarted(u32, ui::pane::PaneTitle),
     ActivityExpired(),
     ActivityAborted(),
+    DisplayOptions(Vec<&'static str>, ActionContinuation, u64),
     Exit,
 }
 impl GameUpdate {

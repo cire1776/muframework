@@ -78,6 +78,10 @@ pub struct UIState {
     pub external_inventory: Option<Vec<Item>>,
     pub external_inventory_id: Option<u64>,
 
+    pub options: Option<Vec<&'static str>>,
+    pub continuation: Option<ActionContinuation>,
+    pub continuation_ref: Option<u64>,
+
     pub background: BackgroundMap,
 
     pub input_state: InputState,
@@ -245,6 +249,21 @@ impl UIState {
                 self.input_state = InputState::Normal;
                 self.activity_time = std::option::Option::None;
             }
+            DisplayOptions(options, continuation, ref_num) => {
+                self.input_state = InputState::DisplayOptions;
+                self.map_window.window_mode = MapWindowMode::DisplayOptions;
+                self.map_window.active_pane = Some(Pane::new(
+                    SelectOutput,
+                    10,
+                    5,
+                    25,
+                    (options.len() + 3) as i32,
+                    options.len() as u8,
+                ));
+                self.options = Some(options);
+                self.continuation = Some(continuation);
+                self.continuation_ref = Some(ref_num);
+            }
         }
     }
 
@@ -269,6 +288,10 @@ impl UIState {
             equipment: vec![],
             external_inventory: None,
             external_inventory_id: None,
+
+            options: None,
+            continuation: None,
+            continuation_ref: None,
 
             input_state: InputState::Normal,
             mouse_state: MouseState::LeftButtonUp,
@@ -444,6 +467,7 @@ impl UIState {
                 self.draw_facing_indicator(&self.player.facing, window, context);
                 self.draw_activity_pane(window, context);
                 self.draw_external_inventory_pane(window, context);
+                self.draw_display_options_pane(window, context);
             }
             {}
         }
@@ -454,7 +478,11 @@ impl UIState {
 
     fn draw_activity_pane(&self, window: &dyn BasicWindow, context: &mut BTerm) {
         if let Some(expiration) = self.activity_time {
-            let seconds = (expiration - time_in_millis()) / 1000;
+            let seconds = if expiration > time_in_millis() {
+                (expiration - time_in_millis()) / 1000
+            } else {
+                0
+            };
             let pane = if let Some(pane) = &self.map_window.active_pane {
                 pane
             } else {
@@ -496,6 +524,25 @@ impl UIState {
             }
         } else {
             panic!("{:?}", window.active_pane());
+        }
+    }
+
+    fn draw_display_options_pane(&self, window: &dyn BasicWindow, context: &mut BTerm) {
+        if self.map_window.window_mode != MapWindowMode::DisplayOptions {
+            return;
+        }
+        if let Some(pane) = window.active_pane() {
+            pane.draw_frame("ESC: Close   Ent.: Ok", window, context);
+
+            if let Some(items) = &self.options {
+                for (i, item) in items.iter().enumerate() {
+                    if Some((i + 1) as u8) == pane.selection {
+                        pane.draw_inverted_text(item, 2, i as i32 + 1, window, context)
+                    } else {
+                        pane.draw_text(item, 2, i as i32 + 1, window, context)
+                    }
+                }
+            }
         }
     }
 

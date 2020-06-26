@@ -159,7 +159,7 @@ mod attribute_list {
 
     #[test]
     fn get_returns_0_if_not_attribute_has_been_set() {
-        let mut subject = AttributeList::new();
+        let subject = AttributeList::new();
 
         assert_eq!(subject.get(&SkillChance("bogus_skill".into()), 0), 0);
     }

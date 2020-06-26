@@ -67,6 +67,8 @@ apple food "Apple"
 olive food "Olive"
 apple_juice food "Apple Juice"
 olive_oil ingredient "Olive Oil"
+bottle_of_water ingredient "Bottle of Water"
+
 softwood_log material "Softwood Log" {
     endorsement: :wants_to_mill_softwood
 }
@@ -75,8 +77,8 @@ hardwood_log material "Hardwood Log" {
 }
 hardwood_plank material "Hardwood Plank"
 softwood_plank material "Softwood Plank"
-bottle_of_water ingredient "Bottle of Water"
 bottle_of_oil material "Bottle of Oil"
+
 bronze_shovel tool "Bronze Shovel" {
     endorsement: :can_dig
 }
@@ -97,6 +99,40 @@ sand ore "Sand"
 stone ore "Stone"
 tin_ore ore "Tin Ore"
 copper_ore ore "Copper Ore"
+lead_ore ore "Lead Ore"
+cinnabar ore "Cinnabar"
+iron_ore ore "Iron Ore"
+tungsten_ore ore "Tungsten Ore"
+cobalt_ore ore "Cobalt Ore"
+nickel_ore ore "Nickel Ore"
+gold_ore ore "Gold Ore"
+aluminum_ore ore "Aluminum Ore"
+silver_ore ore "Silver Ore"
+zinc_ore ore "Zinc Ore"
+platinum_ore ore "Platinum Ore"
+titanium_ore ore "Titanium Ore"
+mythral_ore ore "Mythral Ore"
+
+tin_bar material "Tin Bar"
+copper_bar material "Copper Bar"
+bronze_bar material "Bronze Bar"
+lead_bar material "Lead Bar"
+mercury material "Mercury"
+iron_bar material "Iron Bar"
+tungsten_bar material "Tungsten Bar"
+cobalt_bar material "Cobalt Bar"
+nickel_bar material "Nickel Bar"
+steel_bar material "Steel Bar"
+gold_bar material "Gold Bar"
+aluminum_bar material "Aluminum Bar"
+silver_bar material "Silver Bar"
+zinc_bar material "Zinc Bar"
+platinum_bar material "Platinum Bar"
+stainless_steel_bar material "Stainless Steel Bar"
+stellite_bar material "Stellite Bar"
+titanium_bar material "Titanium Bar"
+mythral_bar material "Mythral Bar"
+
 shrimp ingredient "Shrimp"
 frog ingredient "Frog"
 mackeral ingredient "Mackeral"
@@ -218,6 +254,7 @@ black_see_bass ingredient "Black Sea Bass"q
     property: trap_timer => 30
     property: trap_cooldown => 180
 }
++smeltery 10,5 "An old smeltery"
 ===END OF FACILITIES===
 player amber_leather_cap
 player glass_bottle
@@ -228,6 +265,10 @@ player hardwood_log
 player hardwood_log
 player softwood_log
 player softwood_log
+player tin_ore
+player tin_ore
+player tin_ore
+player tin_ore
 player bronze_shovel
 chest1 shiny_dagger // a dagger
 chest1 sharp_short_sword

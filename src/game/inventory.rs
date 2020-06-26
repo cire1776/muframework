@@ -185,6 +185,14 @@ impl Inventory {
         self.items.len()
     }
 
+    pub fn count_of<S: ToString>(&self, class: ItemClass, description: S) -> u16 {
+        let description = description.to_string();
+        self.items
+            .iter()
+            .filter(|(_, i)| i.is_of_type(class, &description))
+            .fold(0, |accum, (_, i)| accum + i.quantity as u16)
+    }
+
     pub fn set_item_filter(&mut self, filter: Option<Box<dyn game::inventory::InventoryFilter>>) {
         let result = if filter.is_some() {
             Some(filter.unwrap())
@@ -431,10 +439,6 @@ impl Inventory {
     ) {
         let mut quantity = quantity.try_into().ok().expect("must be convertible to u8");
 
-        if quantity > 1 {
-            todo!("Not yet implemented for more than 1");
-        }
-
         let target_type = items.item_types.find(class, description).clone();
 
         let mut items_to_be_removed: Vec<u64> = vec![];
@@ -480,6 +484,16 @@ impl Inventory {
         self.consume(target.class, &target.description, quantity, items);
 
         self.items.iter().any(|(_, i)| i.item_type == target)
+    }
+
+    pub fn has_sufficient<S: ToString, N: TryInto<u8>>(
+        &self,
+        class: ItemClass,
+        description: S,
+        quantity: N,
+    ) -> bool {
+        let count = self.count_of(class, description.to_string());
+        count >= quantity.try_into().ok().unwrap() as u16
     }
 
     pub fn split_stack<N: TryInto<u8>>(

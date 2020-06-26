@@ -17,6 +17,7 @@ pub enum FacilityClass {
     Well,
     Vein,
     FishingSpot,
+    Smeltery,
 }
 
 impl FacilityClass {
@@ -32,7 +33,8 @@ impl FacilityClass {
             "▼well" => FacilityClass::Well,
             "#vein" => FacilityClass::Vein,
             "~fishing_spot" => FacilityClass::FishingSpot,
-            _ => panic!("unknown FacilityClass symbol"),
+            "+smeltery" => FacilityClass::Smeltery,
+            _ => panic!("unknown FacilityClass symbol: {}", symbol),
         }
     }
 }

@@ -146,7 +146,6 @@ impl<'a> CommandHandler<'a> for EquipCommand<'a> {
                 &mut self.items,
             );
         }
-        let player_mounting_points = self.player.mounting_points.clone();
 
         self.item.has_been_equipped(self.player);
         None

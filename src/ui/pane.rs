@@ -16,7 +16,9 @@ pub enum PaneTitle {
     Fishing,
     PlacingTrap,
     CollectingTrap,
+    Smelting,
     ChestContents,
+    SelectOutput,
 }
 
 impl ToString for PaneTitle {
@@ -35,7 +37,9 @@ impl ToString for PaneTitle {
             PaneTitle::Fishing => "Fishing",
             PaneTitle::PlacingTrap => "Placing Trap",
             PaneTitle::CollectingTrap => "Collecting Trap",
+            PaneTitle::Smelting => "Smelting",
             PaneTitle::ChestContents => "Chest Contents",
+            PaneTitle::SelectOutput => "Select Output",
         };
 
         str.into()
