@@ -1,8 +1,11 @@
 use super::*;
+use std::option::Option::None;
 use std::sync::mpsc::*;
+use ui::pane::PaneTitle::*;
+use ItemClass::*;
+
 // use ui::input::InputState;
 // use ui::UIState;
-// use ItemClass::*;
 
 #[cfg(test)]
 pub fn initialize_game_system() -> (
@@ -14,6 +17,7 @@ pub fn initialize_game_system() -> (
     ItemList,
     FacilityList,
     InventoryList,
+    Rng,
     Timer,
     Sender<GameUpdate>,
     Receiver<GameUpdate>,
@@ -38,6 +42,9 @@ pub fn initialize_game_system() -> (
 
     let game_state = GameState::new();
 
+    let mut rng = Rng::new();
+    rng.set_test_mode();
+
     timer.set_test_mode();
 
     (
@@ -49,6 +56,7 @@ pub fn initialize_game_system() -> (
         items,
         facilities,
         inventories,
+        rng,
         timer,
         update_tx,
         update_rx,
@@ -70,6 +78,7 @@ pub fn initialize_game_system_with_player_at(
     ItemList,
     FacilityList,
     InventoryList,
+    Rng,
     Timer,
     Sender<GameUpdate>,
     Receiver<GameUpdate>,
@@ -86,6 +95,7 @@ pub fn initialize_game_system_with_player_at(
         items,
         facilities,
         mut inventories,
+        rng,
         timer,
         update_tx,
         update_rx,
@@ -112,6 +122,7 @@ pub fn initialize_game_system_with_player_at(
         items,
         facilities,
         inventories,
+        rng,
         timer,
         update_tx,
         update_rx,
@@ -229,7 +240,7 @@ pub fn assert_commands_are_empty(command_rx: &mut Receiver<Command>) {
     }
 }
 
-pub fn assert_refresh_inventory(command_rx: &mut Receiver<Command>) {
+pub fn assert_is_refresh_inventory(command_rx: &mut Receiver<Command>) {
     let command = command_rx.try_recv();
 
     match command {
@@ -250,6 +261,24 @@ pub fn assert_is_spawning_item<S: ToString>(
     match command {
         Command::SpawnItem(id, c, d)
             if id == inventory_id && c == class && d == description.to_string() => {}
+        _ => panic!("unexpected command: {:?}", command),
+    }
+}
+
+pub fn assert_is_destroy_facility(command_rx: &mut Receiver<Command>) -> Command {
+    let command = command_rx.try_recv().unwrap();
+
+    match command {
+        Command::DestroyFacility(_id) => Command::None,
+        _ => panic!("unexpected command: {:?}", command),
+    }
+}
+
+pub fn assert_is_activity_abort(command_rx: &mut Receiver<Command>) -> Command {
+    let command = command_rx.try_recv().unwrap();
+
+    match command {
+        Command::ActivityAbort => Command::None,
         _ => panic!("unexpected command: {:?}", command),
     }
 }
@@ -281,3 +310,6 @@ mod chests;
 
 #[cfg(test)]
 mod trees;
+
+#[cfg(test)]
+mod veins;

@@ -1,5 +1,4 @@
 use super::*;
-use ItemClass::*;
 
 #[test]
 fn can_chop_pine_tree() {
@@ -12,6 +11,7 @@ fn can_chop_pine_tree() {
         mut items,
         mut facilities,
         mut inventories,
+        mut _rng,
         mut timer,
         update_tx,
         mut update_rx,
@@ -70,7 +70,7 @@ fn can_chop_pine_tree() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Material, "Softwood Log", &mut command_rx);
-    assert_refresh_inventory(&mut command_rx);
+    assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
 
@@ -85,6 +85,7 @@ fn can_chop_apple_tree() {
         mut items,
         mut facilities,
         mut inventories,
+        mut _rng,
         mut timer,
         update_tx,
         mut update_rx,
@@ -143,7 +144,7 @@ fn can_chop_apple_tree() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Material, "Hardwood Log", &mut command_rx);
-    assert_refresh_inventory(&mut command_rx);
+    assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
 
@@ -158,6 +159,7 @@ fn can_chop_olive_tree() {
         mut items,
         mut facilities,
         mut inventories,
+        mut _rng,
         mut timer,
         update_tx,
         mut update_rx,
@@ -217,7 +219,7 @@ fn can_chop_olive_tree() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Material, "Hardwood Log", &mut command_rx);
-    assert_refresh_inventory(&mut command_rx);
+    assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
 
@@ -232,6 +234,7 @@ fn can_chop_oak_tree() {
         mut items,
         mut facilities,
         mut inventories,
+        mut _rng,
         mut timer,
         update_tx,
         mut update_rx,
@@ -291,7 +294,7 @@ fn can_chop_oak_tree() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Material, "Hardwood Log", &mut command_rx);
-    assert_refresh_inventory(&mut command_rx);
+    assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
 
@@ -306,6 +309,7 @@ fn can_pick_apple_tree() {
         mut items,
         mut facilities,
         mut inventories,
+        mut _rng,
         mut timer,
         update_tx,
         mut update_rx,
@@ -365,7 +369,7 @@ fn can_pick_apple_tree() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Food, "Apple", &mut command_rx);
-    assert_refresh_inventory(&mut command_rx);
+    assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
 
@@ -380,6 +384,7 @@ fn can_pick_olive_tree() {
         mut items,
         mut facilities,
         mut inventories,
+        mut _rng,
         mut timer,
         update_tx,
         mut update_rx,
@@ -439,6 +444,6 @@ fn can_pick_olive_tree() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Food, "Olive", &mut command_rx);
-    assert_refresh_inventory(&mut command_rx);
+    assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
