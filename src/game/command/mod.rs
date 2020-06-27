@@ -658,7 +658,14 @@ pub trait CommandHandler<'a> {
 
         // unwrap senders to avoid thread sending problems
         let update_sender = update_tx.unwrap().clone();
-        let command_tx = command_tx.unwrap().clone();
+
+        let command_sender = match command_tx.clone() {
+            Some(command_sender) => command_sender,
+            None => {
+                let (tx, _) = channel();
+                tx
+            }
+        };
 
         let timer = { self.timer().unwrap() };
         let guard = timer.repeating(
@@ -667,7 +674,7 @@ pub trait CommandHandler<'a> {
             "ActivityComplete",
         );
 
-        let activity = self.create_activity(guard, update_sender, command_tx);
+        let activity = self.create_activity(guard, update_sender, command_sender);
         activity
     }
 

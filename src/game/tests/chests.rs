@@ -14,6 +14,8 @@ fn opening_a_chest_provides_client_with_external_inventory() {
         mut timer,
         update_tx,
         update_rx,
+        _command_tx,
+        _command_rx,
         mut game_state,
     ) = initialize_game_system();
 
@@ -77,6 +79,8 @@ fn taking_all_from_a_chest() {
         mut timer,
         update_tx,
         update_rx,
+        _command_tx,
+        _command_rx,
         mut game_state,
     ) = initialize_game_system();
 
@@ -160,6 +164,8 @@ fn stashing_all_to_a_chest() {
         mut timer,
         update_tx,
         update_rx,
+        _command_tx,
+        _command_rx,
         mut game_state,
     ) = initialize_game_system();
 
