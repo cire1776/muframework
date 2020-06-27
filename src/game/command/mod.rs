@@ -776,10 +776,8 @@ pub trait Activity {
         {
             Command::send(Some(&command_sender), Command::RefreshInventory);
         }
-    }
 
-    fn clear_guard(&mut self) {
-        panic!("must implement clear guard");
+        self.start(update_sender);
     }
 }
 
