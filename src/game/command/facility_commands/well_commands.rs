@@ -147,6 +147,7 @@ impl Activity for WellFillActivity {
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        _rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
@@ -289,27 +290,21 @@ impl Activity for WellDigActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        use rand::Rng;
-
-        let mut rng = rand::thread_rng();
-
         facility.increment_property("depth");
 
         let water_chance = facility.get_property("chance_of_hitting_water");
-        let random_result1 = rng.gen_range(0, water_chance);
-        if random_result1 == 0 {
+        if rng.percentile(water_chance as u8, "water_chance") {
             facility.set_property("fluid", WellType::Water as u128);
             Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::DontRefreshInventory;
         }
 
         let oil_chance = facility.get_property("chance_of_hitting_oil");
-        let random_result2 = rng.gen_range(0, oil_chance);
-
-        if random_result2 == 0 {
+        if rng.percentile(oil_chance as u8, "oil_chance") {
             facility.set_property("fluid", WellType::Oil as u128);
             Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::DontRefreshInventory;

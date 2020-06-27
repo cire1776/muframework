@@ -20,6 +20,8 @@ fn can_chop_pine_tree() {
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 8);
 
+    let mut rng = Rng::new();
+
     player.endorse_with(":can_chop");
 
     let activity = game_state.game_loop_iteration(
@@ -31,6 +33,7 @@ fn can_chop_pine_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -54,6 +57,7 @@ fn can_chop_pine_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         activity,
         &Command::ActivityComplete,
@@ -89,6 +93,8 @@ fn can_chop_apple_tree() {
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 9);
 
+    let mut rng = Rng::new();
+
     player.endorse_with(":can_chop");
 
     let activity = game_state.game_loop_iteration(
@@ -100,6 +106,7 @@ fn can_chop_apple_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -123,6 +130,7 @@ fn can_chop_apple_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         activity,
         &Command::ActivityComplete,
@@ -158,6 +166,8 @@ fn can_chop_olive_tree() {
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 10);
 
+    let mut rng = Rng::new();
+
     player.endorse_with(":can_chop");
 
     let activity = game_state.game_loop_iteration(
@@ -169,6 +179,7 @@ fn can_chop_olive_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -192,6 +203,7 @@ fn can_chop_olive_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         activity,
         &Command::ActivityComplete,
@@ -228,6 +240,8 @@ fn can_chop_oak_tree() {
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 11);
 
+    let mut rng = Rng::new();
+
     player.endorse_with(":can_chop");
 
     let activity = game_state.game_loop_iteration(
@@ -239,6 +253,7 @@ fn can_chop_oak_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -262,6 +277,7 @@ fn can_chop_oak_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         activity,
         &Command::ActivityComplete,
@@ -298,6 +314,8 @@ fn can_pick_apple_tree() {
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 9);
 
+    let mut rng = Rng::new();
+
     player.endorse_with(":can_pick");
 
     let activity = game_state.game_loop_iteration(
@@ -309,6 +327,7 @@ fn can_pick_apple_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -332,6 +351,7 @@ fn can_pick_apple_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         activity,
         &Command::ActivityComplete,
@@ -368,6 +388,8 @@ fn can_pick_olive_tree() {
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 10);
 
+    let mut rng = Rng::new();
+
     player.endorse_with(":can_pick");
 
     let activity = game_state.game_loop_iteration(
@@ -379,6 +401,7 @@ fn can_pick_olive_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -402,6 +425,7 @@ fn can_pick_olive_tree() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         activity,
         &Command::ActivityComplete,

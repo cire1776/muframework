@@ -281,6 +281,7 @@ impl Activity for FruitPressActivity {
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        _rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
@@ -453,6 +454,7 @@ impl Activity for FruitPressFillActivity {
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        _rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {

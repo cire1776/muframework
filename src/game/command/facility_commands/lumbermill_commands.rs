@@ -143,6 +143,7 @@ impl Activity for LumbermillActivity {
         _facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        _rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {

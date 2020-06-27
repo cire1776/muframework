@@ -178,11 +178,10 @@ impl Activity for VeinActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        use rand::Rng;
-
         let ore_type = match self.vein_type {
             Dirt => "Dirt",
             Sand => "Sand",
@@ -197,10 +196,8 @@ impl Activity for VeinActivity {
             Command::SpawnItem(player_inventory_id, ItemClass::Ore, ore_type),
         );
 
-        let mut rng = rand::thread_rng();
-
         let exhastion_chance = facility.get_property("chance_of_exhaustion");
-        if rng.gen_range(0, exhastion_chance) == 0 {
+        if rng.succeeds(0, exhastion_chance, "chance_of_exhaustion") {
             Command::send(
                 Some(command_sender.clone()),
                 Command::DestroyFacility(facility.id),

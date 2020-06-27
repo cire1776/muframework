@@ -19,6 +19,8 @@ fn opening_a_chest_provides_client_with_external_inventory() {
         mut game_state,
     ) = initialize_game_system();
 
+    let mut rng = Rng::new();
+
     game_state.teleport_player(8, 7, &mut player, &mut obstacles, &inventories, None, None);
 
     game_state.game_loop_iteration(
@@ -30,6 +32,7 @@ fn opening_a_chest_provides_client_with_external_inventory() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -84,6 +87,8 @@ fn taking_all_from_a_chest() {
         mut game_state,
     ) = initialize_game_system();
 
+    let mut rng = Rng::new();
+
     game_state.teleport_player(6, 12, &mut player, &mut obstacles, &inventories, None, None);
 
     game_state.game_loop_iteration(
@@ -95,6 +100,7 @@ fn taking_all_from_a_chest() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -120,6 +126,7 @@ fn taking_all_from_a_chest() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::TransferAllItems(chest_inventory_id, 1),
@@ -169,6 +176,8 @@ fn stashing_all_to_a_chest() {
         mut game_state,
     ) = initialize_game_system();
 
+    let mut rng = Rng::new();
+
     game_state.teleport_player(6, 12, &mut player, &mut obstacles, &inventories, None, None);
 
     game_state.game_loop_iteration(
@@ -180,6 +189,7 @@ fn stashing_all_to_a_chest() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::Move(Direction::Left, MoveCommandMode::Use),
@@ -204,6 +214,7 @@ fn stashing_all_to_a_chest() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut rng,
         &mut timer,
         None,
         &Command::TransferAllItems(1, chest_inventory_id),

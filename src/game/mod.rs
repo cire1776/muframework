@@ -6,6 +6,9 @@ use character::CharacterList;
 pub mod blocking_map;
 use blocking_map::BlockingMap;
 
+pub mod random;
+pub use random::*;
+
 pub mod command;
 pub use command::{Activity, CommandHandler, CommandSender, GameUpdateSender};
 
@@ -89,6 +92,7 @@ impl GameState {
 
         loop {
             let command = command_rx.recv();
+            let mut rng = random::Rng::new();
 
             if let Ok(command) = command {
                 activity = game_state.game_loop_iteration(
@@ -100,6 +104,7 @@ impl GameState {
                     &mut items,
                     &mut facilities,
                     &mut inventories,
+                    &mut rng,
                     &mut timer,
                     activity,
                     &command,
@@ -212,6 +217,7 @@ impl GameState {
         items: &mut ItemList,
         facilities: &mut FacilityList,
         inventories: &mut InventoryList,
+        rng: &mut Rng,
         timer: &mut Timer,
         activity: Option<Box<dyn Activity>>,
         command: &Command,
@@ -366,6 +372,7 @@ impl GameState {
                 facilities,
                 items,
                 inventories,
+                rng,
                 update_tx,
                 command_tx,
             ),
@@ -393,6 +400,7 @@ impl GameState {
         facilities: &mut FacilityList,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        rng: &mut Rng,
         update_tx: Option<&GameUpdateSender>,
         command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
@@ -403,6 +411,7 @@ impl GameState {
                 facilities,
                 items,
                 inventories,
+                rng,
                 &update_tx.expect("update_tx is None."),
                 command_tx.expect("command_tx is None"),
             );

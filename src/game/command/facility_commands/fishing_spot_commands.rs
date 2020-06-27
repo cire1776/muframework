@@ -1,5 +1,4 @@
 use super::*;
-use rand::Rng;
 use FishType::*;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
@@ -173,12 +172,12 @@ impl<'a> FishingSpotProperties {
         product_1: FishType,
         product_2: Option<FishType>,
         product_chance: u8,
+        rng: &mut Rng,
     ) -> FishType {
         if product_2.is_none() {
             product_1
         } else {
-            let mut rng = rand::thread_rng();
-            if rng.gen_range(0, 100) < product_chance {
+            if rng.percentile(product_chance, "fish_type") {
                 product_1
             } else {
                 product_2.unwrap()
@@ -322,11 +321,16 @@ impl<'a> Activity for NetFishingActivity {
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let fish_type =
-            FishingSpotProperties::fish_type(self.product_1, self.product_2, self.product_chance);
+        let fish_type = FishingSpotProperties::fish_type(
+            self.product_1,
+            self.product_2,
+            self.product_chance,
+            rng,
+        );
 
         Command::send(
             Some(command_sender),
@@ -480,11 +484,16 @@ impl<'a> Activity for FishingActivity {
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let fish_type =
-            FishingSpotProperties::fish_type(self.product_1, self.product_2, self.product_chance);
+        let fish_type = FishingSpotProperties::fish_type(
+            self.product_1,
+            self.product_2,
+            self.product_chance,
+            rng,
+        );
 
         Command::send(
             Some(command_sender),
@@ -628,6 +637,7 @@ impl<'a> Activity for PlacingFishingTrapActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        _rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
@@ -796,6 +806,7 @@ impl<'a> Activity for CollectFishingTrapActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         inventories: &mut InventoryList,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
@@ -804,9 +815,8 @@ impl<'a> Activity for CollectFishingTrapActivity {
         facility.set_property("trap_expiration", 0);
         facility.set_property("is_in_use", 0);
 
-        let mut rng = rand::thread_rng();
         let max_spawn = facility.get_property("trap_spawn");
-        let spawns = rng.gen_range(1, max_spawn + 1);
+        let spawns = rng.range(1, max_spawn + 1, "trap_spawn");
 
         for _ in 0..spawns {
             let (product_1, product_2) = self.fishing_spot_properties.trap_products();
@@ -814,6 +824,7 @@ impl<'a> Activity for CollectFishingTrapActivity {
                 product_1,
                 product_2,
                 self.fishing_spot_properties.trap_product_chance(),
+                rng,
             );
             Command::send(
                 Some(command_sender.clone()),

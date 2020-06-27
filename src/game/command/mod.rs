@@ -1,5 +1,6 @@
 use super::*;
 use game::blocking_map::*;
+use random::Rng;
 use std::boxed::Box;
 use std::ops::DerefMut;
 
@@ -729,6 +730,7 @@ pub trait Activity {
         facilities: &mut FacilityList,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        rng: &mut Rng,
         update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) {
@@ -741,6 +743,7 @@ pub trait Activity {
             facility,
             items,
             inventories,
+            rng,
             update_sender,
             command_sender,
         );
@@ -752,6 +755,7 @@ pub trait Activity {
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag;
@@ -762,6 +766,7 @@ pub trait Activity {
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        rng: &mut Rng,
         update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) {
@@ -772,6 +777,7 @@ pub trait Activity {
             facility,
             items,
             inventories,
+            rng,
             update_sender,
             command_sender.clone(),
         ) == RefreshInventoryFlag::RefreshInventory
