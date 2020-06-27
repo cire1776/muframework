@@ -713,17 +713,13 @@ pub trait Activity {
         true
     }
 
-    fn expiration(&self) -> u32 {
-        panic!("must implement expiration")
-    }
+    fn expiration(&self) -> u32;
 
-    fn activity_title(&self) -> ui::pane::PaneTitle {
-        panic!("must implement activity_title");
-    }
+    fn activity_title(&self) -> ui::pane::PaneTitle;
 
-    fn facility_id(&self) -> u64 {
-        panic!("must implement facility_id");
-    }
+    fn facility_id(&self) -> u64;
+
+    fn clear_guard(&mut self);
 
     fn complete(
         &mut self,
@@ -756,9 +752,7 @@ pub trait Activity {
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
         _command_sender: &CommandSender,
-    ) -> RefreshInventoryFlag {
-        panic!("must implement on_completion");
-    }
+    ) -> RefreshInventoryFlag;
 
     fn restart_loop(
         &self,
