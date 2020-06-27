@@ -254,6 +254,7 @@ pub fn assert_is_spawning_item<S: ToString>(
     }
 }
 
+#[allow(dead_code)]
 pub fn assert_player_has<S: ToString>(
     class: ItemClass,
     description: S,
