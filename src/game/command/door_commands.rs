@@ -27,7 +27,7 @@ impl<'a> CommandHandler<'a> for OpenDoorCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&CommandSender>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.map
             .set_tile_at(self.x, self.y, tile_map::Tile::OpenDoor);
@@ -74,7 +74,7 @@ impl<'a> CommandHandler<'a> for CloseDoorCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&CommandSender>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.map
             .set_tile_at(self.x, self.y, tile_map::Tile::ClosedDoor);

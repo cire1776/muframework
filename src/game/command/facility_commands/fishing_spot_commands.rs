@@ -191,7 +191,7 @@ pub struct ActivateNetFishingCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
-    timer: &'a extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateNetFishingCommand<'a> {
@@ -199,7 +199,7 @@ impl<'a> ActivateNetFishingCommand<'a> {
         player: &'a mut Player,
         facility_id: u64,
         facilities: &'a mut FacilityList,
-        timer: &'a mut extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
@@ -218,7 +218,7 @@ impl<'a> ActivateNetFishingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -233,7 +233,6 @@ impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -247,7 +246,6 @@ impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility.id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -274,7 +272,6 @@ pub struct NetFishingActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -288,7 +285,6 @@ impl<'a> NetFishingActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -300,7 +296,6 @@ impl<'a> NetFishingActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -328,13 +323,13 @@ impl<'a> Activity for NetFishingActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let fish_type =
             FishingSpotProperties::fish_type(self.product_1, self.product_2, self.product_chance);
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender),
             Command::SpawnItem(
                 player_inventory_id,
                 ItemClass::Ingredient,
@@ -354,7 +349,7 @@ pub struct ActivateFishingCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
-    timer: &'a extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateFishingCommand<'a> {
@@ -362,7 +357,7 @@ impl<'a> ActivateFishingCommand<'a> {
         player: &'a mut Player,
         facility_id: u64,
         facilities: &'a mut FacilityList,
-        timer: &'a extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
@@ -381,7 +376,7 @@ impl<'a> ActivateFishingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -396,7 +391,6 @@ impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -410,7 +404,6 @@ impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility.id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -437,7 +430,6 @@ pub struct FishingActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -451,7 +443,6 @@ impl<'a> FishingActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -463,7 +454,6 @@ impl<'a> FishingActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -491,13 +481,13 @@ impl<'a> Activity for FishingActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let fish_type =
             FishingSpotProperties::fish_type(self.product_1, self.product_2, self.product_chance);
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender),
             Command::SpawnItem(
                 player_inventory_id,
                 ItemClass::Ingredient,
@@ -517,7 +507,7 @@ pub struct ActivatePlaceFishingTrapCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
-    timer: &'a extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivatePlaceFishingTrapCommand<'a> {
@@ -525,7 +515,7 @@ impl<'a> ActivatePlaceFishingTrapCommand<'a> {
         player: &'a mut Player,
         facility_id: u64,
         facilities: &'a mut FacilityList,
-        timer: &'a extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
@@ -544,7 +534,7 @@ impl<'a> ActivatePlaceFishingTrapCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivatePlaceFishingTrapCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -559,7 +549,6 @@ impl<'a> CommandHandler<'a> for ActivatePlaceFishingTrapCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -569,7 +558,6 @@ impl<'a> CommandHandler<'a> for ActivatePlaceFishingTrapCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility.id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -594,7 +582,6 @@ pub struct PlacingFishingTrapActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -606,7 +593,6 @@ impl<'a> PlacingFishingTrapActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -616,7 +602,6 @@ impl<'a> PlacingFishingTrapActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -644,7 +629,7 @@ impl<'a> Activity for PlacingFishingTrapActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -659,7 +644,7 @@ impl<'a> Activity for PlacingFishingTrapActivity {
         facility.set_property("is_in_use", 1);
 
         Command::send(
-            Some(command_sender),
+            Some(command_sender.clone()),
             Command::TransferEquipmentToInventory(MountingPoint::OnHand, facility.id),
         );
 
@@ -677,7 +662,7 @@ pub struct ActivateCollectFishingTrapCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
     facility: &'a mut Facility,
-    timer: &'a extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateCollectFishingTrapCommand<'a> {
@@ -685,7 +670,7 @@ impl<'a> ActivateCollectFishingTrapCommand<'a> {
         player: &'a mut Player,
         facility_id: u64,
         facilities: &'a mut FacilityList,
-        timer: &'a extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let facility = facilities
             .get_mut(facility_id)
@@ -717,7 +702,7 @@ impl<'a> ActivateCollectFishingTrapCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateCollectFishingTrapCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -732,7 +717,6 @@ impl<'a> CommandHandler<'a> for ActivateCollectFishingTrapCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -742,7 +726,6 @@ impl<'a> CommandHandler<'a> for ActivateCollectFishingTrapCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility.id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -767,7 +750,6 @@ pub struct CollectFishingTrapActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -779,7 +761,6 @@ impl<'a> CollectFishingTrapActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -789,7 +770,6 @@ impl<'a> CollectFishingTrapActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -817,9 +797,9 @@ impl<'a> Activity for CollectFishingTrapActivity {
         _items: &mut ItemList,
         inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        Command::send(Some(command_sender), Command::ActivityAbort);
+        Command::send(Some(command_sender.clone()), Command::ActivityAbort);
 
         facility.set_property("trap_expiration", 0);
         facility.set_property("is_in_use", 0);
@@ -836,7 +816,7 @@ impl<'a> Activity for CollectFishingTrapActivity {
                 self.fishing_spot_properties.trap_product_chance(),
             );
             Command::send(
-                Some(&command_sender),
+                Some(command_sender.clone()),
                 Command::SpawnItem(
                     player_inventory_id,
                     ItemClass::Ingredient,

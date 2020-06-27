@@ -60,7 +60,7 @@ impl UIPlayer {
 
 pub struct UIState {
     pub update_rx: std::sync::mpsc::Receiver<GameUpdate>,
-    pub command_tx: std::sync::mpsc::Sender<Command>,
+    pub command_tx: game::command::CommandSender,
 
     pub map_window: MapWindow,
     pub message_window: Window,
@@ -90,7 +90,7 @@ pub struct UIState {
     pub activity_time: Option<u64>,
 }
 
-impl GameState for UIState {
+impl bracket_lib::prelude::GameState for UIState {
     fn tick(&mut self, ctx: &mut BTerm) {
         self.perform_tick(Some(ctx));
     }

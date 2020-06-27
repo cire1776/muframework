@@ -25,7 +25,7 @@ impl<'a> CommandHandler<'a> for OpenSmelteryCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         None
     }
@@ -52,7 +52,7 @@ pub struct ActivateSmelteryCommand<'a> {
     player: &'a mut Player,
     inventories: &'a mut InventoryList,
     facility_id: u64,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateSmelteryCommand<'a> {
@@ -61,7 +61,7 @@ impl<'a> ActivateSmelteryCommand<'a> {
         facility_id: u64,
         product_index: u8,
         inventories: &'a mut InventoryList,
-        timer: &'a mut extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let product = SmeltingSkill::products()[(product_index - 1) as usize].0;
 
@@ -80,7 +80,7 @@ impl<'a> ActivateSmelteryCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -92,7 +92,6 @@ impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -102,7 +101,6 @@ impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility_id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -137,7 +135,6 @@ pub struct SmeltingActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -149,7 +146,6 @@ impl SmeltingActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -159,7 +155,6 @@ impl SmeltingActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -187,7 +182,7 @@ impl Activity for SmeltingActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let inventory = inventories
             .get_mut(&player_inventory_id)
@@ -211,7 +206,7 @@ impl Activity for SmeltingActivity {
         inventory.consume(ItemClass::Material, wood_type, 1, items);
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender.clone()),
             Command::SpawnItem(
                 player_inventory_id,
                 ItemClass::Material,
@@ -220,7 +215,7 @@ impl Activity for SmeltingActivity {
         );
 
         if !SmeltingSkill::can_produce(self.product, inventory) {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender), Command::ActivityAbort);
         }
         RefreshInventoryFlag::RefreshInventory
     }

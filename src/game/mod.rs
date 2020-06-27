@@ -1,5 +1,4 @@
 use super::*;
-use extern_timer::Guard;
 use std::convert::*;
 
 use character::CharacterList;
@@ -70,16 +69,20 @@ impl GameState {
         command_tx: CommandSender,
     ) {
         let (
-            player,
-            map,
-            obstacles,
-            characters,
-            item_class_specifiers,
-            items,
-            facilities,
-            inventories,
-            timer,
-        ) = &mut Self::initialize_game("maps/level1.map", Some(&update_tx));
+            mut player,
+            mut map,
+            mut obstacles,
+            mut characters,
+            mut item_class_specifiers,
+            mut items,
+            mut facilities,
+            mut inventories,
+            mut timer,
+        ) = Self::initialize_game(
+            "maps/level1.map",
+            Some(&update_tx),
+            Some(command_tx.clone()),
+        );
 
         let game_state = &mut GameState::new();
         let mut activity: Option<Box<dyn Activity>> = None;
@@ -89,19 +92,19 @@ impl GameState {
 
             if let Ok(command) = command {
                 activity = game_state.game_loop_iteration(
-                    player,
-                    map,
-                    obstacles,
-                    characters,
-                    item_class_specifiers,
-                    items,
-                    facilities,
-                    inventories,
-                    timer,
+                    &mut player,
+                    &mut map,
+                    &mut obstacles,
+                    &mut characters,
+                    &mut item_class_specifiers,
+                    &mut items,
+                    &mut facilities,
+                    &mut inventories,
+                    &mut timer,
                     activity,
                     &command,
                     Some(&update_tx),
-                    Some(&command_tx),
+                    Some(command_tx.clone()),
                 );
             } else {
                 // if receiver is broken, we just bail, ending the game.
@@ -116,6 +119,7 @@ impl GameState {
     pub fn initialize_game<S: ToString>(
         level_path: S,
         update_tx: Option<&GameUpdateSender>,
+        command_tx: Option<CommandSender>,
     ) -> (
         Player,
         TileMap,
@@ -125,7 +129,7 @@ impl GameState {
         ItemList,
         FacilityList,
         InventoryList,
-        extern_timer::Timer,
+        Timer,
     ) {
         let (
             mut map,
@@ -180,7 +184,9 @@ impl GameState {
         // TODO: consider moving this to a function
         GameUpdate::send(update_tx, SetBackground(map.clone()));
 
-        let timer = extern_timer::Timer::new();
+        let timer: Timer;
+
+        timer = Timer::new(command_tx.clone());
 
         (
             player,
@@ -206,11 +212,11 @@ impl GameState {
         items: &mut ItemList,
         facilities: &mut FacilityList,
         inventories: &mut InventoryList,
-        timer: &mut extern_timer::Timer,
+        timer: &mut Timer,
         activity: Option<Box<dyn Activity>>,
         command: &Command,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         let mut activity = activity;
         activity = self.abort_activity_if_necessary(activity, command, update_tx);
@@ -388,7 +394,7 @@ impl GameState {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         let mut activity = activity;
         if let Some(ref mut activity) = &mut activity {
@@ -398,7 +404,7 @@ impl GameState {
                 items,
                 inventories,
                 &update_tx.expect("update_tx is None."),
-                &command_tx.expect("command_tx is None"),
+                command_tx.expect("command_tx is None"),
             );
         }
 
@@ -462,7 +468,7 @@ impl GameState {
         obstacles: &mut BlockingMap,
         _inventories: &InventoryList,
         update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) {
         let character = player;
         let facing = character.facing;

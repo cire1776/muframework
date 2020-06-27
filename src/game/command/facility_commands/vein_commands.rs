@@ -39,7 +39,7 @@ pub struct ActivateVeinCommand<'a> {
     vein_type: VeinType,
     player: &'a mut Player,
     facility_id: u64,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateVeinCommand<'a> {
@@ -47,7 +47,7 @@ impl<'a> ActivateVeinCommand<'a> {
         player: &'a mut Player,
         facility_id: u64,
         facilities: &mut FacilityList,
-        timer: &'a mut extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let facility = facilities
             .get(facility_id)
@@ -79,7 +79,7 @@ impl<'a> ActivateVeinCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -95,7 +95,6 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -105,7 +104,6 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility_id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -130,7 +128,6 @@ pub struct VeinActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -142,7 +139,6 @@ impl VeinActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -152,7 +148,6 @@ impl VeinActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -184,7 +179,7 @@ impl Activity for VeinActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         use rand::Rng;
 
@@ -198,7 +193,7 @@ impl Activity for VeinActivity {
         .to_string();
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender.clone()),
             Command::SpawnItem(player_inventory_id, ItemClass::Ore, ore_type),
         );
 
@@ -206,8 +201,11 @@ impl Activity for VeinActivity {
 
         let exhastion_chance = facility.get_property("chance_of_exhaustion");
         if rng.gen_range(0, exhastion_chance) == 0 {
-            Command::send(Some(&command_sender), Command::DestroyFacility(facility.id));
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(
+                Some(command_sender.clone()),
+                Command::DestroyFacility(facility.id),
+            );
+            Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::RefreshInventory;
         }
 

@@ -108,7 +108,7 @@ fn opening_external_inventory() {
         mut facilities,
         mut inventories,
         mut timer,
-    ) = game::GameState::initialize_game("maps/test.map", None);
+    ) = game::GameState::initialize_game("maps/test.map", None, None);
 
     let mut game_state = GameState::new();
     game_state.teleport_player(8, 7, &mut player, &mut obstacles, &inventories, None, None);
@@ -178,6 +178,7 @@ fn game_state_closing_external_inventory() {
     let mut subject = game::GameState::new();
 
     let (update_tx, update_rx) = channel();
+
     let (
         mut player,
         mut map,
@@ -188,7 +189,7 @@ fn game_state_closing_external_inventory() {
         mut facilities,
         mut inventories,
         mut timer,
-    ) = game::GameState::initialize_game("maps/test.map", None);
+    ) = game::GameState::initialize_game("maps/test.map", None, None);
 
     subject.game_loop_iteration(
         &mut player,

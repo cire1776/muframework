@@ -29,7 +29,7 @@ pub struct ActivateTreePickingCommand<'a> {
     tree_type: TreeType,
     player: &'a mut Player,
     facility_id: u64,
-    timer: &'a extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateTreePickingCommand<'a> {
@@ -37,7 +37,7 @@ impl<'a> ActivateTreePickingCommand<'a> {
         tree_type: TreeType,
         player: &'a mut Player,
         facility_id: u64,
-        timer: &'a extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         Self {
             tree_type,
@@ -58,7 +58,7 @@ impl<'a> ActivateTreePickingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -73,7 +73,6 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
     }
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -83,7 +82,6 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
             self.expiration(),
             self.player.inventory_id(),
             self.facility_id,
-            timer,
             guard,
             update_sender,
             command_sender,
@@ -109,7 +107,6 @@ pub struct TreePickingActivity {
     expiration: u32,
     player_inventory_id: u64,
     facility_id: u64,
-    timer: extern_timer::Timer,
     guard: Option<Guard>,
     update_sender: GameUpdateSender,
     command_sender: CommandSender,
@@ -121,7 +118,6 @@ impl<'a> TreePickingActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -131,7 +127,6 @@ impl<'a> TreePickingActivity {
             expiration,
             player_inventory_id,
             facility_id,
-            timer,
             guard: Some(guard),
             update_sender,
             command_sender,
@@ -163,7 +158,7 @@ impl<'a> Activity for TreePickingActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let item_class: ItemClass;
         let item_description: &str;
@@ -181,12 +176,12 @@ impl<'a> Activity for TreePickingActivity {
         }
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender.clone()),
             Command::SpawnItem(player_inventory_id, item_class, item_description.into()),
         );
 
         if facility.decrement_property("fruit") <= 0 {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
         RefreshInventoryFlag::RefreshInventory
@@ -201,7 +196,7 @@ pub struct ActivateTreeLoggingCommand<'a> {
     tree_type: TreeType,
     player: &'a mut Player,
     facility_id: u64,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateTreeLoggingCommand<'a> {
@@ -209,7 +204,7 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
         player: &'a mut Player,
         facility_id: u64,
         facilities: &'a mut FacilityList,
-        timer: &'a mut extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let facility = facilities
             .get(facility_id)
@@ -237,7 +232,7 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -249,7 +244,6 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -262,7 +256,6 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
             self.player.inventory_id(),
             self.expiration(),
             self.facility_id,
-            timer,
             guard,
             update_sender,
             command_sender,
@@ -289,7 +282,6 @@ pub struct TreeLoggingActivity {
     player_inventory_id: u64,
     expiration: u32,
     facility_id: u64,
-    timer: extern_timer::Timer,
     guard: Option<Guard>,
     update_sender: GameUpdateSender,
     command_sender: CommandSender,
@@ -301,7 +293,6 @@ impl<'a> TreeLoggingActivity {
         player_inventory_id: u64,
         expiration: u32,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -311,7 +302,6 @@ impl<'a> TreeLoggingActivity {
             player_inventory_id,
             expiration,
             facility_id,
-            timer,
             guard: Some(guard),
             update_sender,
             command_sender,
@@ -339,7 +329,7 @@ impl<'a> Activity for TreeLoggingActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         #[allow(unreachable_patterns)]
         let wood_type = match self.tree_type {
@@ -349,12 +339,12 @@ impl<'a> Activity for TreeLoggingActivity {
         };
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender.clone()),
             Command::SpawnItem(player_inventory_id, ItemClass::Material, wood_type.into()),
         );
 
         if facility.decrement_property("logs") == 0 {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
         RefreshInventoryFlag::RefreshInventory

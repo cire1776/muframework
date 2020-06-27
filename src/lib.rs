@@ -8,8 +8,10 @@ extern crate chrono;
 use bracket_lib::prelude::*;
 use std::collections::HashMap;
 pub mod common;
+pub use common::timer::{Guard, Timer};
 
 pub mod game;
+
 use game::character::CharacterType;
 use game::tile_map::TileMap;
 
@@ -50,7 +52,7 @@ pub enum ActionContinuation {
     CraftingStation,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Command {
     None,
     QuitGame,

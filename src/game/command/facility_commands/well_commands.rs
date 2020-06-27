@@ -37,15 +37,11 @@ impl WellType {
 pub struct ActivateWellFillCommand<'a> {
     player: &'a mut Player,
     facility_id: u64,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateWellFillCommand<'a> {
-    pub fn new(
-        player: &'a mut Player,
-        facility_id: u64,
-        timer: &'a mut extern_timer::Timer,
-    ) -> Self {
+    pub fn new(player: &'a mut Player, facility_id: u64, timer: &'a mut Timer) -> Self {
         Self {
             player,
             facility_id,
@@ -64,7 +60,7 @@ impl<'a> ActivateWellFillCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateWellFillCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -76,7 +72,6 @@ impl<'a> CommandHandler<'a> for ActivateWellFillCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -85,7 +80,6 @@ impl<'a> CommandHandler<'a> for ActivateWellFillCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility_id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -109,7 +103,6 @@ pub struct WellFillActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -120,7 +113,6 @@ impl WellFillActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -129,7 +121,6 @@ impl WellFillActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -157,20 +148,20 @@ impl Activity for WellFillActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let inventory = inventories
             .get_mut(&player_inventory_id)
             .expect("unable to find inventory");
 
         if !inventory.any_left_after_consuming(ItemClass::Material, "Glass Bottle", 1, items) {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
 
         let fluid = WellType::from(facility.get_property("fluid")).to_string();
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender),
             Command::SpawnItem(
                 player_inventory_id,
                 ItemClass::Material,
@@ -189,15 +180,11 @@ impl Activity for WellFillActivity {
 pub struct ActivateWellDigCommand<'a> {
     player: &'a mut Player,
     facility_id: u64,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateWellDigCommand<'a> {
-    pub fn new(
-        player: &'a mut Player,
-        facility_id: u64,
-        timer: &'a mut extern_timer::Timer,
-    ) -> Self {
+    pub fn new(player: &'a mut Player, facility_id: u64, timer: &'a mut Timer) -> Self {
         Self {
             player,
             facility_id,
@@ -215,7 +202,7 @@ impl<'a> ActivateWellDigCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -227,7 +214,6 @@ impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -236,7 +222,6 @@ impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility_id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -260,7 +245,6 @@ pub struct WellDigActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -271,7 +255,6 @@ impl WellDigActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -280,7 +263,6 @@ impl WellDigActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -308,7 +290,7 @@ impl Activity for WellDigActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         use rand::Rng;
 
@@ -320,7 +302,7 @@ impl Activity for WellDigActivity {
         let random_result1 = rng.gen_range(0, water_chance);
         if random_result1 == 0 {
             facility.set_property("fluid", WellType::Water as u128);
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::DontRefreshInventory;
         }
 
@@ -329,7 +311,7 @@ impl Activity for WellDigActivity {
 
         if random_result2 == 0 {
             facility.set_property("fluid", WellType::Oil as u128);
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::DontRefreshInventory;
         }
 

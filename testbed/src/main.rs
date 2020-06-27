@@ -1,5 +1,4 @@
 use chrono::Duration;
-use extern_timer::*;
 
 #[derive(Debug, Clone)]
 enum Command {

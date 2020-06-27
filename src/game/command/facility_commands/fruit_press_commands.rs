@@ -77,7 +77,7 @@ impl<'a> CommandHandler<'a> for OpenFruitPressCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.player.external_inventory = Some(self.external_inventory.to_vec());
         None
@@ -140,7 +140,7 @@ pub struct ActivateFruitPressCommand<'a> {
     facilities: &'a mut FacilityList,
     __items: &'a mut ItemList,
     inventory: &'a mut Inventory,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateFruitPressCommand<'a> {
@@ -150,7 +150,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
         facilities: &'a mut FacilityList,
         items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
-        timer: &'a mut extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let inventory = inventories
             .get_mut(&facility_id)
@@ -173,7 +173,7 @@ impl<'a> ActivateFruitPressCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -185,7 +185,6 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -195,7 +194,6 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressCommand<'a> {
             self.fruit_type,
             self.expiration(),
             self.facility_id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -237,7 +235,6 @@ pub struct FruitPressActivity {
     fruit_type: FruitType,
     expiration: u32,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -249,7 +246,6 @@ impl FruitPressActivity {
         fruit_type: FruitType,
         expiration: u32,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -259,7 +255,6 @@ impl FruitPressActivity {
             fruit_type,
             expiration,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -287,10 +282,10 @@ impl Activity for FruitPressActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         if facility.increment_property("output") == 10 {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
 
         let inventory = inventories
@@ -303,7 +298,7 @@ impl Activity for FruitPressActivity {
         };
 
         if !inventory.any_left_after_consuming(ItemClass::Food, fruit, 1, items) {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
         RefreshInventoryFlag::DontRefreshInventory
@@ -322,7 +317,7 @@ pub struct ActivateFruitPressFillCommand<'a> {
     __items: &'a mut ItemList,
     __inventory: &'a mut Inventory,
     mode: FruitPressMode,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateFruitPressFillCommand<'a> {
@@ -332,7 +327,7 @@ impl<'a> ActivateFruitPressFillCommand<'a> {
         facilities: &'a mut FacilityList,
         __items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
-        timer: &'a mut extern_timer::Timer,
+        timer: &'a mut Timer,
     ) -> Self {
         let inventory = inventories
             .get_mut(&facility_id)
@@ -355,7 +350,7 @@ impl<'a> ActivateFruitPressFillCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -367,7 +362,6 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -377,7 +371,6 @@ impl<'a> CommandHandler<'a> for ActivateFruitPressFillCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility_id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -414,7 +407,6 @@ pub struct FruitPressFillActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -426,7 +418,6 @@ impl FruitPressFillActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -436,7 +427,6 @@ impl FruitPressFillActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -464,7 +454,7 @@ impl Activity for FruitPressFillActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let product = match self.fruit_type {
             FruitType::Apple => "Apple Juice",
@@ -473,17 +463,17 @@ impl Activity for FruitPressFillActivity {
         .to_string();
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender.clone()),
             Command::SpawnItem(1, ItemClass::Food, product),
         );
 
         let inventory = inventories.get_mut(&player_inventory_id).unwrap();
         if !inventory.any_left_after_consuming(ItemClass::Material, "Glass Bottle", 1, items) {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
 
         if facility.decrement_property("output") == 0 {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
         RefreshInventoryFlag::RefreshInventory

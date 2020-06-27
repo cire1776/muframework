@@ -14,7 +14,7 @@ pub fn initialize_game_system() -> (
     ItemList,
     FacilityList,
     InventoryList,
-    extern_timer::Timer,
+    Timer,
     Sender<GameUpdate>,
     Receiver<GameUpdate>,
     GameState,
@@ -31,7 +31,7 @@ pub fn initialize_game_system() -> (
         facilities,
         inventories,
         timer,
-    ) = game::GameState::initialize_game("maps/test.map", None);
+    ) = game::GameState::initialize_game("maps/test.map", None, None);
 
     let game_state = GameState::new();
 

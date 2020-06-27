@@ -24,7 +24,7 @@ impl<'a> CommandHandler<'a> for PickupCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.inventory.pick_up_item(self.item_id, &mut self.items);
         None
@@ -74,7 +74,7 @@ impl<'a> CommandHandler<'a> for DropCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.inventory
             .release_item_at(self.x, self.y, &self.item, &mut self.items);
@@ -134,7 +134,7 @@ impl<'a> CommandHandler<'a> for EquipCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         {
             let player_mounting_points = &mut self.player.mounting_points;
@@ -197,7 +197,7 @@ impl<'a> CommandHandler<'a> for UnequipCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.player
             .mounting_points
@@ -320,7 +320,7 @@ impl<'a> CommandHandler<'a> for TransferItemCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         transfer_an_item(
             self.item,
@@ -373,7 +373,7 @@ impl<'a> CommandHandler<'a> for TransferAllCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         let src_inventory = self.inventories.get_mut(&self.source_id).unwrap();
 

@@ -31,7 +31,7 @@ impl<'a> CommandHandler<'a> for MoveCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.obstacles
             .unblock_at(self.character.x, self.character.y);
@@ -82,7 +82,7 @@ impl<'a> CommandHandler<'a> for ChangeFacingCommand<'a> {
     fn perform_execute(
         &mut self,
         _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.player.facing = self.facing;
         None

@@ -20,15 +20,11 @@ pub struct ActivateLumberMillCommand<'a> {
     log_type: LogType,
     player: &'a mut Player,
     facility_id: u64,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 }
 
 impl<'a> ActivateLumberMillCommand<'a> {
-    pub fn new(
-        player: &'a mut Player,
-        facility_id: u64,
-        timer: &'a mut extern_timer::Timer,
-    ) -> Self {
+    pub fn new(player: &'a mut Player, facility_id: u64, timer: &'a mut Timer) -> Self {
         Self {
             log_type: Self::determine_log_type(player),
             player,
@@ -53,7 +49,7 @@ impl<'a> ActivateLumberMillCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         return Some(self.timer);
     }
 
@@ -68,7 +64,6 @@ impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
 
     fn create_activity(
         &self,
-        timer: extern_timer::Timer,
         guard: Guard,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -78,7 +73,6 @@ impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
             self.expiration(),
             self.player.id,
             self.facility_id,
-            timer,
             Some(guard),
             update_sender,
             command_sender,
@@ -103,7 +97,6 @@ pub struct LumbermillActivity {
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
-    _timer: extern_timer::Timer,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
     _command_sender: CommandSender,
@@ -115,7 +108,6 @@ impl LumbermillActivity {
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
-        timer: extern_timer::Timer,
         guard: Option<Guard>,
         update_sender: GameUpdateSender,
         command_sender: CommandSender,
@@ -125,7 +117,6 @@ impl LumbermillActivity {
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
-            _timer: timer,
             guard,
             _update_sender: update_sender,
             _command_sender: command_sender,
@@ -153,7 +144,7 @@ impl Activity for LumbermillActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         use inflector::Inflector;
 
@@ -169,11 +160,11 @@ impl Activity for LumbermillActivity {
             1,
             items,
         ) {
-            Command::send(Some(&command_sender), Command::ActivityAbort);
+            Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
 
         Command::send(
-            Some(&command_sender),
+            Some(command_sender),
             Command::SpawnItem(
                 player_inventory_id,
                 ItemClass::Material,

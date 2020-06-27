@@ -19,7 +19,7 @@ pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
 
 impl Command {
-    pub fn send(command_tx: Option<&CommandSender>, command: Command) {
+    pub fn send(command_tx: Option<CommandSender>, command: Command) {
         if let None = command_tx {
             return;
         }
@@ -39,10 +39,10 @@ impl Command {
         item_types: &'a ItemTypeList,
         items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
-        timer: &'a mut extern_timer::Timer,
+        timer: &'a mut Timer,
         activity: Option<Box<dyn Activity>>,
         update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         let (dx, dy) = get_deltas_from_direction(direction);
 
@@ -80,7 +80,7 @@ impl Command {
         inventories: &mut InventoryList,
         items: &mut ItemList,
         _update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
-        _command_tx: Option<&CommandSender>,
+        _command_tx: Option<CommandSender>,
     ) {
         let inventory = inventories
             .get_mut(&inventory_id)
@@ -95,7 +95,7 @@ impl Command {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) {
         let x = player.x;
         let y = player.y;
@@ -120,7 +120,7 @@ impl Command {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) {
         let item = &items[item_index].clone();
         let x = player.x;
@@ -145,7 +145,7 @@ impl Command {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) {
         let item = &items.clone()[item_index];
         match item {
@@ -175,7 +175,7 @@ impl Command {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) {
         let item_state = &items.clone()[item_index];
         match item_state {
@@ -197,7 +197,7 @@ impl Command {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&CommandSender>,
+        command_tx: Option<CommandSender>,
     ) {
         let item_state = &items[item_id];
         let item = ItemState::extract_item(item_state);
@@ -213,7 +213,7 @@ impl Command {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&CommandSender>,
+        _command_tx: Option<CommandSender>,
     ) {
         let inventories = inventories;
 
@@ -228,7 +228,7 @@ impl Command {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<&CommandSender>,
+        _command_tx: Option<CommandSender>,
     ) {
         let item_id = player
             .mounting_points
@@ -318,7 +318,7 @@ fn attempt_to_enter<'a>(
     dy: i32,
     player: &'a mut Player,
     obstacles: &'a mut BlockingMap,
-    __timer: &'a extern_timer::Timer,
+    __timer: &'a mut Timer,
     __activity: Option<Box<dyn Activity>>,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let new_x = player.x + dx;
@@ -351,7 +351,7 @@ fn attempt_to_use<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
     activity: Option<Box<dyn Activity>>,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     let mut mode = mode;
@@ -462,7 +462,7 @@ fn use_at<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
-    timer: &'a mut extern_timer::Timer,
+    timer: &'a mut Timer,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
     match map.at(x, y) {
         tile_map::Tile::ClosedDoor => Some(Box::new(OpenDoorCommand::new(x, y, obstacles, map))),
@@ -612,7 +612,6 @@ pub trait CommandHandler<'a> {
 
     fn create_activity(
         &self,
-        _timer: extern_timer::Timer,
         _guard: Guard,
         _update_sender: GameUpdateSender,
         _command_sender: CommandSender,
@@ -631,8 +630,8 @@ pub trait CommandHandler<'a> {
     /// * update_tx - an optional channel to announce upon.  Can be None for testing purposes.
     fn execute(
         &mut self,
-        update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        update_tx: Option<&GameUpdateSender>,
+        command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.prepare_to_execute();
 
@@ -645,7 +644,7 @@ pub trait CommandHandler<'a> {
         }
     }
 
-    fn timer(&self) -> Option<&extern_timer::Timer> {
+    fn timer(&mut self) -> Option<&mut Timer> {
         None
     }
 
@@ -653,26 +652,22 @@ pub trait CommandHandler<'a> {
     fn perform_execute(
         &mut self,
         update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<&std::sync::mpsc::Sender<Command>>,
+        command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
-        let timer = extern_timer::Timer::new();
+        let expiration = self.expiration().clone();
 
         // unwrap senders to avoid thread sending problems
-        let command_sender = command_tx.unwrap().clone();
         let update_sender = update_tx.unwrap().clone();
         let command_tx = command_tx.unwrap().clone();
 
-        let guard = self
-            .timer()
-            .expect("unable to get timer")
-            .schedule_repeating(
-                chrono::Duration::seconds(self.expiration() as i64),
-                move || {
-                    Command::send(Some(&command_sender), Command::ActivityComplete);
-                },
-            );
+        let timer = { self.timer().unwrap() };
+        let guard = timer.repeating(
+            chrono::Duration::seconds(expiration as i64),
+            Command::ActivityComplete,
+            "ActivityComplete",
+        );
 
-        let activity = self.create_activity(timer, guard, update_sender, command_tx);
+        let activity = self.create_activity(guard, update_sender, command_tx);
         activity
     }
 
@@ -728,7 +723,7 @@ pub trait Activity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) {
         let facility = facilities
             .get_mut(self.facility_id())
@@ -751,7 +746,7 @@ pub trait Activity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         _update_sender: &GameUpdateSender,
-        _command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) -> RefreshInventoryFlag;
 
     fn restart_loop(
@@ -761,7 +756,7 @@ pub trait Activity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         update_sender: &GameUpdateSender,
-        command_sender: &CommandSender,
+        command_sender: CommandSender,
     ) {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
@@ -771,10 +766,10 @@ pub trait Activity {
             items,
             inventories,
             update_sender,
-            command_sender,
+            command_sender.clone(),
         ) == RefreshInventoryFlag::RefreshInventory
         {
-            Command::send(Some(&command_sender), Command::RefreshInventory);
+            Command::send(Some(command_sender), Command::RefreshInventory);
         }
 
         self.start(update_sender);
