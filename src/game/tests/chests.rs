@@ -183,11 +183,10 @@ fn stashing_all_to_a_chest() {
 
     let chest_inventory_id = facilities.at(7, 7).unwrap().id;
 
-    let mut player_inventory = inventories.get(&player.id).unwrap().to_vec();
-    let chest_inventory = inventories.get(&chest_inventory_id).unwrap().to_vec();
+    let player_inventory = inventories.get(&player.id).unwrap();
+    let chest_inventory = inventories.get(&chest_inventory_id).unwrap();
 
-    let mut exp_chest_inventory = chest_inventory;
-    exp_chest_inventory.append(&mut player_inventory);
+    let mut exp_chest_inventory = merge_inventories(chest_inventory, player_inventory).count_all();
     exp_chest_inventory.sort();
 
     let activity = game_state.game_loop_iteration(
@@ -213,9 +212,15 @@ fn stashing_all_to_a_chest() {
     let update = update_rx.try_recv().expect("did not receive update");
 
     match update {
-        ExternalInventoryUpdated(mut external_inventory) => {
-            external_inventory.sort();
-            assert_eq!(external_inventory, exp_chest_inventory);
+        ExternalInventoryUpdated(external_inventory) => {
+            let mut found_inventory = count_all(external_inventory);
+            found_inventory.sort();
+            assert!(
+                compare_tuple_quantity_arrays(found_inventory.clone(), exp_chest_inventory.clone()),
+                "Left:`{:?}`\nRight:`{:?}",
+                found_inventory,
+                exp_chest_inventory
+            );
         }
         _ => panic!("received unexpected update: {:?}", update),
     }
