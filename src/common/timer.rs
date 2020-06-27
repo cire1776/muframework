@@ -4,17 +4,18 @@ use game::command::CommandSender;
 
 #[derive(Clone)]
 pub struct Guard {
-    guard: extern_timer::Guard,
+    guard: Option<extern_timer::Guard>,
 }
 
 impl Guard {
-    pub fn new(guard: extern_timer::Guard) -> Self {
+    pub fn new(guard: Option<extern_timer::Guard>) -> Self {
         Self { guard }
     }
 }
 
 pub struct Timer {
     timer: MessageTimer<Command>,
+    test_mode: bool,
     pub tags: HashMap<String, chrono::Duration>,
 }
 
@@ -29,6 +30,7 @@ impl Timer {
 
         Self {
             timer: MessageTimer::new(command_tx.clone()),
+            test_mode: false,
             tags: HashMap::new(),
         }
     }
@@ -39,8 +41,17 @@ impl Timer {
         command: Command,
         tag: S,
     ) -> Guard {
-        let guard = self.timer.schedule_repeating(duration, command);
         self.tags.insert(tag.to_string(), duration);
-        Guard::new(guard)
+
+        if self.test_mode {
+            Guard::new(None)
+        } else {
+            let guard = self.timer.schedule_repeating(duration, command);
+            Guard::new(Some(guard))
+        }
+    }
+
+    pub fn set_test_mode(&mut self) {
+        self.test_mode = true;
     }
 }
