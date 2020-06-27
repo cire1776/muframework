@@ -636,8 +636,9 @@ pub trait CommandHandler<'a> {
     ) -> Option<Box<dyn Activity>> {
         self.prepare_to_execute();
 
+        let activity = self.perform_execute(update_tx, command_tx);
+
         if let Some(update_tx) = update_tx {
-            let activity = self.perform_execute(Some(update_tx), command_tx);
             self.announce(activity, update_tx)
         } else {
             None
