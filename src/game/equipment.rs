@@ -119,7 +119,7 @@ impl MountingPointMap {
         item_class_specifiers: &ItemClassSpecifierList,
         inventory: &mut Inventory,
         items: &mut ItemList,
-    ) {
+    ) -> Vec<u64> {
         if let ItemState::Stored(item, _inventory_id) = items[item.id].clone() {
             // inventory.consume(item.class(), item.raw_description(), 1, items);
 
@@ -130,7 +130,7 @@ impl MountingPointMap {
                 ItemClassSpecifier::mounting_points_for(&item, item_class_specifiers);
 
             if mounting_points.is_empty() {
-                return;
+                return vec![];
             }
 
             let previous = self
@@ -138,11 +138,16 @@ impl MountingPointMap {
                 .get(mounting_points[0])
                 .expect("previous not found");
 
+            let mut unmounted_item_ids = vec![];
+
             if let Some(previous_id) = previous {
+                unmounted_item_ids.push(*previous_id);
                 Self::unmount_previous_item(*previous_id, inventory, items)
             }
 
-            self.mount_new_item(&item, &mounting_points, inventory, items)
+            self.mount_new_item(&item, &mounting_points, inventory, items);
+
+            unmounted_item_ids
         } else {
             panic!("item is not stored");
         }

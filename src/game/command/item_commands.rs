@@ -139,12 +139,21 @@ impl<'a> CommandHandler<'a> for EquipCommand<'a> {
         {
             let player_mounting_points = &mut self.player.mounting_points;
 
-            player_mounting_points.mount(
+            let unmounted_item_ids = player_mounting_points.mount(
                 self.item,
                 self.item_class_specifiers,
                 self.inventory,
                 &mut self.items,
             );
+
+            for item_id in unmounted_item_ids.iter() {
+                let item = self
+                    .items
+                    .get_as_item(*item_id)
+                    .expect("unable to find unmounted item");
+
+                item.has_been_unequipped(self.player);
+            }
         }
 
         self.item.has_been_equipped(self.player);

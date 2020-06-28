@@ -194,7 +194,22 @@ pub fn equip_player_with_spawned_item<S: ToString>(
 
     player
         .mounting_points
-        .mount(&item, &item_class_specifiers, inventory, items)
+        .mount(&item, &item_class_specifiers, inventory, items);
+}
+
+#[cfg(test)]
+pub fn give_player_a_spawned_item<S: ToString>(
+    class: ItemClass,
+    description: S,
+    player: &mut Player,
+    inventories: &mut InventoryList,
+    items: &mut ItemList,
+) {
+    let inventory = inventories
+        .get_mut(&player.id)
+        .expect("unable to get inventory");
+
+    inventory.spawn_stack(class, description, 1, items);
 }
 
 pub fn assert_activity_started(
@@ -219,6 +234,24 @@ pub fn assert_activity_expired(update_rx: &mut Receiver<GameUpdate>) {
     match update {
         GameUpdate::ActivityExpired() => {}
         _ => panic!("unexpected update"),
+    }
+}
+
+pub fn assert_is_equipment_updated(exp_items: Vec<Item>, update_rx: &mut Receiver<GameUpdate>) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(EquipmentUpdated(items)) if items == exp_items => {}
+        _ => panic!("unexpected update: {:?}", update),
+    }
+}
+
+pub fn assert_is_inventory_updated(update_rx: &mut Receiver<GameUpdate>) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(InventoryUpdated(_)) => {}
+        _ => panic!("unexpected update: {:?}", update),
     }
 }
 
@@ -313,3 +346,6 @@ mod trees;
 
 #[cfg(test)]
 mod veins;
+
+#[cfg(test)]
+mod equipment;
