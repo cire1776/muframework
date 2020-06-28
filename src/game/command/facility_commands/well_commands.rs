@@ -297,14 +297,14 @@ impl Activity for WellDigActivity {
         facility.increment_property("depth");
 
         let water_chance = facility.get_property("chance_of_hitting_water");
-        if rng.percentile(water_chance as u8, "water_chance") {
+        if rng.succeeds(0, water_chance, "water_chance") {
             facility.set_property("fluid", WellType::Water as u128);
             Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::DontRefreshInventory;
         }
 
         let oil_chance = facility.get_property("chance_of_hitting_oil");
-        if rng.percentile(oil_chance as u8, "oil_chance") {
+        if rng.succeeds(0, oil_chance, "oil_chance") {
             facility.set_property("fluid", WellType::Oil as u128);
             Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::DontRefreshInventory;
