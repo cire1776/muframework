@@ -3,3 +3,4 @@ kcov-*
 *.code-workspace
 .VSCodeCounter
 .vscode
+testbed/
