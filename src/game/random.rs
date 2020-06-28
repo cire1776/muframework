@@ -57,6 +57,13 @@ impl Rng {
         self.tags.insert(tag, value);
     }
 
+    pub fn set_fail(&mut self, tag: &'static str) {
+        self.set(tag, i128::MAX);
+    }
+
+    pub fn set_succeed(&mut self, tag: &'static str) {
+        self.set(tag, 0)
+    }
     pub fn clear(&mut self) {
         self.tags.clear();
     }
