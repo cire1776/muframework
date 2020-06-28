@@ -303,6 +303,12 @@ impl ItemClassSpecifier {
                 mounting_points: [MountingPoint::AtReady].iter().cloned().collect(),
             },
         );
+        item_class_specifiers.insert(
+            ItemClass::Ingredient,
+            ItemClassSpecifier {
+                mounting_points: [MountingPoint::AtReady].iter().cloned().collect(),
+            },
+        );
         item_class_specifiers
     }
     pub fn to_vec<'a>(&'a self) -> Vec<&'a MountingPoint> {
