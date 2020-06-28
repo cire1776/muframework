@@ -31,11 +31,11 @@ impl Player {
         player.endorse_with(":newb");
         player.add_buff(
             Attribute::SkillLevel("smelting".into()),
-            (45, 0, BuffTag::Level),
+            (45, 0, BuffTag::Level("smelting".into())),
         );
         player.add_buff(
             Attribute::SkillTime("smelting".into()),
-            (-45, 0, BuffTag::Level),
+            (-45, 0, BuffTag::Level("smelting".into())),
         );
         player
     }
@@ -248,9 +248,10 @@ mod attributes {
     fn get_attribute_returns_the_value_of_the_attribute_as_set() {
         let mut subject = Player::new();
 
-        subject
-            .attributes
-            .add(SkillTime("fishing".into()), (-3, 0, Level));
+        subject.attributes.add(
+            SkillTime("fishing".into()),
+            (-3, 0, Level("fishing".into())),
+        );
         subject
             .attributes
             .add(SkillTime("fishing".into()), (-2, 30000, Effect));
@@ -262,7 +263,10 @@ mod attributes {
     fn add_attributes_adds_an_attribute() {
         let mut subject = Player::new();
 
-        subject.add_buff(SkillTime("fishing".into()), (-3, 0, Level));
+        subject.add_buff(
+            SkillTime("fishing".into()),
+            (-3, 0, Level("fishing".into())),
+        );
         subject.add_buff(SkillTime("fishing".into()), (-2, 30000, Effect));
 
         assert_eq!(subject.get_attribute(SkillTime("fishing".into()), 0), -5);
@@ -272,7 +276,10 @@ mod attributes {
     fn remove_buff_removes_a_buff_with_a_particular_tag() {
         let mut subject = Player::new();
 
-        subject.add_buff(SkillTime("fishing".into()), (-3, 0, Level));
+        subject.add_buff(
+            SkillTime("fishing".into()),
+            (-3, 0, Level("fishing".into())),
+        );
         subject.add_buff(SkillTime("fishing".into()), (-2, 30000, Effect));
 
         subject.remove_buff(Effect);

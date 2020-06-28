@@ -176,6 +176,15 @@ pub fn compare_tuple_quantity_arrays(
         .all(|(a, b)| a.0 == b.0 && a.1 == b.1)
 }
 
+pub fn give_player_level<S: ToString>(skill: S, level: u8, player: &mut Player) {
+    let skill = skill.to_string();
+    player.remove_buff(BuffTag::Level(skill.clone()));
+    player.add_buff(
+        Attribute::SkillLevel(skill.clone()),
+        (level as i8, 0, BuffTag::Level(skill)),
+    );
+}
+
 #[allow(dead_code)]
 pub fn equip_player_with_spawned_item<S: ToString>(
     class: ItemClass,

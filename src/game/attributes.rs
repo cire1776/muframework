@@ -10,7 +10,7 @@ pub enum BuffTag {
     Guild(String),
     Base,
     Effect,
-    Level,
+    Level(String),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
