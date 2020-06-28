@@ -11,6 +11,7 @@ pub struct Player {
     pub mounting_points: MountingPointMap,
     pub external_inventory: Option<Vec<Item>>,
     endorsements: HashMap<String, u32>,
+    endorsement_components: HashMap<String, String>,
     attributes: AttributeList,
 }
 
@@ -25,6 +26,7 @@ impl Player {
             mounting_points: MountingPointMap::new(),
             external_inventory: None,
             endorsements: HashMap::new(),
+            endorsement_components: HashMap::new(),
             attributes: AttributeList::new(),
         };
         // temporary.  Not sure where this belongs once saving is in place.
@@ -61,6 +63,15 @@ impl Player {
         };
     }
 
+    pub fn endorse_component_with<S: ToString>(&mut self, endorsement: S, component: S) {
+        let endorsement = endorsement.to_string();
+
+        self.endorse_with(endorsement.clone());
+
+        self.endorsement_components
+            .insert(endorsement, component.to_string());
+    }
+
     pub fn unendorse_with<S: ToString>(&mut self, endorsement: S) {
         let endorsement = endorsement.to_string();
         let possible = self.endorsements.get_mut(&endorsement);
@@ -74,6 +85,10 @@ impl Player {
             }
             None => {}
         };
+    }
+
+    pub fn get_endorsement_component<S: ToString>(&self, endorsement: S) -> Option<&String> {
+        self.endorsement_components.get(&endorsement.to_string())
     }
 
     pub fn get_attribute(&self, attribute: Attribute, current_time: u128) -> i8 {

@@ -100,12 +100,13 @@ impl ItemState {
     }
 }
 
-#[derive(Debug, Eq, Clone, Ord, PartialOrd)]
+#[derive(Debug, Eq, Clone)]
 pub struct ItemType {
     pub class: ItemClass,
     pub description: String,
     pub endorsements: Vec<String>,
     pub buffs: Vec<AttributeBuff>,
+    pub components: HashMap<String, String>,
 }
 
 impl Hash for ItemType {
@@ -121,6 +122,18 @@ impl PartialEq for ItemType {
     }
 }
 
+impl Ord for ItemType {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        (self.class, &self.description).cmp(&(other.class, &other.description))
+    }
+}
+
+impl PartialOrd for ItemType {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        (self.class, &self.description).partial_cmp(&(other.class, &other.description))
+    }
+}
+
 impl ItemType {
     pub fn new<S: ToString>(class: ItemClass, description: S) -> Self {
         Self {
@@ -128,11 +141,18 @@ impl ItemType {
             description: description.to_string(),
             endorsements: vec![],
             buffs: vec![],
+            components: HashMap::new(),
         }
     }
 
     pub fn add_endorsement<S: ToString>(&mut self, endorsement: S) {
         self.endorsements.push(endorsement.to_string());
+    }
+
+    pub fn add_endorsement_with_component<S: ToString>(&mut self, endorsement: S, component: S) {
+        let endorsement = endorsement.to_string();
+        self.add_endorsement(endorsement.clone());
+        self.components.insert(endorsement, component.to_string());
     }
 
     pub fn add_buff(&mut self, buff: AttributeBuff) {
@@ -167,7 +187,7 @@ impl ItemType {
             return;
         }
 
-        let re = Regex::new(r#"(?m)^\s*(?:(endorsement|buff)\s*:\s*)(?:(:\w+|\d+)|(?:(SkillTime|SkillChance|Fortune|SpellCastPeriod|SpellDamage|Defense|Attack|MaxHP|MaxMP)(?:\("(\w+)"\))?\s*=>\s*(-?\d+)))(?:\s*//.*)?$"#).unwrap();
+        let re = Regex::new(r#"(?m)^\s*(?:(endorsement|buff)\s*:\s*)(?:(:\w+)(?:\((\w+)\))?|(?:(SkillTime|SkillChance|Fortune|SpellCastPeriod|SpellDamage|Defense|Attack|MaxHP|MaxMP)(?:\("(\w+)"\))?\s*=>\s*(-?\d+)))(?:\s*//.*)?$"#).unwrap();
 
         for captures in re.captures_iter(attributes) {
             let attribute_type = capture_string(&captures, 1);
@@ -175,12 +195,18 @@ impl ItemType {
             match attribute_type {
                 "endorsement" => {
                     let endorsement = capture_string(&captures, 2);
-                    new_type.add_endorsement(endorsement)
+                    let property = capture_optional_string(&captures, 3);
+
+                    if property == "" {
+                        new_type.add_endorsement(endorsement);
+                    } else {
+                        new_type.add_endorsement_with_component(endorsement, property);
+                    }
                 }
                 "buff" => {
-                    let attribute_name = capture_optional_string(&captures, 3);
-                    let attribute_subname = capture_optional_string(&captures, 4);
-                    let attribute_value = capture_optional_string(&captures, 5)
+                    let attribute_name = capture_optional_string(&captures, 4);
+                    let attribute_subname = capture_optional_string(&captures, 5);
+                    let attribute_value = capture_optional_string(&captures, 6)
                         .parse::<i8>()
                         .expect("unable to get value");
 
@@ -328,7 +354,11 @@ impl Item {
 
     pub fn endorse(&self, player: &mut Player) {
         for endorsement in &self.item_type.endorsements {
-            player.endorse_with(endorsement);
+            let component = self.item_type.components.get(endorsement);
+            match component {
+                Some(component) => player.endorse_component_with(endorsement, component),
+                None => player.endorse_with(endorsement),
+            }
         }
     }
 
