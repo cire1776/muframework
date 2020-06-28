@@ -166,10 +166,7 @@ fn can_smelt_tin_with_excess_quantities() {
         &mut items,
     );
 
-    let facility_id = match map.at(10, 5) {
-        tile_map::Tile::Facility(id) => id,
-        _ => panic!("smeltery not found"),
-    };
+    let facility_id = get_facility_id_at(10, 5, &map);
 
     let activity = game_state.game_loop_iteration(
         &mut player,

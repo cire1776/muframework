@@ -166,6 +166,13 @@ pub fn count_all(items: Vec<Item>) -> Vec<(ItemType, u16)> {
     result
 }
 
+pub fn get_facility_id_at(x: i32, y: i32, map: &TileMap) -> u64 {
+    match map.at(x, y) {
+        tile_map::Tile::Facility(id) => id,
+        _ => panic!("facility not found"),
+    }
+}
+
 pub fn compare_tuple_quantity_arrays(
     array1: Vec<(ItemType, u16)>,
     array2: Vec<(ItemType, u16)>,
