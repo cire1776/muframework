@@ -11,7 +11,7 @@ fn can_chop_pine_tree() {
         mut items,
         mut facilities,
         mut inventories,
-        mut _rng,
+        mut rng,
         mut timer,
         update_tx,
         mut update_rx,
@@ -19,8 +19,6 @@ fn can_chop_pine_tree() {
         mut command_rx,
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 8);
-
-    let mut rng = Rng::new();
 
     player.endorse_with(":can_chop");
 
@@ -47,6 +45,8 @@ fn can_chop_pine_tree() {
     );
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
+    assert_updates_are_empty(&mut update_rx);
+    assert_commands_are_empty(&mut command_rx);
 
     game_state.game_loop_iteration(
         &mut player,
