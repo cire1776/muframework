@@ -165,7 +165,11 @@ impl Activity for WellFillActivity {
             Some(command_sender),
             Command::SpawnItem(
                 player_inventory_id,
-                ItemClass::Material,
+                if fluid == "Water" {
+                    ItemClass::Ingredient
+                } else {
+                    ItemClass::Material
+                },
                 format!("Bottle of {}", fluid),
             ),
         );
