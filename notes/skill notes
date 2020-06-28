@@ -64,6 +64,8 @@ Locksmithing
 Construction (milling lumber)
 Cooking (fruit press, well filling)
 Engineering (well drilling/Mineshaft preparation)
+Forestry
+
 
 Skill
 SkillChart
@@ -106,17 +108,17 @@ Titanium  3000 -8 secs    25      Advanced             20
 
 Fishing                                                                 
 =======                     Lvl                         Cooking                                                 HP
-Shrimp          net          1  45 second timer         1               Cooked Shrimp   Burnt Shrimp            2
-Frog            net          1  45 second timer         2               Frog Legs       Burnt Frog Legs         2
-Mackeral        rod          1  60 second timer         3               Cooked Mackeral Burnt mackeral          3
-Crab            trap         1  180 second timer        5               Crab Legs       Burnt Crab Legs         3
+Shrimp          net          1  45 second timer         1               Cooked Shrimp   Burnt Shrimp            2       65% 9   10
+Frog            net          1  45 second timer         2               Frog Legs       Burnt Frog Legs         2       75% 9   11
+Mackeral        rod          1  60 second timer         3               Cooked Mackeral Burnt mackeral          3       75% 14  17
+Crab            trap         1  180 second timer        5               Crab Legs       Burnt Crab Legs         3       45% 23  28
                                 540 second cooldown
                                 1-5 spawns
 
-Catfish         net          5  50 second timer         7               Grilled Catfish Burnt Catfish           4
-Salmon          rod          5  65 second timer         8               Grilled Salmon  Burnt Salmon            4
+Catfish         net          5  50 second timer         7               Grilled Catfish Burnt Catfish           4       75% 8   15
+Salmon          rod          5  65 second timer         8               Grilled Salmon  Burnt Salmon            4       35% 21  29
 
-Bass            rod         10  70 second timer         11              Cooked Bass     Burnt Bass              5
+Bass            rod         10  70 second timer         11              Cooked Bass     Burnt Bass              5       40% 20  31
 Oyster          trap        10  210 second timer   *can be eaten raw
                                 540 second cooldown
                                 1-5 spawns
@@ -125,32 +127,32 @@ Oyster          trap        10  210 second timer   *can be eaten raw
                                 100000 chance of
                                 spawning black pearl
 
-Flounder        rod         15  75 second timer         15              Cooked Flounder Burnt Flounder          5
-Haddock         rod         15  240 second timer        17              Cooked Haddock  Burnt Haddock           6
+Flounder        rod         15  75 second timer         15              Cooked Flounder Burnt Flounder          5       45% 30  45
+Haddock         rod         15  240 second timer        17              Cooked Haddock  Burnt Haddock           6       50  13  30
                                 540 second cooldown
                                 1-5 spawns
 
-Swordfish       boat,rod    20  80 second timer         19              Swordfish Steak Burnt Swordfish         6
-Eel             trap        20  270 second timer        21              Cooked Eel      Burnt Eel               7
+Swordfish       boat,rod    20  80 second timer         19              Swordfish Steak Burnt Swordfish         6       80  16 35
+Eel             trap        20  270 second timer        21              Cooked Eel      Burnt Eel               7       20  5  26
                                 540 second cooldown
                                 1-5 spawns
 
-Sardine                     25                          23              Canned Sardines                         7
-Sandbar Shark               25                          25              Shark Steaks    Burnt Shark             8
+Sardine                     25                          23              Canned Sardines                         7       90  5  28
+Sandbar Shark               25                          25              Shark Steaks    Burnt Shark             8       20  20 45
 
-Pike                        30                          27              Cooked Pike     Burnt Pike              8
-Lobster         trap        30                          29              Steamed Lobster Burnt Lobster           9
+Pike                        30                          27              Cooked Pike     Burnt Pike              8       10  13 40
+Lobster         trap        30                          29              Steamed Lobster Burnt Lobster           9       90  5  34
 
-Tuna            boat,net    35                          31              Tuna Steaks     Burnt Tuna              9
+Tuna            boat,net    35                          31              Tuna Steaks     Burnt Tuna              9       30  11 42
 Striped Marlin  rod         35                          33              
 
-Herring         net         40                          35              Pickled Herring Rotten Herring          10
-Trout           rod         40                          37              Grilled Trout   Burnt Trout             11
+Herring         net         40                          35              Pickled Herring Rotten Herring          10      40  5  40
+Trout           rod         40                          37              Grilled Trout   Burnt Trout             11      50  5  42
 
-Snapper         rod         45                          39              Grilled Snapper Burnt Snapper           12
-Red Trout       rod         45                          41              Grilled Trout   Burnt Trout             13
-Red Herring     net         45                          43              Pickled Herring Rotten Herring          14
-Cod             rod         45                          45              Fishsticks      Burnt Cod               15
+Snapper         rod         45                          39              Grilled Snapper Burnt Snapper           12      20  6  M
+Red Trout       rod         45                          41              Grilled Trout   Burnt Trout             13      45  5  M
+Red Herring     net         45                          43              Pickled Herring Rotten Herring          14      60  2  M
+Cod             rod         45                          45              Fishsticks      Burnt Cod               15      80  1  M
 
 Sturgeon        rod        master
 Giant Catfish   net        master
@@ -176,4 +178,94 @@ canoe and net
 
 Skill Levels
 ============
+
+
+
+SPECIALTIES
+===========
+
+Culture
+        Painting
+        Sculpting
+        Acrobatics/Gymnastics
+        Dancing
+        Cards
+        Curation
+
+Intellectual
+        Teaching
+        Writing
+        Trade
+        Alchemy
+
++Hunting
+        Currying/Leather Tanning
+        Falconry
+        Tracking
+        Bounty Hunting
+
+
++Crafting
+        Spinning
+        Tailoring
+        Weaving
+        Coopering
+        Cobbling
+        Bowyer
+        Carpentry/Woodworking
+        +Locksmithing
+
++Smithing
+        Weapon smith
+        Armorer
+        Glassblowing
+        Jewlery making
+        Smelting
+
++Cooking
+        Baking
+        Brewing
+        Vintnery
+
++Foraging
+        *Logging
+        Herbalism
+        *Forestry
+        *Fishing
+        Healing
+        Navigation
+        Trapping
+
++Harvesting
+        Farming
+        Animal Husbandry/Ranching?
+        Farrier
+
+Sailing
+
++Combat
+        Horsemanship
+        Archery
+        Swordsmanship
+        Wrestling
+        Unarmed Combat
+
++Construction
+        Stonemasonry
+        Architecture
+
++Mining
+        +*Engineering
+        Prospecting
+        Quarrying
+
+Knavery
+        Lockpicking
+        Pickpocket
+        Forgery
+        Burglery
+
+Magic
+
+
 
