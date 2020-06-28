@@ -133,34 +133,126 @@ stellite_bar material "Stellite Bar"
 titanium_bar material "Titanium Bar"
 mythral_bar material "Mythral Bar"
 
-shrimp ingredient "Shrimp"
-frog ingredient "Frog"
-mackeral ingredient "Mackeral"
-crab ingredient "Crab"
-catfish ingredient "Catfish"
-salmon ingredient "Salmon"
-bass ingredient "Bass"
-oyster ingredient "Oyster"
-flounder ingredient "Flounder"
-haddock ingredient "Haddock"
-swordfish ingredient "Swordfish"
-eel ingredient "Eel"
-sardines ingredient "Sardine"
-sandbar_shark ingredient "Sandbar Shark"
-pike ingredient "Pike"
-lobster ingredient "Lobster"
-tuna ingredient "Tuna"
-striped_marlin ingredient "Striped Marlin"
-herring ingredient "Herring"
-trout ingredient "Trout"
-snapper ingredient "Snapper"
-red_trout ingredient "Red Trout"
-red_herring ingredient "Red Herring"
-cod ingredient "Cod"
-sturgeon ingredient "Sturgeon"
-giant_catfish ingredient "Giant Catfish"
-grouper ingredient "Grouper"
-black_see_bass ingredient "Black Sea Bass"q
+shrimp ingredient "Shrimp" { 
+    endorsement: :wants_to_cook(shrimp)
+}
+frog ingredient "Frog" { 
+    endorsement: :wants_to_cook(frog)
+}
+mackeral ingredient "Mackeral" { 
+    endorsement: :wants_to_cook(mackeral)
+}
+crab ingredient "Crab" { 
+    endorsement: :wants_to_cook(crab)
+}
+catfish ingredient "Catfish" { 
+    endorsement: :wants_to_cook(catfish)
+}
+salmon ingredient "Salmon" { 
+    endorsement: :wants_to_cook(salmon)
+}
+bass ingredient "Bass" { 
+    endorsement: :wants_to_cook(bass)
+}
+oyster ingredient "Oyster" { 
+    endorsement: :wants_to_cook(oyster)
+}
+flounder ingredient "Flounder" { 
+    endorsement: :wants_to_cook(flounder)
+}
+haddock ingredient "Haddock" { 
+    endorsement: :wants_to_cook(haddock)
+}
+swordfish ingredient "Swordfish" { 
+    endorsement: :wants_to_cook(swordfish)
+}
+eel ingredient "Eel" { 
+    endorsement: :wants_to_cook(eel)
+}
+sardines ingredient "Sardine" { 
+    endorsement: :wants_to_cook(sardines)
+}
+sandbar_shark ingredient "Sandbar Shark" { 
+    endorsement: :wants_to_cook(sandbar_shark)
+}
+pike ingredient "Pike" { 
+    endorsement: :wants_to_cook(pike)
+}
+lobster ingredient "Lobster" { 
+    endorsement: :wants_to_cook(lobster)
+}
+tuna ingredient "Tuna" { 
+    endorsement: :wants_to_cook(tuna)
+}
+striped_marlin ingredient "Striped Marlin" { 
+    endorsement: :wants_to_cook(striped_marlin)
+}
+herring ingredient "Herring" { 
+    endorsement: :wants_to_cook(herring)
+}
+trout ingredient "Trout" { 
+    endorsement: :wants_to_cook(trout)
+}
+snapper ingredient "Snapper" { 
+    endorsement: :wants_to_cook(snapper)
+}
+red_trout ingredient "Red Trout" { 
+    endorsement: :wants_to_cook(red_trout)
+}
+red_herring ingredient "Red Herring" { 
+    endorsement: :wants_to_cook(red_herring)
+}
+cod ingredient "Cod" { 
+    endorsement: :wants_to_cook(cod)
+}
+sturgeon ingredient "Sturgeon" { 
+    endorsement: :wants_to_cook(sturgeon)
+}
+giant_catfish ingredient "Giant Catfish" { 
+    endorsement: :wants_to_cook(giant_catfish)
+}
+grouper ingredient "Grouper" { 
+    endorsement: :wants_to_cook(grouper)
+}
+black_see_bass ingredient "Black Sea Bass" { 
+    endorsement: :wants_to_cook(black_see_bass)
+}
+burnt_shrimp material "Shrimp"
+burnt_frog material "Frog"
+burnt_mackeral material "Mackeral"
+burnt_crab material "Crab"
+burnt_catfish material "Catfish"
+burnt_salmon material "Salmon"
+burnt_bass material "Bass"
+burnt_oyster material "Oyster"
+burnt_flounder material "Flounder"
+burnt_haddock material "Haddock"
+burnt_swordfish material "Swordfish"
+burnt_eel material "Eel"
+burnt_sardines material "Sardine"
+burnt_sandbar_shark material "Sandbar Shark"
+burnt_pike material "Pike"
+burnt_lobster material "Lobster"
+burnt_tuna material "Tuna"
+burnt_striped_marlin material "Striped Marlin"
+burnt_herring material "Herring"
+burnt_trout material "Trout"
+burnt_snapper material "Snapper"
+burnt_red_trout material "Red Trout"
+burnt_red_herring material "Red Herring"
+burnt_cod material "Cod"
+burnt_sturgeon material "Sturgeon"
+burnt_giant_catfish material "Giant Catfish"
+burnt_grouper material "Grouper"
+burnt_black_see_bass material "Black Sea Bass"
+grilled_shrimp food "Grilled Shrimp"
+
+grilled_shrimp food "Grilled Shrimp"
+fried_frog_legs food "Fried Frog Legs"
+cooked_mackeral food "Cooked Mackeral"
+crab_legs food "Crab Legs"
+grilled_catfish food "Grilled Catfish"
+grilled_salmon food "Grilled Salmon"
 ===END OF ITEM TYPES===
 ↓ 25,23 crusty_dagger // a dagger
 ^ 27,7 very_old_leather_cap
@@ -256,6 +348,7 @@ black_see_bass ingredient "Black Sea Bass"q
     property: trap_cooldown => 180
 }
 +smeltery 10,5 "An old smeltery"
+^firepit 11,5 "A campfire"
 ===END OF FACILITIES===
 player amber_leather_cap
 player hardwood_log

@@ -1,0 +1,92 @@
+use super::*;
+use game::command::facility_commands::fishing_spot_commands::FishType;
+use FishType::*;
+use ItemClass::*;
+
+lazy_static! {
+    static ref COOKING_RECIPES: HashMap<FishType, Recipe> = {
+        let mut m = HashMap::new();
+        m.insert(Shrimp, Recipe::new("Grilled Shrimp", 1, 65, 9));
+        m.insert(Frog, Recipe::new("Fried Frog Legs", 2, 75, 9));
+        m.insert(Mackeral, Recipe::new("Cooked Mackeral", 3, 75, 14));
+        m.insert(Crab, Recipe::new("Crab Legs", 5, 45, 23));
+        m.insert(Catfish, Recipe::new("Grilled Catfish", 7, 75, 8));
+        m.insert(Salmon, Recipe::new("Grilled Salmon", 8, 35, 21));
+        m
+    };
+}
+
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq)]
+pub struct Recipe {
+    success_product: String,
+    required_level: u8,
+    success_rate: u8,
+    learning_period: u8,
+}
+
+impl Recipe {
+    pub fn new<S: ToString>(
+        success_product: S,
+        required_level: u8,
+        success_rate: u8,
+        learning_period: u8,
+    ) -> Self {
+        Self {
+            success_product: success_product.to_string(),
+            required_level,
+            success_rate,
+            learning_period,
+        }
+    }
+}
+
+pub struct CookingSkill {}
+
+impl CookingSkill {
+    pub fn can_produce(product: FishType, _level: u8, inventory: &Inventory) -> bool {
+        if !inventory.has_sufficient(Ingredient, product.to_string(), 1) {
+            return false;
+        }
+
+        if !inventory.has_sufficient(Material, "Softwood Log", 1)
+            && !inventory.has_sufficient(Material, "Hardwood Logs", 1)
+        {
+            return false;
+        }
+
+        true
+    }
+    pub fn consume_from_inventory_for(
+        product: FishType,
+        inventory: &mut Inventory,
+        items: &mut ItemList,
+    ) {
+        inventory.consume(Ingredient, product.to_string(), 1, items);
+
+        if inventory.has_sufficient(Material, "Softwood Log", 1) {
+            inventory.consume(Material, "Softwood Log", 1, items);
+        } else if inventory.has_sufficient(Material, "Hardwood Log", 1) {
+            inventory.consume(Material, "Hardwood Log", 1, items);
+        }
+    }
+
+    pub fn output_for(product: FishType, level: u8, rng: &mut Rng) -> (ItemClass, String) {
+        let recipe = &COOKING_RECIPES[&product];
+
+        let success_rate = if level < recipe.required_level {
+            0
+        } else {
+            let delta_level = std::cmp::min(level - recipe.required_level, recipe.learning_period);
+            let factor = (100 - recipe.success_rate) / delta_level;
+            recipe.success_rate + delta_level * factor
+        };
+
+        let success = rng.percentile(success_rate, "cooking_success");
+
+        if success {
+            (Food, recipe.success_product.clone())
+        } else {
+            (Material, format!("Burnt {}", product.to_string()))
+        }
+    }
+}

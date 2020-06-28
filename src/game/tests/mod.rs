@@ -229,6 +229,14 @@ pub fn give_player_spawned_items<S: ToString>(
     inventory.spawn_stack(class, description, quantity, items);
 }
 
+pub fn assert_player_is_at(x: i32, y: i32, player: &Player) {
+    assert_eq!(
+        (player.x, player.y),
+        (x, y),
+        "Player moved when it shouldn't have."
+    );
+}
+
 pub fn assert_activity_started(
     duration: u32,
     exp_title: ui::pane::PaneTitle,
@@ -383,6 +391,9 @@ mod smeltery;
 
 #[cfg(test)]
 mod wells;
+
+#[cfg(test)]
+mod firepits;
 
 #[cfg(test)]
 mod equipment;

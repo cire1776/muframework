@@ -1,5 +1,5 @@
-// #[macro_use]
-// extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 // use mut_static::MutStatic;
 // extern crate extern_rand;
 

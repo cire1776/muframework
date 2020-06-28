@@ -443,7 +443,7 @@ fn can_use_at(
                         || ActivateCollectFishingTrapCommand::can_perform(player, facility)
                 }
                 FacilityClass::Smeltery => OpenSmelteryCommand::can_perform(player, facility),
-
+                FacilityClass::Firepit => ActivateFirepitCommand::can_perform(player, facility),
                 _ => false,
             }
         }
@@ -598,6 +598,12 @@ fn use_at<'a>(
                     player,
                     facility.id,
                     facilities,
+                ))),
+                FacilityClass::Firepit => Some(Box::new(ActivateFirepitCommand::new(
+                    player,
+                    facility_id,
+                    inventories,
+                    timer,
                 ))),
                 _ => None,
             }

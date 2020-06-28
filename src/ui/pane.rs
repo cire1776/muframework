@@ -17,6 +17,7 @@ pub enum PaneTitle {
     PlacingTrap,
     CollectingTrap,
     Smelting,
+    Cooking,
     ChestContents,
     SelectOutput,
 }
@@ -38,6 +39,7 @@ impl ToString for PaneTitle {
             PaneTitle::PlacingTrap => "Placing Trap",
             PaneTitle::CollectingTrap => "Collecting Trap",
             PaneTitle::Smelting => "Smelting",
+            PaneTitle::Cooking => "Cooking",
             PaneTitle::ChestContents => "Chest Contents",
             PaneTitle::SelectOutput => "Select Output",
         };

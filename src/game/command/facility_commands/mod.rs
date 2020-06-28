@@ -27,3 +27,6 @@ pub use fishing_spot_commands::*;
 
 pub mod smeltery_commands;
 pub use smeltery_commands::*;
+
+pub mod firepit_commands;
+pub use firepit_commands::*;

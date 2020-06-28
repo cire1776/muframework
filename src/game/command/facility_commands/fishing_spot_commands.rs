@@ -67,6 +67,39 @@ impl FishType {
             _ => None,
         }
     }
+    pub fn from_string(string: String) -> FishType {
+        match &string[..] {
+            "shrimp" => Shrimp,
+            "frog" => Frog,
+            "mackeral" => Mackeral,
+            "crab" => Crab,
+            "catfish" => Catfish,
+            "salmon" => Salmon,
+            "bass" => Bass,
+            "oyster" => Oyster,
+            "flounder" => Flounder,
+            "haddock" => Haddock,
+            "swordfish" => Swordfish,
+            "eel" => Eel,
+            "sardine" => Sardines,
+            "sandbar_shark" => SandbarShark,
+            "pike" => Pike,
+            "lobster" => Lobster,
+            "tuna" => Tuna,
+            "striped_marlin" => StripedMarlin,
+            "herring" => Herring,
+            "trout" => Trout,
+            "snapper" => Snapper,
+            "red_trout" => RedTrout,
+            "red_herring" => RedHerring,
+            "cod" => Cod,
+            "sturgeon" => Sturgeon,
+            "giant_catfish" => GiantCatfish,
+            "grouper" => Grouper,
+            "black_sea_bass" => BlackSeaBass,
+            _ => panic!("unknown fish type"),
+        }
+    }
 }
 
 impl ToString for FishType {
