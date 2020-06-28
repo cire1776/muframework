@@ -246,7 +246,7 @@ impl<'a> Facility {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FacilityList {
     facilities: HashMap<u64, Facility>,
 }
