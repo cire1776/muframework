@@ -1,5 +1,4 @@
 use super::*;
-use game::command::facility_commands::fishing_spot_commands::FishType::*;
 
 pub struct ActivateFirepitCommand<'a> {
     fish_type: FishType,
@@ -142,7 +141,7 @@ impl Activity for FirepitActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         _facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
@@ -151,7 +150,7 @@ impl Activity for FirepitActivity {
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let inventory = inventories
-            .get_mut(&player_inventory_id)
+            .get_mut(&player.inventory_id())
             .expect("unable to find inventory");
 
         CookingSkill::consume_from_inventory_for(self.fish_type, inventory, items);
@@ -159,7 +158,7 @@ impl Activity for FirepitActivity {
         let (class, description) = CookingSkill::output_for(self.fish_type, self.player_level, rng);
         Command::send(
             Some(command_sender),
-            Command::SpawnItem(player_inventory_id, class, description),
+            Command::SpawnItem(player.inventory_id(), class, description),
         );
 
         RefreshInventoryFlag::RefreshInventory

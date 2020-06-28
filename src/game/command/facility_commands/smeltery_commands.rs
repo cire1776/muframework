@@ -177,7 +177,7 @@ impl Activity for SmeltingActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         _facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
@@ -186,7 +186,7 @@ impl Activity for SmeltingActivity {
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let inventory = inventories
-            .get_mut(&player_inventory_id)
+            .get_mut(&player.inventory_id())
             .expect("unable to find inventory");
 
         inventory.consume(
@@ -209,7 +209,7 @@ impl Activity for SmeltingActivity {
         Command::send(
             Some(command_sender.clone()),
             Command::SpawnItem(
-                player_inventory_id,
+                player.inventory_id(),
                 ItemClass::Material,
                 format!("{} Bar", self.product.to_string()),
             ),

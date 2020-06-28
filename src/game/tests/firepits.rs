@@ -58,7 +58,7 @@ fn can_cook_fish_successfully() {
     let exp_shrimp_count = inventory.count_of(Ingredient, "Shrimp") - 1;
     let exp_log_count = inventory.count_of(Material, "Softwood Log") - 1;
 
-    let mut activity = game_state.game_loop_iteration(
+    let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
         &mut obstacles,
@@ -182,7 +182,7 @@ fn can_burn_fish() {
     let exp_shrimp_count = inventory.count_of(Ingredient, "Shrimp") - 1;
     let exp_log_count = inventory.count_of(Material, "Softwood Log") - 1;
 
-    let mut activity = game_state.game_loop_iteration(
+    let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
         &mut obstacles,

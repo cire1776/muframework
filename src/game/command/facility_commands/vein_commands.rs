@@ -174,7 +174,7 @@ impl Activity for VeinActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -193,7 +193,7 @@ impl Activity for VeinActivity {
 
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(player_inventory_id, ItemClass::Ore, ore_type),
+            Command::SpawnItem(player.inventory_id(), ItemClass::Ore, ore_type),
         );
 
         let exhastion_chance = facility.get_property("chance_of_exhaustion");

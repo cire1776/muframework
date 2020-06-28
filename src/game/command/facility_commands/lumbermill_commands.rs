@@ -139,7 +139,7 @@ impl Activity for LumbermillActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         _facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
@@ -150,7 +150,7 @@ impl Activity for LumbermillActivity {
         use inflector::Inflector;
 
         let inventory = inventories
-            .get_mut(&player_inventory_id)
+            .get_mut(&player.inventory_id())
             .expect("unable to find inventory");
 
         let wood = self.log_type.to_string().to_title_case();
@@ -167,7 +167,7 @@ impl Activity for LumbermillActivity {
         Command::send(
             Some(command_sender),
             Command::SpawnItem(
-                player_inventory_id,
+                player.inventory_id(),
                 ItemClass::Material,
                 format!("{} Plank", wood),
             ),

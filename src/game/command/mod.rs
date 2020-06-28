@@ -745,7 +745,7 @@ pub trait Activity {
             .expect("can't find facility");
 
         self.restart_loop(
-            player.id,
+            player,
             facility,
             items,
             inventories,
@@ -757,7 +757,7 @@ pub trait Activity {
 
     fn on_completion(
         &self,
-        _player_inventory_id: u64,
+        _player: &mut Player,
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -768,7 +768,7 @@ pub trait Activity {
 
     fn restart_loop(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
@@ -779,7 +779,7 @@ pub trait Activity {
         GameUpdate::send(Some(&update_sender), GameUpdate::ActivityExpired());
 
         if self.on_completion(
-            player_inventory_id,
+            player,
             facility,
             items,
             inventories,

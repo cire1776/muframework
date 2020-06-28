@@ -143,7 +143,7 @@ impl Activity for WellFillActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
@@ -152,7 +152,7 @@ impl Activity for WellFillActivity {
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let inventory = inventories
-            .get_mut(&player_inventory_id)
+            .get_mut(&player.inventory_id())
             .expect("unable to find inventory");
 
         if !inventory.any_left_after_consuming(ItemClass::Material, "Glass Bottle", 1, items) {
@@ -164,7 +164,7 @@ impl Activity for WellFillActivity {
         Command::send(
             Some(command_sender),
             Command::SpawnItem(
-                player_inventory_id,
+                player.inventory_id(),
                 if fluid == "Water" {
                     ItemClass::Ingredient
                 } else {
@@ -290,7 +290,7 @@ impl Activity for WellDigActivity {
 
     fn on_completion(
         &self,
-        _player_inventory_id: u64,
+        _player: &mut Player,
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,

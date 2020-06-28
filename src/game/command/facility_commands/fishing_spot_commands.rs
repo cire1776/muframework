@@ -350,7 +350,7 @@ impl<'a> Activity for NetFishingActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -368,7 +368,7 @@ impl<'a> Activity for NetFishingActivity {
         Command::send(
             Some(command_sender),
             Command::SpawnItem(
-                player_inventory_id,
+                player.inventory_id(),
                 ItemClass::Ingredient,
                 fish_type.to_string(),
             ),
@@ -513,7 +513,7 @@ impl<'a> Activity for FishingActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -531,7 +531,7 @@ impl<'a> Activity for FishingActivity {
         Command::send(
             Some(command_sender),
             Command::SpawnItem(
-                player_inventory_id,
+                player.inventory_id(),
                 ItemClass::Ingredient,
                 fish_type.to_string(),
             ),
@@ -666,7 +666,7 @@ impl<'a> Activity for PlacingFishingTrapActivity {
 
     fn on_completion(
         &self,
-        _player_inventory_id: u64,
+        _player: &mut Player,
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -835,7 +835,7 @@ impl<'a> Activity for CollectFishingTrapActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         facility: &mut Facility,
         _items: &mut ItemList,
         inventories: &mut InventoryList,
@@ -862,7 +862,7 @@ impl<'a> Activity for CollectFishingTrapActivity {
             Command::send(
                 Some(command_sender.clone()),
                 Command::SpawnItem(
-                    player_inventory_id,
+                    player.inventory_id(),
                     ItemClass::Ingredient,
                     fish_type.to_string(),
                 ),
@@ -877,7 +877,7 @@ impl<'a> Activity for CollectFishingTrapActivity {
 
         Command::send(
             Some(command_sender),
-            Command::TransferItem(item.id, facility.id, player_inventory_id),
+            Command::TransferItem(item.id, facility.id, player.inventory_id()),
         );
 
         RefreshInventoryFlag::RefreshInventory

@@ -153,7 +153,7 @@ impl<'a> Activity for TreePickingActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -178,7 +178,7 @@ impl<'a> Activity for TreePickingActivity {
 
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(player_inventory_id, item_class, item_description.into()),
+            Command::SpawnItem(player.inventory_id(), item_class, item_description.into()),
         );
 
         if facility.decrement_property("fruit") <= 0 {
@@ -325,7 +325,7 @@ impl<'a> Activity for TreeLoggingActivity {
 
     fn on_completion(
         &self,
-        player_inventory_id: u64,
+        player: &mut Player,
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -342,7 +342,7 @@ impl<'a> Activity for TreeLoggingActivity {
 
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(player_inventory_id, ItemClass::Material, wood_type.into()),
+            Command::SpawnItem(player.inventory_id(), ItemClass::Material, wood_type.into()),
         );
 
         if facility.decrement_property("logs") == 0 {
