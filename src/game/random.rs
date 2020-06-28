@@ -18,12 +18,7 @@ impl Rng {
     pub fn percentile(&mut self, chance: u8, tag: &'static str) -> bool {
         let tag_value = self.tags.get(tag);
         let value = match tag_value {
-            Some(value) => {
-                if *value >= 100 {
-                    panic!("invalid tag setting");
-                }
-                *value
-            }
+            Some(value) => *value,
             None => {
                 self.check_for_test_mode(tag);
                 let mut rng = thread_rng();
