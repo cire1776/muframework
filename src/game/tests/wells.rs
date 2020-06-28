@@ -22,6 +22,7 @@ fn can_dig_without_success() {
 
     rng.set_fail("water_chance");
     rng.set_fail("oil_chance");
+    rng.set_fail("bedrock_chance");
 
     player.endorse_with(":can_dig");
 
@@ -207,6 +208,7 @@ fn can_dig_striking_oil() {
 
     rng.set_fail("water_chance");
     rng.set_succeed("oil_chance");
+    rng.set_fail("bedrock_chance");
 
     player.endorse_with(":can_dig");
 

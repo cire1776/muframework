@@ -338,10 +338,11 @@ pub fn assert_is_destroy_facility(command_rx: &mut Receiver<Command>) -> Command
 }
 
 pub fn assert_is_activity_abort(command_rx: &mut Receiver<Command>) -> Command {
-    let command = command_rx.try_recv().unwrap();
+    let command = command_rx.try_recv();
 
     match command {
-        Command::ActivityAbort => Command::None,
+        Ok(Command::ActivityAbort) => Command::None,
+        Err(TryRecvError::Empty) => panic!("No command received. Expected ActivityAbort"),
         _ => panic!("unexpected command: {:?}", command),
     }
 }

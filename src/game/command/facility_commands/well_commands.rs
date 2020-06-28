@@ -314,6 +314,13 @@ impl Activity for WellDigActivity {
             return RefreshInventoryFlag::DontRefreshInventory;
         }
 
+        let bedrock_chance = facility.get_property("chance_of_hitting_bedrock");
+        if rng.succeeds(0, bedrock_chance, "bedrock_chance") {
+            facility.set_property("fluid", WellType::Bedrock as u128);
+            Command::send(Some(command_sender), Command::ActivityAbort);
+            return RefreshInventoryFlag::DontRefreshInventory;
+        }
+
         RefreshInventoryFlag::DontRefreshInventory
     }
 
