@@ -381,4 +381,7 @@ mod veins;
 mod smeltery;
 
 #[cfg(test)]
+mod wells;
+
+#[cfg(test)]
 mod equipment;
