@@ -421,6 +421,19 @@ impl Inventory {
         item
     }
 
+    pub fn find<S: ToString>(&self, class: ItemClass, description: S) -> Option<Item> {
+        let possible_item = self
+            .items
+            .iter()
+            .find(|(_, i)| i.is_of_type(class, description.to_string()));
+
+        if let Some((_, item)) = possible_item {
+            return Some(item.clone());
+        } else {
+            return None;
+        }
+    }
+
     pub fn update_item(&mut self, item_id: u64, new_quantity: u8, items: &mut ItemList) {
         let item = self
             .items
