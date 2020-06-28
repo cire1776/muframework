@@ -207,9 +207,10 @@ pub fn equip_player_with_spawned_item<S: ToString>(
 }
 
 #[cfg(test)]
-pub fn give_player_a_spawned_item<S: ToString>(
+pub fn give_player_spawned_items<S: ToString>(
     class: ItemClass,
     description: S,
+    quantity: u8,
     player: &mut Player,
     inventories: &mut InventoryList,
     items: &mut ItemList,
@@ -218,7 +219,7 @@ pub fn give_player_a_spawned_item<S: ToString>(
         .get_mut(&player.id)
         .expect("unable to get inventory");
 
-    inventory.spawn_stack(class, description, 1, items);
+    inventory.spawn_stack(class, description, quantity, items);
 }
 
 pub fn assert_activity_started(
@@ -251,6 +252,19 @@ pub fn assert_is_equipment_updated(exp_items: Vec<Item>, update_rx: &mut Receive
 
     match update {
         Ok(EquipmentUpdated(items)) if items == exp_items => {}
+        _ => panic!("unexpected update: {:?}", update),
+    }
+}
+pub fn assert_is_display_options<S: ToString>(
+    exp_options: Vec<S>,
+    exp_continuation: ActionContinuation,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+    let exp_options: Vec<String> = exp_options.iter().map(|s| s.to_string()).collect();
+    match update {
+        Ok(DisplayOptions(options, action_continuation, _facility_id))
+            if options == exp_options && exp_continuation == action_continuation => {}
         _ => panic!("unexpected update: {:?}", update),
     }
 }
@@ -355,6 +369,9 @@ mod trees;
 
 #[cfg(test)]
 mod veins;
+
+#[cfg(test)]
+mod smeltery;
 
 #[cfg(test)]
 mod equipment;

@@ -29,9 +29,10 @@ fn unequip_command_removes_endorsements() {
         &mut items,
     );
 
-    give_player_a_spawned_item(
+    give_player_spawned_items(
         Tool,
         "Simple Fishing Net",
+        1,
         &mut player,
         &mut inventories,
         &mut items,
