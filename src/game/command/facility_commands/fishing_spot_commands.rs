@@ -1,7 +1,7 @@
 use super::*;
 use FishType::*;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum FishType {
     Shrimp,
     Frog,
