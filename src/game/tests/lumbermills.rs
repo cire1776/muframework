@@ -297,3 +297,95 @@ fn mills_can_break() {
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
+
+#[test]
+fn consumes_supplies_from_inventory() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        _update_tx,
+        mut _update_rx,
+        _command_tx,
+        mut _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(12, 10);
+
+    rng.set_succeed("lumbermill_breaks");
+
+    player.endorse_component_with(":wants_to_mill", "softwood");
+
+    equip_player_with_spawned_item(
+        Material,
+        "Softwood Log",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    give_player_spawned_items(
+        Material,
+        "Softwood Log",
+        1,
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let exp_log_count = {
+        let inventory = inventories
+            .get(&player.inventory_id())
+            .expect("unable to get player's inventory.");
+
+        inventory.count_of(Material, "Softwood Log") - 1
+    };
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Down, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        None,
+        None,
+    );
+    let act_log_count = {
+        let inventory = inventories
+            .get(&player.inventory_id())
+            .expect("unable to get player's inventory.");
+
+        inventory.count_of(Material, "Softwood Log")
+    };
+    assert_eq!(act_log_count, exp_log_count);
+}

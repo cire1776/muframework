@@ -130,7 +130,7 @@ impl Activity for LumbermillActivity {
         &self,
         player: &mut Player,
         facility: &mut Facility,
-        _items: &mut ItemList,
+        items: &mut ItemList,
         inventories: &mut InventoryList,
         rng: &mut Rng,
         _update_sender: &GameUpdateSender,
@@ -145,6 +145,8 @@ impl Activity for LumbermillActivity {
         if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
             Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
+
+        ConstructionSkill::consume_from_inventory_for(self.log_type, player, inventories, items);
 
         let (class, description) =
             ConstructionSkill::produce_results_for(self.log_type, player, rng);

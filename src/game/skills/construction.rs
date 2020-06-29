@@ -21,7 +21,7 @@ impl ConstructionSkill {
             .expect("unable to get player's inventory.");
 
         let wood_type = Self::wood(product);
-        inventory.consume(Material, format!("{} Plank", wood_type), 1, items);
+        inventory.consume(Material, format!("{} Log", wood_type), 1, items);
     }
 
     pub fn produce_results_for(
