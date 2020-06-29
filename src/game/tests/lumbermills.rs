@@ -22,6 +22,8 @@ fn can_saw_softwood_without_breaking_mill() {
 
     rng.set_succeed("lumbermill_breaks");
 
+    let exp_xp = player.get_xp("construction") + 5;
+
     player.endorse_with(":wants_to_mill_softwood");
 
     equip_player_with_spawned_item(
@@ -94,6 +96,8 @@ fn can_saw_softwood_without_breaking_mill() {
     assert_is_spawning_item(player.id, Material, "Softwood Plank", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
+
+    assert_eq!(player.get_xp("construction"), exp_xp);
 }
 
 #[test]
@@ -117,6 +121,8 @@ fn can_saw_hardwood_without_breaking_mill() {
     ) = initialize_game_system_with_player_at(12, 10);
 
     rng.set_succeed("lumbermill_breaks");
+
+    let exp_xp = player.get_xp("construction") + 10;
 
     player.endorse_with(":wants_to_mill_hardwood");
 
@@ -190,6 +196,8 @@ fn can_saw_hardwood_without_breaking_mill() {
     assert_is_spawning_item(player.id, Material, "Hardwood Plank", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
+
+    assert_eq!(player.get_xp("construction"), exp_xp);
 }
 
 #[test]

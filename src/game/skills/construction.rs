@@ -26,9 +26,16 @@ impl ConstructionSkill {
 
     pub fn produce_results_for(
         product: LogType,
-        _player: &mut Player,
+        player: &mut Player,
         _rng: &mut Rng,
     ) -> (ItemClass, String) {
+        let xp_gain = match product {
+            LogType::Softwood => 5,
+            LogType::Hardwood => 10,
+        };
+
+        player.increment_xp("construction", xp_gain);
+
         (Material, format!("{} Plank", Self::wood(product)))
     }
 
