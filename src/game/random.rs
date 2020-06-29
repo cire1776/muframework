@@ -53,6 +53,19 @@ impl Rng {
         roll == 0
     }
 
+    pub fn fails(&mut self, low: i128, high: i128, tag: &'static str) -> bool {
+        let tag_value = self.tags.get(tag);
+        let roll = match tag_value {
+            Some(value) => *value,
+            None => {
+                self.check_for_test_mode(tag);
+                let mut rng = thread_rng();
+                rng.gen_range(low, high)
+            }
+        };
+        roll >= high - 1
+    }
+
     pub fn set(&mut self, tag: &'static str, value: i128) {
         self.tags.insert(tag, value);
     }
