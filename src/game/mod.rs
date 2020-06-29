@@ -406,14 +406,26 @@ impl GameState {
     ) -> Option<Box<dyn Activity>> {
         let mut activity = activity;
         if let Some(ref mut activity) = &mut activity {
+            let (new_updater, _urx) = std::sync::mpsc::channel::<GameUpdate>();
+            let (new_commander, _crx) = std::sync::mpsc::channel::<Command>();
+
+            let update_sender = match update_tx {
+                Some(updater) => updater,
+                None => &new_updater,
+            };
+            let command_sender = match command_tx {
+                Some(commander) => commander,
+                None => new_commander,
+            };
+
             activity.complete(
                 player,
                 facilities,
                 items,
                 inventories,
                 rng,
-                &update_tx.expect("update_tx is None."),
-                command_tx.expect("command_tx is None"),
+                update_sender,
+                command_sender,
             );
         }
 
