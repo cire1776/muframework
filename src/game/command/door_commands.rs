@@ -24,11 +24,7 @@ impl<'a> OpenDoorCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for OpenDoorCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.map
             .set_tile_at(self.x, self.y, tile_map::Tile::OpenDoor);
         self.obstacles.unblock_at(self.x, self.y);
@@ -71,11 +67,7 @@ impl<'a> CloseDoorCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for CloseDoorCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.map
             .set_tile_at(self.x, self.y, tile_map::Tile::ClosedDoor);
         self.obstacles.block_at(self.x, self.y);

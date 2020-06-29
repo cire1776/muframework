@@ -33,11 +33,7 @@ impl<'a> OpenChestCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for OpenChestCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.player.external_inventory = Some(self.external_inventory.to_vec());
         None
     }

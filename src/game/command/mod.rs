@@ -617,12 +617,7 @@ pub trait CommandHandler<'a> {
         60
     }
 
-    fn create_activity(
-        &self,
-        _guard: Guard,
-        _update_sender: GameUpdateSender,
-        _command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, _guard: Guard) -> Option<Box<dyn Activity>> {
         None
     }
 
@@ -638,11 +633,11 @@ pub trait CommandHandler<'a> {
     fn execute(
         &mut self,
         update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<CommandSender>,
+        _command_tx: Option<CommandSender>,
     ) -> Option<Box<dyn Activity>> {
         self.prepare_to_execute();
 
-        let activity = self.perform_execute(update_tx, command_tx);
+        let activity = self.perform_execute();
 
         if let Some(update_tx) = update_tx {
             self.announce(activity, update_tx)
@@ -656,23 +651,11 @@ pub trait CommandHandler<'a> {
     }
 
     /// perform the actions of the command
-    fn perform_execute(
-        &mut self,
-        update_tx: Option<&GameUpdateSender>,
-        command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         let expiration = self.expiration().clone();
 
         // unwrap senders to avoid thread sending problems
-        let update_sender = update_tx.unwrap().clone();
-
-        let command_sender = match command_tx.clone() {
-            Some(command_sender) => command_sender,
-            None => {
-                let (tx, _) = channel();
-                tx
-            }
-        };
+        // let update_sender = update_tx.unwrap().clone();
 
         let timer = { self.timer().unwrap() };
         let guard = timer.repeating(
@@ -681,7 +664,7 @@ pub trait CommandHandler<'a> {
             "ActivityComplete",
         );
 
-        let activity = self.create_activity(guard, update_sender, command_sender);
+        let activity = self.create_activity(guard);
         activity
     }
 

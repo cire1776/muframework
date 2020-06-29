@@ -62,20 +62,13 @@ impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
             .get_attribute(Attribute::SkillTime("construction".into()), 0)) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = LumbermillActivity::new(
             self.log_type,
             self.expiration(),
             self.player.id,
             self.facility_id,
             Some(guard),
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -98,8 +91,6 @@ pub struct LumbermillActivity {
     _player_inventory_id: u64,
     facility_id: u64,
     guard: Option<Guard>,
-    _update_sender: GameUpdateSender,
-    _command_sender: CommandSender,
 }
 
 impl LumbermillActivity {
@@ -109,8 +100,6 @@ impl LumbermillActivity {
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             log_type,
@@ -118,8 +107,6 @@ impl LumbermillActivity {
             _player_inventory_id: player_inventory_id,
             facility_id,
             guard,
-            _update_sender: update_sender,
-            _command_sender: command_sender,
         }
     }
 }

@@ -21,11 +21,7 @@ impl<'a> PickupCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for PickupCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.inventory.pick_up_item(self.item_id, &mut self.items);
         None
     }
@@ -71,11 +67,7 @@ impl<'a> DropCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for DropCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.inventory
             .release_item_at(self.x, self.y, &self.item, &mut self.items);
         None
@@ -131,11 +123,7 @@ impl<'a> EquipCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for EquipCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         {
             let player_mounting_points = &mut self.player.mounting_points;
 
@@ -203,11 +191,7 @@ impl<'a> UnequipCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for UnequipCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.player
             .mounting_points
             .unmount_item_by_id(self.item_id, self.inventory, self.items);
@@ -326,11 +310,7 @@ impl<'a> TransferItemCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for TransferItemCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         transfer_an_item(
             self.item,
             self.source_id,
@@ -379,11 +359,7 @@ impl<'a> TransferAllCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for TransferAllCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         let src_inventory = self.inventories.get_mut(&self.source_id).unwrap();
 
         for (_id, item) in &src_inventory.items.clone() {

@@ -46,12 +46,7 @@ impl<'a> CommandHandler<'a> for ActivateFirepitCommand<'a> {
             .get_attribute(Attribute::SkillTime("cooking".into()), 0)) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let level = self
             .player
             .get_attribute(Attribute::SkillLevel("cooking".into()), 0);
@@ -63,8 +58,6 @@ impl<'a> CommandHandler<'a> for ActivateFirepitCommand<'a> {
             level as u8,
             self.facility_id,
             Some(guard),
-            update_sender,
-            command_sender,
         );
 
         let inventory = self
@@ -98,8 +91,6 @@ pub struct FirepitActivity {
     _player_level: u8,
     facility_id: u64,
     guard: Option<Guard>,
-    _update_sender: GameUpdateSender,
-    _command_sender: CommandSender,
 }
 
 impl FirepitActivity {
@@ -110,8 +101,6 @@ impl FirepitActivity {
         player_level: u8,
         facility_id: u64,
         guard: Option<Guard>,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             fish_type,
@@ -120,8 +109,6 @@ impl FirepitActivity {
             _player_level: player_level,
             facility_id,
             guard,
-            _update_sender: update_sender,
-            _command_sender: command_sender,
         }
     }
 }

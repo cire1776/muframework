@@ -263,12 +263,7 @@ impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
         (base_time as i64 + modifier as i64) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let (product1, product2) = self.fishing_spot_properties.net_products();
 
         let activity = NetFishingActivity::new(
@@ -279,8 +274,6 @@ impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
             self.player.id,
             self.facility.id,
             Some(guard),
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -305,8 +298,6 @@ pub struct NetFishingActivity {
     _player_inventory_id: u64,
     facility_id: u64,
     guard: Option<Guard>,
-    _update_sender: GameUpdateSender,
-    _command_sender: CommandSender,
 }
 
 impl<'a> NetFishingActivity {
@@ -318,8 +309,6 @@ impl<'a> NetFishingActivity {
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             product_1,
@@ -329,8 +318,6 @@ impl<'a> NetFishingActivity {
             _player_inventory_id: player_inventory_id,
             facility_id,
             guard,
-            _update_sender: update_sender,
-            _command_sender: command_sender,
         }
     }
 }
@@ -426,12 +413,7 @@ impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
         (base_time as i64 + modifier as i64) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let (product1, product2) = self.fishing_spot_properties.rod_products();
 
         let activity = FishingActivity::new(
@@ -442,8 +424,6 @@ impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
             self.player.id,
             self.facility.id,
             Some(guard),
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -468,8 +448,6 @@ pub struct FishingActivity {
     _player_inventory_id: u64,
     facility_id: u64,
     guard: Option<Guard>,
-    _update_sender: GameUpdateSender,
-    _command_sender: CommandSender,
 }
 
 impl<'a> FishingActivity {
@@ -481,8 +459,6 @@ impl<'a> FishingActivity {
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             product_1,
@@ -492,8 +468,6 @@ impl<'a> FishingActivity {
             _player_inventory_id: player_inventory_id,
             facility_id,
             guard,
-            _update_sender: update_sender,
-            _command_sender: command_sender,
         }
     }
 }
@@ -589,20 +563,13 @@ impl<'a> CommandHandler<'a> for ActivatePlaceFishingTrapCommand<'a> {
         (base_time as i64 + modifier as i64) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = PlacingFishingTrapActivity::new(
             self.fishing_spot_properties.clone(),
             self.expiration(),
             self.player.id,
             self.facility.id,
             Some(guard),
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -625,8 +592,6 @@ pub struct PlacingFishingTrapActivity {
     _player_inventory_id: u64,
     facility_id: u64,
     guard: Option<Guard>,
-    _update_sender: GameUpdateSender,
-    _command_sender: CommandSender,
 }
 
 impl<'a> PlacingFishingTrapActivity {
@@ -636,8 +601,6 @@ impl<'a> PlacingFishingTrapActivity {
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             fishing_spot_properties,
@@ -645,8 +608,6 @@ impl<'a> PlacingFishingTrapActivity {
             _player_inventory_id: player_inventory_id,
             facility_id,
             guard,
-            _update_sender: update_sender,
-            _command_sender: command_sender,
         }
     }
 }
@@ -758,20 +719,13 @@ impl<'a> CommandHandler<'a> for ActivateCollectFishingTrapCommand<'a> {
         (base_time as i64 + modifier as i64) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = CollectFishingTrapActivity::new(
             self.fishing_spot_properties.clone(),
             self.expiration(),
             self.player.id,
             self.facility.id,
             Some(guard),
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -794,8 +748,6 @@ pub struct CollectFishingTrapActivity {
     _player_inventory_id: u64,
     facility_id: u64,
     guard: Option<Guard>,
-    _update_sender: GameUpdateSender,
-    _command_sender: CommandSender,
 }
 
 impl<'a> CollectFishingTrapActivity {
@@ -805,8 +757,6 @@ impl<'a> CollectFishingTrapActivity {
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             fishing_spot_properties,
@@ -814,8 +764,6 @@ impl<'a> CollectFishingTrapActivity {
             _player_inventory_id: player_inventory_id,
             facility_id,
             guard,
-            _update_sender: update_sender,
-            _command_sender: command_sender,
         }
     }
 }

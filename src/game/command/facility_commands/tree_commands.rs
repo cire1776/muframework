@@ -71,20 +71,13 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
             .player
             .get_attribute(Attribute::SkillTime("logging".into()), 0)) as u32
     }
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = TreePickingActivity::new(
             self.tree_type,
             self.expiration(),
             self.player.inventory_id(),
             self.facility_id,
             guard,
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -108,8 +101,6 @@ pub struct TreePickingActivity {
     player_inventory_id: u64,
     facility_id: u64,
     guard: Option<Guard>,
-    update_sender: GameUpdateSender,
-    command_sender: CommandSender,
 }
 
 impl<'a> TreePickingActivity {
@@ -119,8 +110,6 @@ impl<'a> TreePickingActivity {
         player_inventory_id: u64,
         facility_id: u64,
         guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             tree_type,
@@ -128,8 +117,6 @@ impl<'a> TreePickingActivity {
             player_inventory_id,
             facility_id,
             guard: Some(guard),
-            update_sender,
-            command_sender,
         }
     }
 }
@@ -243,23 +230,13 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
             .get_attribute(Attribute::SkillTime("logging".into()), 0)) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
-        let command_sender = command_sender.clone();
-        let update_sender = update_sender.clone();
-
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = TreeLoggingActivity::new(
             self.tree_type,
             self.player.inventory_id(),
             self.expiration(),
             self.facility_id,
             guard,
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -284,8 +261,6 @@ pub struct TreeLoggingActivity {
     expiration: u32,
     facility_id: u64,
     guard: Option<Guard>,
-    update_sender: GameUpdateSender,
-    command_sender: CommandSender,
 }
 
 impl<'a> TreeLoggingActivity {
@@ -295,8 +270,6 @@ impl<'a> TreeLoggingActivity {
         expiration: u32,
         facility_id: u64,
         guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             tree_type,
@@ -304,8 +277,6 @@ impl<'a> TreeLoggingActivity {
             expiration,
             facility_id,
             guard: Some(guard),
-            update_sender,
-            command_sender,
         }
     }
 }

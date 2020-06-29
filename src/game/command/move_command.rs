@@ -28,11 +28,7 @@ impl<'a> MoveCommand<'a> {
     }
 }
 impl<'a> CommandHandler<'a> for MoveCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.obstacles
             .unblock_at(self.character.x, self.character.y);
         self.obstacles.block_at(self.x, self.y);
@@ -79,11 +75,7 @@ impl<'a> ChangeFacingCommand<'a> {
 }
 
 impl<'a> CommandHandler<'a> for ChangeFacingCommand<'a> {
-    fn perform_execute(
-        &mut self,
-        _update_tx: Option<&GameUpdateSender>,
-        _command_tx: Option<CommandSender>,
-    ) -> Option<Box<dyn Activity>> {
+    fn perform_execute(&mut self) -> Option<Box<dyn Activity>> {
         self.player.facing = self.facing;
         None
     }

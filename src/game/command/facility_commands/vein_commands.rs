@@ -93,20 +93,13 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
             .get_attribute(Attribute::SkillTime("mining".into()), 0)) as u32
     }
 
-    fn create_activity(
-        &self,
-        guard: Guard,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
-    ) -> Option<Box<dyn Activity>> {
+    fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = VeinActivity::new(
             self.vein_type,
             self.expiration(),
             self.player.id,
             self.facility_id,
             Some(guard),
-            update_sender,
-            command_sender,
         );
         Some(Box::new(activity))
     }
@@ -129,8 +122,6 @@ pub struct VeinActivity {
     _player_inventory_id: u64,
     facility_id: u64,
     guard: Option<Guard>,
-    _update_sender: GameUpdateSender,
-    _command_sender: CommandSender,
 }
 
 impl VeinActivity {
@@ -140,8 +131,6 @@ impl VeinActivity {
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
-        update_sender: GameUpdateSender,
-        command_sender: CommandSender,
     ) -> Self {
         Self {
             vein_type,
@@ -149,8 +138,6 @@ impl VeinActivity {
             _player_inventory_id: player_inventory_id,
             facility_id,
             guard,
-            _update_sender: update_sender,
-            _command_sender: command_sender,
         }
     }
 }
