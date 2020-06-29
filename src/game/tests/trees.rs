@@ -102,6 +102,8 @@ fn can_chop_apple_tree() {
 
     player.endorse_with(":can_chop");
 
+    let exp_xp = player.get_xp("logging") + 6;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -150,6 +152,8 @@ fn can_chop_apple_tree() {
     assert_is_spawning_item(1, Material, "Hardwood Log", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
+
+    assert_eq!(player.get_xp("logging"), exp_xp);
 }
 
 #[test]
@@ -176,6 +180,8 @@ fn can_chop_olive_tree() {
 
     player.endorse_with(":can_chop");
 
+    let exp_xp = player.get_xp("logging") + 6;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -225,6 +231,8 @@ fn can_chop_olive_tree() {
     assert_is_spawning_item(1, Material, "Hardwood Log", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
+
+    assert_eq!(player.get_xp("logging"), exp_xp);
 }
 
 #[test]
@@ -251,6 +259,8 @@ fn can_chop_oak_tree() {
 
     player.endorse_with(":can_chop");
 
+    let exp_xp = player.get_xp("logging") + 8;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -300,6 +310,8 @@ fn can_chop_oak_tree() {
     assert_is_spawning_item(1, Material, "Hardwood Log", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
+
+    assert_eq!(player.get_xp("logging"), exp_xp);
 }
 
 #[test]
