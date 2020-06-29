@@ -166,6 +166,46 @@ pub fn count_all(items: Vec<Item>) -> Vec<(ItemType, u16)> {
     result
 }
 
+pub fn count_of<S: ToString>(
+    class: ItemClass,
+    description: S,
+    player: &Player,
+    inventories: &InventoryList,
+) -> u16 {
+    let inventory = inventories
+        .get(&player.inventory_id())
+        .expect("unable to get player's inventory.");
+
+    inventory.count_of(class, description)
+}
+
+pub fn consume_all_supplies_from_inventory<S: ToString>(
+    class: ItemClass,
+    description: S,
+    player: &Player,
+    inventories: &mut InventoryList,
+    items: &mut ItemList,
+) {
+    let quantity = count_of(class, description.to_string(), player, inventories);
+
+    consume_supplies_from_inventory(class, description, quantity, player, inventories, items)
+}
+
+pub fn consume_supplies_from_inventory<S: ToString>(
+    class: ItemClass,
+    description: S,
+    quantity: u16,
+    player: &Player,
+    inventories: &mut InventoryList,
+    items: &mut ItemList,
+) {
+    let inventory = inventories
+        .get_mut(&player.inventory_id())
+        .expect("unable to get player's inventory.");
+
+    inventory.consume(class, description, quantity, items);
+}
+
 pub fn get_facility_id_at(x: i32, y: i32, map: &TileMap) -> u64 {
     match map.at(x, y) {
         tile_map::Tile::Facility(id) => id,

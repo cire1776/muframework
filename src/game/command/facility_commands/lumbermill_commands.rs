@@ -138,16 +138,24 @@ impl Activity for LumbermillActivity {
     ) -> RefreshInventoryFlag {
         let level = player.get_attribute(Attribute::SkillLevel("construction".into()), 0) as u8;
 
-        let inventory = inventories
-            .get_mut(&player.inventory_id())
-            .expect("unable to find inventory");
+        {
+            let inventory = inventories
+                .get_mut(&player.inventory_id())
+                .expect("unable to find inventory");
 
-        if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
-            Command::send(Some(command_sender.clone()), Command::ActivityAbort);
+            if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
+                Command::send(Some(command_sender.clone()), Command::ActivityAbort);
+            }
         }
 
-        ConstructionSkill::consume_from_inventory_for(self.log_type, player, inventories, items);
-
+        {
+            ConstructionSkill::consume_from_inventory_for(
+                self.log_type,
+                player,
+                inventories,
+                items,
+            );
+        }
         let (class, description) =
             ConstructionSkill::produce_results_for(self.log_type, player, rng);
 
@@ -163,6 +171,18 @@ impl Activity for LumbermillActivity {
                 Command::DestroyFacility(facility.id),
             );
             Command::send(Some(command_sender), Command::ActivityAbort);
+            return RefreshInventoryFlag::RefreshInventory;
+        }
+
+        {
+            let inventory = inventories
+                .get_mut(&player.inventory_id())
+                .expect("unable to find inventory");
+
+            let level = player.get_attribute(Attribute::SkillLevel("construction".into()), 0) as u8;
+            if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
+                Command::send(Some(command_sender), Command::ActivityAbort);
+            }
         }
 
         RefreshInventoryFlag::RefreshInventory
