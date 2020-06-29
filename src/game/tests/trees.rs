@@ -22,6 +22,8 @@ fn can_chop_pine_tree() {
 
     player.endorse_with(":can_chop");
 
+    let exp_xp = player.get_xp("logging") + 5;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -72,6 +74,8 @@ fn can_chop_pine_tree() {
     assert_is_spawning_item(1, Material, "Softwood Log", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
+
+    assert_eq!(player.get_xp("logging"), exp_xp);
 }
 
 #[test]

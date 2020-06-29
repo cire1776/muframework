@@ -329,20 +329,16 @@ impl<'a> Activity for TreeLoggingActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
-        _rng: &mut Rng,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         #[allow(unreachable_patterns)]
-        let wood_type = match self.tree_type {
-            TreeType::Apple | TreeType::Olive | TreeType::Oak => "Hardwood Log",
-            TreeType::Pine => "Softwood Log",
-            _ => panic!("unknown tree type"),
-        };
+        let (class, description) = LoggingSkill::produce_results_for(self.tree_type, player, rng);
 
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(player.inventory_id(), ItemClass::Material, wood_type.into()),
+            Command::SpawnItem(player.inventory_id(), class, description),
         );
 
         if facility.decrement_property("logs") == 0 {
