@@ -2,7 +2,7 @@ use super::*;
 use LogType::*;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum LogType {
+pub enum LogType {
     Softwood,
     Hardwood,
 }
@@ -141,36 +141,28 @@ impl Activity for LumbermillActivity {
         &self,
         player: &mut Player,
         facility: &mut Facility,
-        items: &mut ItemList,
+        _items: &mut ItemList,
         inventories: &mut InventoryList,
         rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        use inflector::Inflector;
+        let level = player.get_attribute(Attribute::SkillLevel("construction".into()), 0) as u8;
 
         let inventory = inventories
             .get_mut(&player.inventory_id())
             .expect("unable to find inventory");
 
-        let wood = self.log_type.to_string().to_title_case();
-
-        if !inventory.any_left_after_consuming(
-            ItemClass::Material,
-            format!("{} Log", wood),
-            1,
-            items,
-        ) {
+        if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
             Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
 
+        let (class, description) =
+            ConstructionSkill::produce_results_for(self.log_type, player, rng);
+
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(
-                player.inventory_id(),
-                ItemClass::Material,
-                format!("{} Plank", wood),
-            ),
+            Command::SpawnItem(player.inventory_id(), class, description),
         );
 
         let chance_of_breakage = facility.get_property("chance_of_breakage");
