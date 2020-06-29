@@ -141,9 +141,18 @@ impl Activity for FirepitActivity {
         let (class, description) = CookingSkill::produce_results_for(self.fish_type, player, rng);
 
         Command::send(
-            Some(command_sender),
+            Some(command_sender.clone()),
             Command::SpawnItem(player.inventory_id(), class, description),
         );
+        let inventory = inventories
+            .get(&player.inventory_id())
+            .expect("unable to get player inventory.");
+
+        let level = player.get_attribute(Attribute::SkillLevel("cooking".into()), 0) as u8;
+
+        if !CookingSkill::can_produce(self.fish_type, level, inventory) {
+            Command::send(Some(command_sender), Command::ActivityAbort);
+        }
 
         RefreshInventoryFlag::RefreshInventory
     }

@@ -642,7 +642,7 @@ pub trait CommandHandler<'a> {
         if let Some(update_tx) = update_tx {
             self.announce(activity, update_tx)
         } else {
-            None
+            activity
         }
     }
 

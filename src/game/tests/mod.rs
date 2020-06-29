@@ -258,7 +258,7 @@ pub fn assert_activity_expired(update_rx: &mut Receiver<GameUpdate>) {
 
     match update {
         GameUpdate::ActivityExpired() => {}
-        _ => panic!("unexpected update"),
+        _ => panic!("unexpected update: {:?}", update),
     }
 }
 
