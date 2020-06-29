@@ -25,6 +25,8 @@ fn can_cook_fish_successfully() {
     player.endorse_component_with(":wants_to_cook", "shrimp");
     give_player_level("cooking", 4, &mut player);
 
+    let exp_xp = player.get_xp("cooking") + 3;
+
     equip_player_with_spawned_item(
         Ingredient,
         "Shrimp",
@@ -123,6 +125,8 @@ fn can_cook_fish_successfully() {
 
     assert_eq!(shrimp_count, exp_shrimp_count);
     assert_eq!(log_count, exp_log_count);
+
+    assert_eq!(player.get_xp("cooking"), exp_xp);
 }
 
 #[test]
@@ -148,6 +152,8 @@ fn can_burn_fish() {
     rng.set_fail("cooking_success");
 
     player.endorse_component_with(":wants_to_cook", "shrimp");
+
+    let exp_xp = player.get_xp("cooking") + 1;
 
     equip_player_with_spawned_item(
         Ingredient,
@@ -247,4 +253,6 @@ fn can_burn_fish() {
 
     assert_eq!(shrimp_count, exp_shrimp_count);
     assert_eq!(log_count, exp_log_count);
+
+    assert_eq!(player.get_xp("cooking"), exp_xp);
 }

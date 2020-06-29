@@ -6,12 +6,12 @@ use ItemClass::*;
 lazy_static! {
     static ref COOKING_RECIPES: HashMap<FishType, Recipe> = {
         let mut m = HashMap::new();
-        m.insert(Shrimp, Recipe::new("Grilled Shrimp", 1, 65, 9));
-        m.insert(Frog, Recipe::new("Fried Frog Legs", 2, 75, 9));
-        m.insert(Mackeral, Recipe::new("Cooked Mackeral", 3, 75, 14));
-        m.insert(Crab, Recipe::new("Crab Legs", 5, 45, 23));
-        m.insert(Catfish, Recipe::new("Grilled Catfish", 7, 75, 8));
-        m.insert(Salmon, Recipe::new("Grilled Salmon", 8, 35, 21));
+        m.insert(Shrimp, Recipe::new("Grilled Shrimp", 1, 65, 9, 3, 1));
+        m.insert(Frog, Recipe::new("Fried Frog Legs", 2, 75, 9, 3, 2));
+        m.insert(Mackeral, Recipe::new("Cooked Mackeral", 3, 75, 14, 4, 2));
+        m.insert(Crab, Recipe::new("Crab Legs", 5, 45, 23, 8, 3));
+        m.insert(Catfish, Recipe::new("Grilled Catfish", 7, 75, 8, 5, 2));
+        m.insert(Salmon, Recipe::new("Grilled Salmon", 8, 35, 21, 10, 3));
         m
     };
 }
@@ -22,6 +22,8 @@ pub struct Recipe {
     required_level: u8,
     success_rate: u8,
     learning_period: u8,
+    xp_on_success: u8,
+    xp_on_failure: u8,
 }
 
 impl Recipe {
@@ -30,12 +32,16 @@ impl Recipe {
         required_level: u8,
         success_rate: u8,
         learning_period: u8,
+        xp_on_success: u8,
+        xp_on_failure: u8,
     ) -> Self {
         Self {
             success_product: success_product.to_string(),
             required_level,
             success_rate,
             learning_period,
+            xp_on_success,
+            xp_on_failure,
         }
     }
 }
@@ -99,8 +105,10 @@ impl CookingSkill {
         let success = Self::succeeds(recipe, level, rng);
 
         if success {
+            player.increment_xp("cooking", recipe.xp_on_success as u64);
             (Food, recipe.success_product.clone())
         } else {
+            player.increment_xp("cooking", recipe.xp_on_failure as u64);
             (Material, format!("Burnt {}", product.to_string()))
         }
     }
