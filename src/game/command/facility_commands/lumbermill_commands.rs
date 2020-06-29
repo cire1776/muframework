@@ -140,10 +140,10 @@ impl Activity for LumbermillActivity {
     fn on_completion(
         &self,
         player: &mut Player,
-        _facility: &mut Facility,
+        facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-        _rng: &mut Rng,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
@@ -165,13 +165,22 @@ impl Activity for LumbermillActivity {
         }
 
         Command::send(
-            Some(command_sender),
+            Some(command_sender.clone()),
             Command::SpawnItem(
                 player.inventory_id(),
                 ItemClass::Material,
                 format!("{} Plank", wood),
             ),
         );
+
+        let chance_of_breakage = facility.get_property("chance_of_breakage");
+        if rng.fails(0, chance_of_breakage, "lumbermill_breaks") {
+            Command::send(
+                Some(command_sender.clone()),
+                Command::DestroyFacility(facility.id),
+            );
+            Command::send(Some(command_sender), Command::ActivityAbort);
+        }
 
         RefreshInventoryFlag::RefreshInventory
     }

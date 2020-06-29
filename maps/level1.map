@@ -284,7 +284,9 @@ grilled_salmon food "Grilled Salmon"
     property: item => 0
     property: output => 0
 }
-*lumbermill 12,11 "A Rickety Lumbermill"
+*lumbermill 12,11 "A Rickety Lumbermill"{
+    property: chance_of_breakage => 1000
+}
 ▼well 13, 11 "A dry well" {
     property: fluid => 0
     property: depth => 0
