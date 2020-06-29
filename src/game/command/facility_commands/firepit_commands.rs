@@ -95,7 +95,7 @@ pub struct FirepitActivity {
     fish_type: FishType,
     expiration: u32,
     _player_inventory_id: u64,
-    player_level: u8,
+    _player_level: u8,
     facility_id: u64,
     guard: Option<Guard>,
     _update_sender: GameUpdateSender,
@@ -117,7 +117,7 @@ impl FirepitActivity {
             fish_type,
             expiration,
             _player_inventory_id: player_inventory_id,
-            player_level,
+            _player_level: player_level,
             facility_id,
             guard,
             _update_sender: update_sender,
@@ -149,13 +149,10 @@ impl Activity for FirepitActivity {
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let inventory = inventories
-            .get_mut(&player.inventory_id())
-            .expect("unable to find inventory");
+        CookingSkill::consume_from_inventory_for(self.fish_type, player, inventories, items);
 
-        CookingSkill::consume_from_inventory_for(self.fish_type, inventory, items);
+        let (class, description) = CookingSkill::produce_results_for(self.fish_type, player, rng);
 
-        let (class, description) = CookingSkill::output_for(self.fish_type, self.player_level, rng);
         Command::send(
             Some(command_sender),
             Command::SpawnItem(player.inventory_id(), class, description),

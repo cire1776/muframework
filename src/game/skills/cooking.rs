@@ -58,9 +58,14 @@ impl CookingSkill {
     }
     pub fn consume_from_inventory_for(
         product: FishType,
-        inventory: &mut Inventory,
+        player: &Player,
+        inventories: &mut InventoryList,
         items: &mut ItemList,
     ) {
+        let inventory = inventories
+            .get_mut(&player.inventory_id())
+            .expect("unable to find inventory");
+
         inventory.consume(Ingredient, product.to_string(), 1, items);
 
         if inventory.has_sufficient(Material, "Softwood Log", 1) {
@@ -70,9 +75,7 @@ impl CookingSkill {
         }
     }
 
-    pub fn output_for(product: FishType, level: u8, rng: &mut Rng) -> (ItemClass, String) {
-        let recipe = &COOKING_RECIPES[&product];
-
+    fn succeeds(recipe: &Recipe, level: u8, rng: &mut Rng) -> bool {
         let success_rate = if level < recipe.required_level {
             0
         } else {
@@ -81,7 +84,19 @@ impl CookingSkill {
             recipe.success_rate + delta_level * factor
         };
 
-        let success = rng.percentile(success_rate, "cooking_success");
+        rng.percentile(success_rate, "cooking_success")
+    }
+
+    pub fn produce_results_for(
+        product: FishType,
+        player: &mut Player,
+        rng: &mut Rng,
+    ) -> (ItemClass, String) {
+        let recipe = &COOKING_RECIPES[&product];
+
+        let level = player.get_attribute(Attribute::SkillLevel("cooking".into()), 0) as u8;
+
+        let success = Self::succeeds(recipe, level, rng);
 
         if success {
             (Food, recipe.success_product.clone())
