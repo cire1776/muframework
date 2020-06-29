@@ -34,17 +34,19 @@ impl<'a> ActivateLumberMillCommand<'a> {
     }
 
     fn determine_log_type(player: &Player) -> LogType {
-        if player.is_endorsed_with(":wants_to_mill_hardwood") {
-            Hardwood
-        } else {
-            Softwood
+        let wood_type = player
+            .get_endorsement_component(":wants_to_mill")
+            .expect("couldnt find wood type.");
+
+        match &wood_type[..] {
+            "hardwood" => Hardwood,
+            "softwood" => Softwood,
+            _ => panic!("unknown wood type: {}", wood_type),
         }
     }
 
     pub fn can_perform(player: &Player, facility: &Facility) -> bool {
-        !facility.is_in_use()
-            && (player.is_endorsed_with(":wants_to_mill_softwood")
-                || player.is_endorsed_with(":wants_to_mill_hardwood"))
+        !facility.is_in_use() && player.is_endorsed_with(":wants_to_mill")
     }
 }
 

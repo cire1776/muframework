@@ -70,10 +70,10 @@ olive_oil ingredient "Olive Oil"
 bottle_of_water ingredient "Bottle of Water"
 
 softwood_log material "Softwood Log" {
-    endorsement: :wants_to_mill_softwood
+    endorsement: :wants_to_mill(softwood)
 }
 hardwood_log material "Hardwood Log" {
-    endorsement: :wants_to_mill_hardwood
+    endorsement: :wants_to_mill(hardwood)
 }
 hardwood_plank material "Hardwood Plank"
 softwood_plank material "Softwood Plank"

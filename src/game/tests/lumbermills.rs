@@ -24,7 +24,7 @@ fn can_saw_softwood_without_breaking_mill() {
 
     let exp_xp = player.get_xp("construction") + 5;
 
-    player.endorse_with(":wants_to_mill_softwood");
+    player.endorse_component_with(":wants_to_mill", "softwood");
 
     equip_player_with_spawned_item(
         Material,
@@ -124,7 +124,7 @@ fn can_saw_hardwood_without_breaking_mill() {
 
     let exp_xp = player.get_xp("construction") + 10;
 
-    player.endorse_with(":wants_to_mill_hardwood");
+    player.endorse_component_with(":wants_to_mill", "hardwood");
 
     equip_player_with_spawned_item(
         Material,
@@ -222,7 +222,7 @@ fn mills_can_break() {
 
     rng.set_fail("lumbermill_breaks");
 
-    player.endorse_with(":wants_to_mill_hardwood");
+    player.endorse_component_with(":wants_to_mill", "hardwood");
 
     equip_player_with_spawned_item(
         Material,
