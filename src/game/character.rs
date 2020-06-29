@@ -13,6 +13,7 @@ pub struct Player {
     endorsements: HashMap<String, u32>,
     endorsement_components: HashMap<String, String>,
     attributes: AttributeList,
+    xp: HashMap<String, u64>,
 }
 
 impl Player {
@@ -28,6 +29,7 @@ impl Player {
             endorsements: HashMap::new(),
             endorsement_components: HashMap::new(),
             attributes: AttributeList::new(),
+            xp: HashMap::new(),
         };
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");
@@ -101,6 +103,26 @@ impl Player {
 
     pub fn remove_buff(&mut self, tag: BuffTag) {
         self.attributes.remove(tag);
+    }
+
+    pub fn increment_xp<S: ToString>(&mut self, skill: S, value: u64) {
+        let skill = skill.to_string();
+
+        let xp = self.xp.get_mut(&skill);
+        match xp {
+            Some(xp) => *xp += value,
+            None => {
+                self.xp.insert(skill, value);
+            }
+        }
+    }
+
+    pub fn get_xp<S: ToString>(&mut self, skill: S) -> u64 {
+        let xp = self.xp.get(&skill.to_string());
+        match xp {
+            Some(xp) => *xp,
+            None => 0,
+        }
     }
 }
 
