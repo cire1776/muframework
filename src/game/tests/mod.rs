@@ -396,4 +396,7 @@ mod wells;
 mod firepits;
 
 #[cfg(test)]
+mod lumbermills;
+
+#[cfg(test)]
 mod equipment;
