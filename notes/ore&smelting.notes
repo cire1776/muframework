@@ -1,22 +1,22 @@
-Tin Ore         1       Tin        1
-Copper Ore      3       Copper     2
-Coal            6       Bronze     4
-Lead            9       Lead       6
-                        Mercury    9
-Cinnabar        12      Iron       12
-Cobalt          15      Cobalt     15 (blue in glass, pottery) 
-Iron Ore        18      Nickel     18
-Nickel          21      Steel      21
-                        Gold       24 (+mercury)
-Gold Ore        24      Aluminum   27        
-bauxite Ore     27      Silver     30 (+mercury)
-Silver Ore      30      Zinc       33
-Zinc            33      Platinum   36
-                        Stainless Steel (+zinc) 39
-Tungsten        36      Stellite   40 (cutting blades)
-Platinum        39      Titanium   43
-Titanium Ore    42      Mythral    45
-Mythral         45      
+Tin Ore         1     5       Tin       1  5    
+Copper Ore      3     6      Copper     2   6    
+Coal            6     8      Bronze     4   7    
+Lead            9     9      Lead       6   8    
+                             Mercury    9   10    
+Cinnabar        12    10     Iron       12  15     
+Cobalt          15    15     Cobalt     15  20      (blue in glass, pottery) 
+Iron Ore        18    20     Nickel     18  25   
+Nickel          21    25     Steel      21  30     
+                             Gold       24  35      (+mercury)
+Gold Ore        24    30     Aluminum   27  40             
+bauxite Ore     27    35     Silver     30  45      (+mercury)
+Silver Ore      30    40     Zinc       33  50   
+Zinc            33    45     Platinum   36  55   
+                 Stainless Steel(+zinc) 39  60
+Tungsten        36    50     Stellite   40  65    (cutting blades)
+Platinum        39    55     Titanium   43  70   
+Titanium Ore    42    60     Mythral    45  75   
+Mythral         45    65     
 
 Adamantite      master  Adamantite  master
 Ore1            master  Ore1        master
