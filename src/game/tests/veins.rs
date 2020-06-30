@@ -767,3 +767,147 @@ fn can_mine_copper_with_exhaustion() {
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
+
+#[test]
+fn tin_provides_5_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        _command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(14, 7);
+
+    rng.set_succeed("chance_of_exhaustion");
+
+    give_player_level(Mining, 3, &mut player);
+    player.endorse_with(":can_mine");
+
+    let exp_xp = player.get_xp(Mining) + 5;
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Down, MoveCommandMode::Use),
+        Some(&update_tx),
+        None,
+    );
+
+    assert_eq!(
+        timer.tags["ActivityComplete"],
+        chrono::Duration::seconds(60)
+    );
+
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        None,
+        None,
+    );
+
+    let actual_xp = player.get_xp(Mining);
+    assert_eq!(actual_xp, exp_xp);
+}
+
+#[test]
+fn copper_provides_6_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        _command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(15, 7);
+
+    rng.set_succeed("chance_of_exhaustion");
+
+    give_player_level(Mining, 3, &mut player);
+    player.endorse_with(":can_mine");
+
+    let exp_xp = player.get_xp(Mining) + 6;
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Down, MoveCommandMode::Use),
+        Some(&update_tx),
+        None,
+    );
+
+    assert_eq!(
+        timer.tags["ActivityComplete"],
+        chrono::Duration::seconds(60)
+    );
+
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        None,
+        None,
+    );
+
+    let actual_xp = player.get_xp(Mining);
+    assert_eq!(actual_xp, exp_xp);
+}

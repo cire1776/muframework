@@ -118,14 +118,14 @@ impl ToString for OreType {
 
 pub struct MiningSkill {
     mining_level: u8,
-    _mining_xp: u8,
+    mining_xp: u8,
 }
 
 impl MiningSkill {
     pub fn new(mining_level: u8, mining_xp: u8) -> Self {
         Self {
             mining_level,
-            _mining_xp: mining_xp,
+            mining_xp,
         }
     }
 
@@ -140,9 +140,12 @@ impl MiningSkill {
 
     pub fn produce_results_for(
         product: OreType,
-        _player: &mut Player,
+        player: &mut Player,
         _rng: &mut Rng,
     ) -> (ItemClass, String) {
+        let xp_gain = MINE_PRODUCTS[&product].mining_xp;
+        player.increment_xp(Mining, xp_gain as u64);
+
         let description = product.to_ore_product();
         (Ore, description)
     }
