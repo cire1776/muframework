@@ -3,7 +3,7 @@ use WellType::*;
 
 #[allow(dead_code)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum WellType {
+pub enum WellType {
     Dry = 0,
     Water,
     Oil,
@@ -172,14 +172,21 @@ impl Activity for WellFillActivity {
 pub struct ActivateWellDigCommand<'a> {
     player: &'a mut Player,
     facility_id: u64,
+    facilities: &'a mut FacilityList,
     timer: &'a mut Timer,
 }
 
 impl<'a> ActivateWellDigCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, timer: &'a mut Timer) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &'a mut FacilityList,
+        timer: &'a mut Timer,
+    ) -> Self {
         Self {
             player,
             facility_id,
+            facilities,
             timer,
         }
     }
@@ -211,7 +218,19 @@ impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
             self.facility_id,
             Some(guard),
         );
-        Some(Box::new(activity))
+
+        let facility = self
+            .facilities
+            .get(self.facility_id)
+            .expect("unable to get facility.");
+
+        let level = self.player.get_attribute(Attribute::SkillLevel(Mining), 0) as u8;
+
+        if EngineeringSkill::can_produce(level, facility) {
+            Some(Box::new(activity))
+        } else {
+            None
+        }
     }
 
     fn announce(
@@ -264,7 +283,7 @@ impl Activity for WellDigActivity {
 
     fn on_completion(
         &self,
-        _player: &mut Player,
+        player: &mut Player,
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
@@ -272,27 +291,11 @@ impl Activity for WellDigActivity {
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        facility.increment_property("depth");
+        let result = EngineeringSkill::produce_results_for(player, facility, rng);
 
-        let water_chance = facility.get_property("chance_of_hitting_water");
-        if rng.succeeds(0, water_chance, "water_chance") {
-            facility.set_property("fluid", WellType::Water as u128);
+        if result != Dry {
+            facility.set_property("fluid", result as u128);
             Command::send(Some(command_sender), Command::ActivityAbort);
-            return RefreshInventoryFlag::DontRefreshInventory;
-        }
-
-        let oil_chance = facility.get_property("chance_of_hitting_oil");
-        if rng.succeeds(0, oil_chance, "oil_chance") {
-            facility.set_property("fluid", WellType::Oil as u128);
-            Command::send(Some(command_sender), Command::ActivityAbort);
-            return RefreshInventoryFlag::DontRefreshInventory;
-        }
-
-        let bedrock_chance = facility.get_property("chance_of_hitting_bedrock");
-        if rng.succeeds(0, bedrock_chance, "bedrock_chance") {
-            facility.set_property("fluid", WellType::Bedrock as u128);
-            Command::send(Some(command_sender), Command::ActivityAbort);
-            return RefreshInventoryFlag::DontRefreshInventory;
         }
 
         RefreshInventoryFlag::DontRefreshInventory

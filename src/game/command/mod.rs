@@ -547,6 +547,7 @@ fn use_at<'a>(
                         Some(Box::new(ActivateWellDigCommand::new(
                             player,
                             facility_id,
+                            facilities,
                             timer,
                         )))
                     } else {
