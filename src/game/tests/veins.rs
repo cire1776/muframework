@@ -21,7 +21,7 @@ fn can_dig_dirt_without_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(11, 7);
 
-    rng.set("chance_of_exhaustion", 75);
+    rng.set_fail("chance_of_exhaustion");
 
     player.endorse_with(":can_dig");
 
@@ -95,7 +95,7 @@ fn can_dig_dirt_with_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(11, 7);
 
-    rng.set("chance_of_exhaustion", 0);
+    rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_dig");
 
@@ -172,7 +172,7 @@ fn can_dig_sand_without_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(12, 7);
 
-    rng.set("chance_of_exhaustion", 75);
+    rng.set_fail("chance_of_exhaustion");
 
     player.endorse_with(":can_dig");
 
@@ -246,7 +246,7 @@ fn can_dig_sand_with_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(12, 7);
 
-    rng.set("chance_of_exhaustion", 0);
+    rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_dig");
 
@@ -322,7 +322,7 @@ fn can_mine_stone_without_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(13, 7);
 
-    rng.set("chance_of_exhaustion", 75);
+    rng.set_fail("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
 
@@ -397,7 +397,7 @@ fn can_mine_stone_with_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(13, 7);
 
-    rng.set("chance_of_exhaustion", 0);
+    rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
 
@@ -474,7 +474,7 @@ fn can_mine_tin_without_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(14, 7);
 
-    rng.set("chance_of_exhaustion", 75);
+    rng.set_fail("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
 
@@ -549,7 +549,7 @@ fn can_mine_tin_with_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(14, 7);
 
-    rng.set("chance_of_exhaustion", 0);
+    rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
 
@@ -626,7 +626,7 @@ fn can_mine_copper_without_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(15, 7);
 
-    rng.set("chance_of_exhaustion", 75);
+    rng.set_fail("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
 
@@ -701,7 +701,7 @@ fn can_mine_copper_with_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(15, 7);
 
-    rng.set("chance_of_exhaustion", 0);
+    rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
 
