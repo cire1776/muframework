@@ -224,7 +224,9 @@ impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
             .get(self.facility_id)
             .expect("unable to get facility.");
 
-        let level = self.player.get_attribute(Attribute::SkillLevel(Mining), 0) as u8;
+        let level = self
+            .player
+            .get_attribute(Attribute::SkillLevel(Engineering), 0) as u8;
 
         if EngineeringSkill::can_produce(level, facility) {
             Some(Box::new(activity))
@@ -295,6 +297,12 @@ impl Activity for WellDigActivity {
 
         if result != Dry {
             facility.set_property("fluid", result as u128);
+            Command::send(Some(command_sender.clone()), Command::ActivityAbort);
+        }
+
+        let level = player.get_attribute(Attribute::SkillLevel(Engineering), 0) as u8;
+
+        if !EngineeringSkill::can_produce(level, facility) {
             Command::send(Some(command_sender), Command::ActivityAbort);
         }
 

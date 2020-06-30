@@ -25,6 +25,7 @@ fn can_dig_without_success() {
     rng.set_fail("bedrock_chance");
 
     player.endorse_with(":can_dig");
+    give_player_level(Engineering, 1, &mut player);
 
     let facility = facilities
         .get(get_facility_id_at(13, 11, &&map))
@@ -47,7 +48,7 @@ fn can_dig_without_success() {
         None,
         &Command::Move(Direction::Up, MoveCommandMode::Use),
         Some(&update_tx),
-        None,
+        Some(command_tx.clone()),
     );
 
     assert_eq!(
@@ -117,6 +118,7 @@ fn can_dig_striking_water() {
     rng.set_fail("oil_chance");
 
     player.endorse_with(":can_dig");
+    give_player_level(Engineering, 1, &mut player);
 
     let facility = facilities
         .get(get_facility_id_at(13, 11, &map))
@@ -211,6 +213,7 @@ fn can_dig_striking_oil() {
     rng.set_fail("bedrock_chance");
 
     player.endorse_with(":can_dig");
+    give_player_level(Engineering, 1, &mut player);
 
     let facility = facilities
         .get(get_facility_id_at(13, 11, &map))
@@ -305,6 +308,7 @@ fn can_dig_striking_bedrock() {
     rng.set_succeed("bedrock_chance");
 
     player.endorse_with(":can_dig");
+    give_player_level(Engineering, 1, &mut player);
 
     let facility = facilities
         .get(get_facility_id_at(13, 11, &map))
@@ -595,5 +599,295 @@ fn cannot_fill_from_dry_well() {
     assert!(activity.is_none());
 
     assert_updates_are_empty(&mut update_rx);
+    assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
+fn level_1_cannot_mine_a_level_2_well() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        _command_tx,
+        mut command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(13, 12);
+
+    player.endorse_with(":can_dig");
+    give_player_level(Engineering, 1, &mut player);
+
+    let facility_id = get_facility_id_at(13, 11, &map);
+
+    let facility = facilities
+        .get_mut(facility_id)
+        .expect("unable to find facility");
+
+    facility.set_property("depth", 300);
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        Some(&update_tx),
+        None,
+    );
+
+    assert!(activity.is_none());
+
+    assert_updates_are_empty(&mut update_rx);
+    assert_commands_are_empty(&mut command_rx);
+}
+#[test]
+fn stops_after_the_well_grows_too_deep_for_level_1() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        command_tx,
+        mut command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(13, 12);
+
+    rng.set_fail("water_chance");
+    rng.set_fail("oil_chance");
+    rng.set_fail("bedrock_chance");
+
+    player.endorse_with(":can_dig");
+    give_player_level(Engineering, 1, &mut player);
+
+    let facility_id = get_facility_id_at(13, 11, &map);
+
+    let facility = facilities
+        .get_mut(facility_id)
+        .expect("unable to find facility");
+
+    facility.set_property("depth", 299);
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    let _activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    // assert!(activity.is_none());
+
+    assert_activity_expired(&mut update_rx);
+    assert_activity_started(60000, Digging, &mut update_rx);
+    assert_updates_are_empty(&mut update_rx);
+
+    assert_is_activity_abort(&mut command_rx);
+    assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
+fn stops_after_the_well_grows_too_deep_for_level_29() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        command_tx,
+        mut command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(13, 12);
+
+    rng.set_fail("water_chance");
+    rng.set_fail("oil_chance");
+    rng.set_fail("bedrock_chance");
+
+    player.endorse_with(":can_dig");
+    give_player_level(Engineering, 29, &mut player);
+
+    let facility_id = get_facility_id_at(13, 11, &map);
+
+    let facility = facilities
+        .get_mut(facility_id)
+        .expect("unable to find facility");
+
+    facility.set_property("depth", 649);
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert!(activity.is_some());
+
+    assert_activity_expired(&mut update_rx);
+    assert_activity_started(60000, Digging, &mut update_rx);
+    assert_updates_are_empty(&mut update_rx);
+
+    assert_is_activity_abort(&mut command_rx);
+    assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
+fn stops_after_the_well_grows_too_deep_for_level_45() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        command_tx,
+        mut command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(13, 12);
+
+    rng.set_fail("water_chance");
+    rng.set_fail("oil_chance");
+    rng.set_fail("bedrock_chance");
+
+    player.endorse_with(":can_dig");
+    give_player_level(Engineering, 45, &mut player);
+
+    let facility_id = get_facility_id_at(13, 11, &map);
+
+    let facility = facilities
+        .get_mut(facility_id)
+        .expect("unable to find facility");
+
+    facility.set_property("depth", 999);
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert!(activity.is_some());
+
+    assert_activity_expired(&mut update_rx);
+    assert_activity_started(60000, Digging, &mut update_rx);
+    assert_updates_are_empty(&mut update_rx);
+
+    assert_is_activity_abort(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
