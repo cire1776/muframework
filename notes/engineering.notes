@@ -13,8 +13,8 @@ Digging Mineshaft 5       45      35
                                                  Eng.      Chance
 Bonuses                  Bonus Chance  Collapse  Restores  Richness Richness  size
 -------                         
-Striking Water 1 0-300    100    100     
-Striking Water 2 300-650  200    100
+Striking Water 1 0-299    100    100     
+Striking Water 2 300-649  200    100
 Striking Water 3 650-999  300    100
 Striking Oil             1000  10000
 Striking Bedrock         5000  50000
