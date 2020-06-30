@@ -1,4 +1,5 @@
 use super::*;
+use skills::smelting::*;
 
 // TODO: change facility to reflect open chest status.
 pub struct OpenSmelteryCommand<'a> {
@@ -31,20 +32,21 @@ impl<'a> CommandHandler<'a> for OpenSmelteryCommand<'a> {
         activity: Option<Box<dyn Activity>>,
         update_tx: &GameUpdateSender,
     ) -> Option<Box<dyn Activity>> {
+        let products = SmeltingSkill::products_for_player_level(self.player)
+            .iter()
+            .map(|p| p.to_string())
+            .collect();
+
         GameUpdate::send(
             Some(update_tx),
-            GameUpdate::DisplayOptions(
-                SmeltingSkill::products_for_player_level(self.player),
-                ActionContinuation::Smeltery,
-                self.facility_id,
-            ),
+            GameUpdate::DisplayOptions(products, ActionContinuation::Smeltery, self.facility_id),
         );
         activity
     }
 }
 
 pub struct ActivateSmelteryCommand<'a> {
-    product: SmeltingSkill,
+    product: SmeltingType,
     player: &'a mut Player,
     inventories: &'a mut InventoryList,
     facility_id: u64,
@@ -59,7 +61,8 @@ impl<'a> ActivateSmelteryCommand<'a> {
         inventories: &'a mut InventoryList,
         timer: &'a mut Timer,
     ) -> Self {
-        let product = SmeltingSkill::products()[(product_index - 1) as usize].0;
+        let product =
+            SmeltingSkill::products_for_player_level(player)[(product_index - 1) as usize];
 
         Self {
             product,
@@ -120,7 +123,7 @@ impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
 }
 
 pub struct SmeltingActivity {
-    product: SmeltingSkill,
+    product: SmeltingType,
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
@@ -129,7 +132,7 @@ pub struct SmeltingActivity {
 
 impl SmeltingActivity {
     fn new(
-        product: SmeltingSkill,
+        product: SmeltingType,
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,

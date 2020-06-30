@@ -1,8 +1,94 @@
 use super::*;
-use SmeltingSkill::*;
+use SmeltingType::*;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
-pub enum SmeltingSkill {
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum OreType {
+    Tin,
+    Copper,
+    Coal,
+    Lead,
+    Cinnabar,
+    Iron,
+    Tungsten,
+    Cobalt,
+    Nickel,
+    Steel,
+    Gold,
+    Bauxite,
+    Silver,
+    Zinc,
+    Platinum,
+    Titanium,
+    Mythral,
+}
+
+impl ToString for OreType {
+    fn to_string(&self) -> String {
+        match self {
+            OreType::Tin => "Tin",
+            OreType::Copper => "Copper",
+            OreType::Coal => "Coal",
+            OreType::Lead => "Lead",
+            OreType::Cinnabar => "Cinnabar",
+            OreType::Iron => "Iron",
+            OreType::Tungsten => "Tungsten",
+            OreType::Cobalt => "Cobalt",
+            OreType::Nickel => "Nickel",
+            OreType::Steel => "Steel",
+            OreType::Gold => "Gold",
+            OreType::Bauxite => "Bauxite",
+            OreType::Silver => "Silver",
+            OreType::Zinc => "Zinc",
+            OreType::Platinum => "Platinum",
+            OreType::Titanium => "Titanium",
+            OreType::Mythral => "Mythral",
+        }
+        .to_string()
+    }
+}
+
+lazy_static! {
+    static ref SMELTING_PRODUCTS: HashMap<SmeltingType, SmeltingProduct> = {
+        let mut m = HashMap::new();
+        m.insert(Tin, SmeltingProduct::new(1, 5));
+        m.insert(Copper, SmeltingProduct::new(2, 6));
+        m.insert(Bronze, SmeltingProduct::new(4, 7));
+        m.insert(Lead, SmeltingProduct::new(6, 8));
+        m.insert(Mercury, SmeltingProduct::new(9, 10));
+        m.insert(Iron, SmeltingProduct::new(12, 15));
+        m.insert(Tungsten, SmeltingProduct::new(12, 15));
+        m.insert(Cobalt, SmeltingProduct::new(15, 20));
+        m.insert(Nickel, SmeltingProduct::new(18, 25));
+        m.insert(Steel, SmeltingProduct::new(21, 30));
+        m.insert(Gold, SmeltingProduct::new(24, 35));
+        m.insert(Aluminum, SmeltingProduct::new(27, 40));
+        m.insert(Silver, SmeltingProduct::new(30, 45));
+        m.insert(Zinc, SmeltingProduct::new(33, 50));
+        m.insert(Platinum, SmeltingProduct::new(36, 55));
+        m.insert(StainlessSteel, SmeltingProduct::new(39, 60));
+        m.insert(Stellite, SmeltingProduct::new(40, 65));
+        m.insert(Titanium, SmeltingProduct::new(43, 70));
+        m.insert(Mythral, SmeltingProduct::new(45, 75));
+        m
+    };
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct SmeltingProduct {
+    smelting_level: u8,
+    smelting_xp: u8,
+}
+
+impl SmeltingProduct {
+    pub fn new(smelting_level: u8, smelting_xp: u8) -> Self {
+        Self {
+            smelting_level,
+            smelting_xp,
+        }
+    }
+}
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum SmeltingType {
     Tin,
     Copper,
     Bronze,
@@ -24,7 +110,7 @@ pub enum SmeltingSkill {
     Mythral,
 }
 
-impl ToString for SmeltingSkill {
+impl ToString for SmeltingType {
     fn to_string(&self) -> String {
         match self {
             Tin => "Tin",
@@ -50,47 +136,32 @@ impl ToString for SmeltingSkill {
         .to_string()
     }
 }
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum SmeltingSkill {}
 
 impl SmeltingSkill {
-    pub fn products() -> Vec<(SmeltingSkill, u8)> {
-        vec![
-            (Tin, 1),             // simple
-            (Copper, 2),          // simple
-            (Bronze, 4),          // 50/50 compound
-            (Lead, 6),            // simple
-            (Mercury, 9),         // simple
-            (Iron, 12),           // simple
-            (Tungsten, 12),       // simple
-            (Cobalt, 15),         // simple
-            (Nickel, 18),         // simple
-            (Steel, 21),          // 3 steel 1 coal + fuel
-            (Gold, 24),           // mercury compound
-            (Aluminum, 27),       // simple
-            (Silver, 30),         // mercury compound
-            (Zinc, 33),           // simple
-            (Platinum, 36),       // mercury compound
-            (StainlessSteel, 39), // zinc compound
-            (Stellite, 40),       // 50/50 compound
-            (Titanium, 43),       // simple
-            (Mythral, 45),        // simple
-        ]
-    }
-    pub fn products_for_player_level(player: &Player) -> Vec<String> {
+    pub fn products_for_player_level(player: &Player) -> Vec<SmeltingType> {
         let level = std::cmp::max(
             1,
             player.get_attribute(Attribute::SkillLevel(Smelting.into()), 0),
         ) as u8;
 
-        let products = Self::products()
+        let mut sorted_product_list = SMELTING_PRODUCTS
             .iter()
-            .take_while(|p| p.1 <= level)
-            .map(|p| p.0.to_string())
+            .collect::<Vec<(&SmeltingType, &SmeltingProduct)>>();
+
+        sorted_product_list.sort_by(|e, other| e.0.cmp(other.0));
+
+        let products = sorted_product_list
+            .iter()
+            .take_while(|(_, p)| p.smelting_level <= level)
+            .map(|(p, _)| **p)
             .collect();
 
         products
     }
 
-    pub fn can_produce(product: SmeltingSkill, inventory: &Inventory) -> bool {
+    pub fn can_produce(product: SmeltingType, inventory: &Inventory) -> bool {
         match product {
             Tin | Copper | Lead | Iron | Tungsten | Cobalt | Nickel => {
                 if !inventory.has_sufficient(
@@ -213,7 +284,7 @@ impl SmeltingSkill {
     }
 
     pub fn consume_from_inventory_for(
-        product: SmeltingSkill,
+        product: SmeltingType,
         inventory: &mut Inventory,
         items: &mut ItemList,
     ) {

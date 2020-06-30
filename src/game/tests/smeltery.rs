@@ -221,7 +221,7 @@ fn can_smelt_tin_with_excess_quantities() {
 }
 
 #[test]
-fn can_smelt_tin_with_just_enough_for_one() {
+fn stops_when_supplies_run_out() {
     let (
         mut player,
         mut map,
