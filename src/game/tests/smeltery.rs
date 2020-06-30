@@ -20,7 +20,7 @@ fn can_open_a_smeltery_at_level_10() {
         mut game_state,
     ) = initialize_game_system_with_player_at(9, 5);
 
-    give_player_level("smelting", 10, &mut player);
+    give_player_level(Smelting, 10, &mut player);
 
     give_player_spawned_items(Ore, "Tin Ore", 4, &mut player, &mut inventories, &mut items);
     give_player_spawned_items(
@@ -78,7 +78,7 @@ fn can_open_a_smeltery_at_level_45() {
         mut game_state,
     ) = initialize_game_system_with_player_at(9, 5);
 
-    give_player_level("smelting", 45, &mut player);
+    give_player_level(Smelting, 45, &mut player);
 
     give_player_spawned_items(Ore, "Tin Ore", 4, &mut player, &mut inventories, &mut items);
     give_player_spawned_items(

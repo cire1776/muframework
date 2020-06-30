@@ -61,7 +61,7 @@ impl<'a> CommandHandler<'a> for ActivateLumberMillCommand<'a> {
             LogType::Hardwood => 60,
         } + self
             .player
-            .get_attribute(Attribute::SkillTime("construction".into()), 0)) as u32
+            .get_attribute(Attribute::SkillTime(Construction), 0)) as u32
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
@@ -136,7 +136,7 @@ impl Activity for LumbermillActivity {
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let level = player.get_attribute(Attribute::SkillLevel("construction".into()), 0) as u8;
+        let level = player.get_attribute(Attribute::SkillLevel(Construction), 0) as u8;
 
         {
             let inventory = inventories
@@ -179,7 +179,7 @@ impl Activity for LumbermillActivity {
                 .get_mut(&player.inventory_id())
                 .expect("unable to find inventory");
 
-            let level = player.get_attribute(Attribute::SkillLevel("construction".into()), 0) as u8;
+            let level = player.get_attribute(Attribute::SkillLevel(Construction), 0) as u8;
             if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
                 Command::send(Some(command_sender), Command::ActivityAbort);
             }

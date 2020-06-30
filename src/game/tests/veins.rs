@@ -1,4 +1,5 @@
 use super::*;
+use ui::PaneTitle;
 
 #[test]
 fn can_dig_dirt_without_exhaustion() {
@@ -347,7 +348,7 @@ fn can_mine_stone_without_exhaustion() {
         chrono::Duration::seconds(60)
     );
 
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -367,7 +368,7 @@ fn can_mine_stone_without_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Stone", &mut command_rx);
@@ -422,7 +423,7 @@ fn can_mine_stone_with_exhaustion() {
         chrono::Duration::seconds(60)
     );
 
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -442,7 +443,7 @@ fn can_mine_stone_with_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Stone", &mut command_rx);
@@ -499,7 +500,7 @@ fn can_mine_tin_without_exhaustion() {
         chrono::Duration::seconds(60)
     );
 
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -519,7 +520,7 @@ fn can_mine_tin_without_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Tin Ore", &mut command_rx);
@@ -574,7 +575,7 @@ fn can_mine_tin_with_exhaustion() {
         chrono::Duration::seconds(60)
     );
 
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -594,7 +595,7 @@ fn can_mine_tin_with_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Tin Ore", &mut command_rx);
@@ -651,7 +652,7 @@ fn can_mine_copper_without_exhaustion() {
         chrono::Duration::seconds(60)
     );
 
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -671,7 +672,7 @@ fn can_mine_copper_without_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Copper Ore", &mut command_rx);
@@ -726,7 +727,7 @@ fn can_mine_copper_with_exhaustion() {
         chrono::Duration::seconds(60)
     );
 
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -746,7 +747,7 @@ fn can_mine_copper_with_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, Mining, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Copper Ore", &mut command_rx);

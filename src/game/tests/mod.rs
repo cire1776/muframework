@@ -223,9 +223,8 @@ pub fn compare_tuple_quantity_arrays(
         .all(|(a, b)| a.0 == b.0 && a.1 == b.1)
 }
 
-pub fn give_player_level<S: ToString>(skill: S, level: u8, player: &mut Player) {
-    let skill = skill.to_string();
-    player.remove_buff(BuffTag::Level(skill.clone()));
+pub fn give_player_level(skill: Skill, level: u8, player: &mut Player) {
+    player.remove_buff(BuffTag::Level(skill));
     player.add_buff(
         Attribute::SkillLevel(skill.clone()),
         (level as i8, 0, BuffTag::Level(skill)),

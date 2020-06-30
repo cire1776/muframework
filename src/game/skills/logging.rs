@@ -16,7 +16,7 @@ impl LoggingSkill {
             TreeType::Oak => 8,
         };
 
-        player.increment_xp("logging", xp_gain);
+        player.increment_xp(Logging, xp_gain);
 
         let wood_type = match product {
             TreeType::Apple | TreeType::Olive | TreeType::Oak => "Hardwood Log",

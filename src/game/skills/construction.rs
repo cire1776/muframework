@@ -34,7 +34,7 @@ impl ConstructionSkill {
             LogType::Hardwood => 10,
         };
 
-        player.increment_xp("construction", xp_gain);
+        player.increment_xp(Construction, xp_gain);
 
         (Material, format!("{} Plank", Self::wood(product)))
     }

@@ -13,7 +13,7 @@ pub struct Player {
     endorsements: HashMap<String, u32>,
     endorsement_components: HashMap<String, String>,
     attributes: AttributeList,
-    xp: HashMap<String, u64>,
+    xp: HashMap<Skill, u64>,
 }
 
 impl Player {
@@ -34,12 +34,12 @@ impl Player {
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");
         player.add_buff(
-            Attribute::SkillLevel("smelting".into()),
-            (45, 0, BuffTag::Level("smelting".into())),
+            Attribute::SkillLevel(Smelting),
+            (45, 0, BuffTag::Level(Smelting)),
         );
         player.add_buff(
-            Attribute::SkillTime("smelting".into()),
-            (-45, 0, BuffTag::Level("smelting".into())),
+            Attribute::SkillTime(Smelting),
+            (-45, 0, BuffTag::Level(Smelting)),
         );
         player
     }
@@ -105,9 +105,9 @@ impl Player {
         self.attributes.remove(tag);
     }
 
-    pub fn increment_xp<S: ToString>(&mut self, skill: S, value: u64) {
-        let skill = skill.to_string();
+    // pub fn get_level_for()
 
+    pub fn increment_xp(&mut self, skill: Skill, value: u64) {
         let xp = self.xp.get_mut(&skill);
         match xp {
             Some(xp) => *xp += value,
@@ -117,8 +117,8 @@ impl Player {
         }
     }
 
-    pub fn get_xp<S: ToString>(&mut self, skill: S) -> u64 {
-        let xp = self.xp.get(&skill.to_string());
+    pub fn get_xp(&mut self, skill: Skill) -> u64 {
+        let xp = self.xp.get(&skill);
         match xp {
             Some(xp) => *xp,
             None => 0,
@@ -285,42 +285,35 @@ mod attributes {
     fn get_attribute_returns_the_value_of_the_attribute_as_set() {
         let mut subject = Player::new();
 
-        subject.attributes.add(
-            SkillTime("fishing".into()),
-            (-3, 0, Level("fishing".into())),
-        );
         subject
             .attributes
-            .add(SkillTime("fishing".into()), (-2, 30000, Effect));
+            .add(SkillTime(Fishing.into()), (-3, 0, Level(Fishing.into())));
+        subject
+            .attributes
+            .add(SkillTime(Fishing.into()), (-2, 30000, Effect));
 
-        assert_eq!(subject.get_attribute(SkillTime("fishing".into()), 0), -5);
+        assert_eq!(subject.get_attribute(SkillTime(Fishing.into()), 0), -5);
     }
 
     #[test]
     fn add_attributes_adds_an_attribute() {
         let mut subject = Player::new();
 
-        subject.add_buff(
-            SkillTime("fishing".into()),
-            (-3, 0, Level("fishing".into())),
-        );
-        subject.add_buff(SkillTime("fishing".into()), (-2, 30000, Effect));
+        subject.add_buff(SkillTime(Fishing.into()), (-3, 0, Level(Fishing.into())));
+        subject.add_buff(SkillTime(Fishing.into()), (-2, 30000, Effect));
 
-        assert_eq!(subject.get_attribute(SkillTime("fishing".into()), 0), -5);
+        assert_eq!(subject.get_attribute(SkillTime(Fishing.into()), 0), -5);
     }
 
     #[test]
     fn remove_buff_removes_a_buff_with_a_particular_tag() {
         let mut subject = Player::new();
 
-        subject.add_buff(
-            SkillTime("fishing".into()),
-            (-3, 0, Level("fishing".into())),
-        );
-        subject.add_buff(SkillTime("fishing".into()), (-2, 30000, Effect));
+        subject.add_buff(SkillTime(Fishing.into()), (-3, 0, Level(Fishing.into())));
+        subject.add_buff(SkillTime(Fishing.into()), (-2, 30000, Effect));
 
         subject.remove_buff(Effect);
 
-        assert_eq!(subject.get_attribute(SkillTime("fishing".into()), 0), -3);
+        assert_eq!(subject.get_attribute(SkillTime(Fishing.into()), 0), -3);
     }
 }

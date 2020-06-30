@@ -67,9 +67,7 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
             TreeType::Apple => 60,
             TreeType::Olive => 90,
             _ => panic!("Non-fruit tree supplied"),
-        } + self
-            .player
-            .get_attribute(Attribute::SkillTime("logging".into()), 0)) as u32
+        } + self.player.get_attribute(Attribute::SkillTime(Logging), 0)) as u32
     }
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = TreePickingActivity::new(
@@ -225,9 +223,7 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (60 + self
-            .player
-            .get_attribute(Attribute::SkillTime("logging".into()), 0)) as u32
+        (60 + self.player.get_attribute(Attribute::SkillTime(Logging), 0)) as u32
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {

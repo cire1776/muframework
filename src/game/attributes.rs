@@ -1,5 +1,5 @@
 use super::*;
-
+pub use Skill::*;
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum BuffTag {
     None,
@@ -10,14 +10,14 @@ pub enum BuffTag {
     Guild(String),
     Base,
     Effect,
-    Level(String),
+    Level(Skill),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub enum Attribute {
-    SkillTime(String),
-    SkillChance(String),
-    SkillLevel(String),
+    SkillTime(Skill),
+    SkillChance(Skill),
+    SkillLevel(Skill),
     Fortune,
     SpellCastPeriod,
     SpellDamage,
@@ -29,9 +29,9 @@ pub enum Attribute {
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum AttributeBuff {
-    SkillTime(String, i8, u128),
-    SkillChance(String, i8, u128),
-    SkillLevel(String, i8, u128),
+    SkillTime(Skill, i8, u128),
+    SkillChance(Skill, i8, u128),
+    SkillLevel(Skill, i8, u128),
     Fortune(i8, u128),
     SpellCastPeriod(i8, u128),
     SpellDamage(i8, u128),
@@ -142,7 +142,7 @@ mod attribute_list {
     fn add_adds_a_buff_to_an_empty_attribute() {
         let mut subject = AttributeList::new();
 
-        subject.add(SkillTime("fishing".into()), (-3, 0, Equipment(1159)));
+        subject.add(SkillTime(Fishing), (-3, 0, Equipment(1159)));
 
         assert_eq!(subject.attributes.len(), 1);
     }
@@ -150,37 +150,37 @@ mod attribute_list {
     #[test]
     fn add_adds_a_buff_to_a_preexisting_attribute() {
         let mut subject = AttributeList::new();
-        subject.add(SkillTime("fishing".into()), (-3, 0, Equipment(1159)));
-        subject.add(SkillTime("fishing".into()), (-3, 30000, Effect));
+        subject.add(SkillTime(Fishing.into()), (-3, 0, Equipment(1159)));
+        subject.add(SkillTime(Fishing.into()), (-3, 30000, Effect));
 
         assert_eq!(subject.attributes.len(), 1);
-        assert_eq!(subject.attributes[&SkillTime("fishing".into())].len(), 2);
+        assert_eq!(subject.attributes[&SkillTime(Fishing.into())].len(), 2);
     }
 
     #[test]
     fn get_returns_0_if_not_attribute_has_been_set() {
         let subject = AttributeList::new();
 
-        assert_eq!(subject.get(&SkillChance("bogus_skill".into()), 0), 0);
+        assert_eq!(subject.get(&SkillChance(Fishing), 0), 0);
     }
 
     #[test]
     fn get_returns_3_if_attribute_has_been_set_for_3() {
         let mut subject = AttributeList::new();
 
-        subject.add(SkillChance("bogus_skill".into()), (3, 0, Base));
+        subject.add(SkillChance(Fishing), (3, 0, Base));
 
-        assert_eq!(subject.get(&SkillChance("bogus_skill".into()), 0), 3);
+        assert_eq!(subject.get(&SkillChance(Fishing), 0), 3);
     }
 
     #[test]
     fn get_returns_5_if_two_attributes_have_been_set_for_5() {
         let mut subject = AttributeList::new();
 
-        subject.add(SkillChance("bogus_skill".into()), (3, 0, Base));
-        subject.add(SkillChance("bogus_skill".into()), (2, 0, Base));
+        subject.add(SkillChance(Fishing), (3, 0, Base));
+        subject.add(SkillChance(Fishing), (2, 0, Base));
 
-        assert_eq!(subject.get(&SkillChance("bogus_skill".into()), 0), 5);
+        assert_eq!(subject.get(&SkillChance(Fishing), 0), 5);
     }
 
     #[test]

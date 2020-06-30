@@ -1,5 +1,7 @@
 use super::*;
 
+use ui::PaneTitle;
+
 #[test]
 fn can_cook_fish_successfully() {
     let (
@@ -23,9 +25,9 @@ fn can_cook_fish_successfully() {
     rng.set_succeed("cooking_success");
 
     player.endorse_component_with(":wants_to_cook", "shrimp");
-    give_player_level("cooking", 4, &mut player);
+    give_player_level(Cooking, 4, &mut player);
 
-    let exp_xp = player.get_xp("cooking") + 3;
+    let exp_xp = player.get_xp(Cooking) + 3;
 
     equip_player_with_spawned_item(
         Ingredient,
@@ -85,7 +87,7 @@ fn can_cook_fish_successfully() {
     );
     assert!(activity.is_some());
 
-    assert_activity_started(60_000, Cooking, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Cooking, &mut update_rx);
 
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
@@ -108,7 +110,7 @@ fn can_cook_fish_successfully() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60000, Cooking, &mut update_rx);
+    assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Food, "Grilled Shrimp", &mut command_rx);
@@ -126,7 +128,7 @@ fn can_cook_fish_successfully() {
     assert_eq!(shrimp_count, exp_shrimp_count);
     assert_eq!(log_count, exp_log_count);
 
-    assert_eq!(player.get_xp("cooking"), exp_xp);
+    assert_eq!(player.get_xp(Cooking), exp_xp);
 }
 
 #[test]
@@ -153,7 +155,7 @@ fn can_burn_fish() {
 
     player.endorse_component_with(":wants_to_cook", "shrimp");
 
-    let exp_xp = player.get_xp("cooking") + 1;
+    let exp_xp = player.get_xp(Cooking) + 1;
 
     equip_player_with_spawned_item(
         Ingredient,
@@ -213,7 +215,7 @@ fn can_burn_fish() {
     );
     assert!(activity.is_some());
 
-    assert_activity_started(60000, Cooking, &mut update_rx);
+    assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
 
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
@@ -236,7 +238,7 @@ fn can_burn_fish() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60000, Cooking, &mut update_rx);
+    assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Material, "Burnt Shrimp", &mut command_rx);
@@ -254,7 +256,7 @@ fn can_burn_fish() {
     assert_eq!(shrimp_count, exp_shrimp_count);
     assert_eq!(log_count, exp_log_count);
 
-    assert_eq!(player.get_xp("cooking"), exp_xp);
+    assert_eq!(player.get_xp(Cooking), exp_xp);
 }
 
 #[test]
@@ -280,7 +282,7 @@ fn stops_cooking_when_supplies_run_out() {
     rng.set_succeed("cooking_success");
 
     player.endorse_component_with(":wants_to_cook", "shrimp");
-    give_player_level("cooking", 4, &mut player);
+    give_player_level(Cooking, 4, &mut player);
 
     equip_player_with_spawned_item(
         Ingredient,
@@ -347,7 +349,7 @@ fn stops_cooking_when_supplies_run_out() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, Cooking, &mut update_rx);
+    assert_activity_started(60_000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Food, "Grilled Shrimp", &mut command_rx);

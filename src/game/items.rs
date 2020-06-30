@@ -211,12 +211,16 @@ impl ItemType {
                         .expect("unable to get value");
 
                     let buff = match attribute_name {
-                        "SkillTime" => {
-                            AttributeBuff::SkillTime(attribute_subname.into(), attribute_value, 0)
-                        }
-                        "SkillChance" => {
-                            AttributeBuff::SkillChance(attribute_subname.into(), attribute_value, 0)
-                        }
+                        "SkillTime" => AttributeBuff::SkillTime(
+                            Skill::from_string(attribute_subname),
+                            attribute_value,
+                            0,
+                        ),
+                        "SkillChance" => AttributeBuff::SkillChance(
+                            Skill::from_string(attribute_subname),
+                            attribute_value,
+                            0,
+                        ),
                         "Fortune" => AttributeBuff::Fortune(attribute_value, 0),
                         "SpellCastPeriod" => AttributeBuff::SpellCastPeriod(attribute_value, 0),
                         "SpellDamage" => AttributeBuff::SpellDamage(attribute_value, 0),

@@ -258,7 +258,7 @@ impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
         let base_time = self.fishing_spot_properties.net_timer();
         let modifier = self
             .player
-            .get_attribute(Attribute::SkillTime("fishing".into()), 0);
+            .get_attribute(Attribute::SkillTime(Fishing.into()), 0);
 
         (base_time as i64 + modifier as i64) as u32
     }
@@ -408,7 +408,7 @@ impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
         let base_time = self.fishing_spot_properties.rod_timer();
         let modifier = self
             .player
-            .get_attribute(Attribute::SkillTime("fishing".into()), 0);
+            .get_attribute(Attribute::SkillTime(Fishing.into()), 0);
 
         (base_time as i64 + modifier as i64) as u32
     }
@@ -558,7 +558,7 @@ impl<'a> CommandHandler<'a> for ActivatePlaceFishingTrapCommand<'a> {
         let base_time = self.fishing_spot_properties.trap_timer();
         let modifier = self
             .player
-            .get_attribute(Attribute::SkillTime("fishing".into()), 0);
+            .get_attribute(Attribute::SkillTime(Fishing.into()), 0);
 
         (base_time as i64 + modifier as i64) as u32
     }
@@ -714,7 +714,7 @@ impl<'a> CommandHandler<'a> for ActivateCollectFishingTrapCommand<'a> {
         let base_time = self.fishing_spot_properties.trap_timer();
         let modifier = self
             .player
-            .get_attribute(Attribute::SkillTime("fishing".into()), 0);
+            .get_attribute(Attribute::SkillTime(Fishing.into()), 0);
 
         (base_time as i64 + modifier as i64) as u32
     }

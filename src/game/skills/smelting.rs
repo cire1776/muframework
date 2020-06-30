@@ -78,7 +78,7 @@ impl SmeltingSkill {
     pub fn products_for_player_level(player: &Player) -> Vec<String> {
         let level = std::cmp::max(
             1,
-            player.get_attribute(Attribute::SkillLevel("smelting".into()), 0),
+            player.get_attribute(Attribute::SkillLevel(Smelting.into()), 0),
         ) as u8;
 
         let products = Self::products()

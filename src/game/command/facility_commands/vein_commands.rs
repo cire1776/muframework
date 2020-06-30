@@ -88,9 +88,7 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
             Dirt => 40,
             Sand => 20,
             _ => 60,
-        } + self
-            .player
-            .get_attribute(Attribute::SkillTime("mining".into()), 0)) as u32
+        } + self.player.get_attribute(Attribute::SkillTime(Mining), 0)) as u32
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {

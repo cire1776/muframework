@@ -22,7 +22,7 @@ fn can_saw_softwood_without_breaking_mill() {
 
     rng.set_succeed("lumbermill_breaks");
 
-    let exp_xp = player.get_xp("construction") + 5;
+    let exp_xp = player.get_xp(Construction) + 5;
 
     player.endorse_component_with(":wants_to_mill", "softwood");
 
@@ -97,7 +97,7 @@ fn can_saw_softwood_without_breaking_mill() {
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 
-    assert_eq!(player.get_xp("construction"), exp_xp);
+    assert_eq!(player.get_xp(Construction), exp_xp);
 }
 
 #[test]
@@ -122,7 +122,7 @@ fn can_saw_hardwood_without_breaking_mill() {
 
     rng.set_succeed("lumbermill_breaks");
 
-    let exp_xp = player.get_xp("construction") + 10;
+    let exp_xp = player.get_xp(Construction) + 10;
 
     player.endorse_component_with(":wants_to_mill", "hardwood");
 
@@ -197,7 +197,7 @@ fn can_saw_hardwood_without_breaking_mill() {
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 
-    assert_eq!(player.get_xp("construction"), exp_xp);
+    assert_eq!(player.get_xp(Construction), exp_xp);
 }
 
 #[test]

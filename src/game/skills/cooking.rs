@@ -100,15 +100,15 @@ impl CookingSkill {
     ) -> (ItemClass, String) {
         let recipe = &COOKING_RECIPES[&product];
 
-        let level = player.get_attribute(Attribute::SkillLevel("cooking".into()), 0) as u8;
+        let level = player.get_attribute(Attribute::SkillLevel(Cooking), 0) as u8;
 
         let success = Self::succeeds(recipe, level, rng);
 
         if success {
-            player.increment_xp("cooking", recipe.xp_on_success as u64);
+            player.increment_xp(Cooking, recipe.xp_on_success as u64);
             (Food, recipe.success_product.clone())
         } else {
-            player.increment_xp("cooking", recipe.xp_on_failure as u64);
+            player.increment_xp(Cooking, recipe.xp_on_failure as u64);
             (Material, format!("Burnt {}", product.to_string()))
         }
     }

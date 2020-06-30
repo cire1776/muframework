@@ -41,15 +41,11 @@ impl<'a> CommandHandler<'a> for ActivateFirepitCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (60 + self
-            .player
-            .get_attribute(Attribute::SkillTime("cooking".into()), 0)) as u32
+        (60 + self.player.get_attribute(Attribute::SkillTime(Cooking), 0)) as u32
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
-        let level = self
-            .player
-            .get_attribute(Attribute::SkillLevel("cooking".into()), 0);
+        let level = self.player.get_attribute(Attribute::SkillLevel(Cooking), 0);
 
         let activity = FirepitActivity::new(
             self.fish_type,
@@ -148,7 +144,7 @@ impl Activity for FirepitActivity {
             .get(&player.inventory_id())
             .expect("unable to get player inventory.");
 
-        let level = player.get_attribute(Attribute::SkillLevel("cooking".into()), 0) as u8;
+        let level = player.get_attribute(Attribute::SkillLevel(Cooking), 0) as u8;
 
         if !CookingSkill::can_produce(self.fish_type, level, inventory) {
             Command::send(Some(command_sender), Command::ActivityAbort);
