@@ -1,0 +1,25 @@
+                        level    xp_gain
+Digging Well 1            1       10
+Studying from Book        5       10
+Drafting                  10      12  
+Digging Mineshaft 1       15      15
+Digging Well 2            20      18
+Digging Mineshaft 2       25      20
+Digging Well 3            30      23
+Digging Mineshaft 3       35      26
+Digging Mineshaft 4       40      20
+Digging Mineshaft 5       45      35
+
+                                                 Eng.      Chance
+Bonuses                  Bonus Chance  Collapse  Restores  Richness Richness  size
+-------                         
+Striking Water 1 0-300    100    100     
+Striking Water 2 300-650  200    100
+Striking Water 3 650-999  300    100
+Striking Oil             1000  10000
+Striking Bedrock         5000  50000
+Completing Mineshaft 1   1000  10000    1000      10         50      50      20x20
+Completing Mineshaft 2   5000  50000     900                                 15x15
+Completing Mineshaft 3  10000 100000     750                                 15x15
+Completing Mineshaft 4  50000 250000     500                                 15x10
+Completing Mineshaft 5 250000 500000     250                                 10x10
