@@ -23,6 +23,7 @@ fn can_dig_dirt_without_exhaustion() {
 
     rng.set_fail("chance_of_exhaustion");
 
+    give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_dig");
 
     let activity = game_state.game_loop_iteration(
@@ -96,6 +97,7 @@ fn can_dig_dirt_with_exhaustion() {
     ) = initialize_game_system_with_player_at(11, 7);
 
     rng.set_succeed("chance_of_exhaustion");
+    give_player_level(Mining, 1, &mut player);
 
     player.endorse_with(":can_dig");
 
@@ -174,6 +176,7 @@ fn can_dig_sand_without_exhaustion() {
 
     rng.set_fail("chance_of_exhaustion");
 
+    give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_dig");
 
     let activity = game_state.game_loop_iteration(
@@ -246,6 +249,7 @@ fn can_dig_sand_with_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(12, 7);
 
+    give_player_level(Mining, 1, &mut player);
     rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_dig");
@@ -324,6 +328,7 @@ fn can_mine_stone_without_exhaustion() {
 
     rng.set_fail("chance_of_exhaustion");
 
+    give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_mine");
 
     let activity = game_state.game_loop_iteration(
@@ -399,6 +404,7 @@ fn can_mine_stone_with_exhaustion() {
 
     rng.set_succeed("chance_of_exhaustion");
 
+    give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_mine");
 
     let activity = game_state.game_loop_iteration(
@@ -474,6 +480,7 @@ fn can_mine_tin_without_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(14, 7);
 
+    give_player_level(Mining, 2, &mut player);
     rng.set_fail("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
@@ -549,6 +556,7 @@ fn can_mine_tin_with_exhaustion() {
         mut game_state,
     ) = initialize_game_system_with_player_at(14, 7);
 
+    give_player_level(Mining, 2, &mut player);
     rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
@@ -628,6 +636,7 @@ fn can_mine_copper_without_exhaustion() {
 
     rng.set_fail("chance_of_exhaustion");
 
+    give_player_level(Mining, 3, &mut player);
     player.endorse_with(":can_mine");
 
     let activity = game_state.game_loop_iteration(
@@ -703,6 +712,7 @@ fn can_mine_copper_with_exhaustion() {
 
     rng.set_succeed("chance_of_exhaustion");
 
+    give_player_level(Mining, 3, &mut player);
     player.endorse_with(":can_mine");
 
     let activity = game_state.game_loop_iteration(

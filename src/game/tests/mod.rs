@@ -281,14 +281,15 @@ pub fn assert_activity_started(
     exp_title: ui::pane::PaneTitle,
     update_rx: &mut Receiver<GameUpdate>,
 ) {
-    let update = update_rx.try_recv().unwrap();
+    let update = update_rx.try_recv();
 
     match update {
-        GameUpdate::ActivityStarted(millis, title) => {
+        Ok(GameUpdate::ActivityStarted(millis, title)) => {
             assert_eq!(millis, duration);
             assert_eq!(title, exp_title);
         }
-        _ => panic!("unexpected update"),
+        Err(error) => panic!("error received: {:?}", error),
+        _ => panic!("unexpected update: {:?}", update),
     }
 }
 

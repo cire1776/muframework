@@ -1,52 +1,6 @@
 use super::*;
 use SmeltingType::*;
 
-#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
-pub enum OreType {
-    Tin,
-    Copper,
-    Coal,
-    Lead,
-    Cinnabar,
-    Iron,
-    Tungsten,
-    Cobalt,
-    Nickel,
-    Steel,
-    Gold,
-    Bauxite,
-    Silver,
-    Zinc,
-    Platinum,
-    Titanium,
-    Mythral,
-}
-
-impl ToString for OreType {
-    fn to_string(&self) -> String {
-        match self {
-            OreType::Tin => "Tin",
-            OreType::Copper => "Copper",
-            OreType::Coal => "Coal",
-            OreType::Lead => "Lead",
-            OreType::Cinnabar => "Cinnabar",
-            OreType::Iron => "Iron",
-            OreType::Tungsten => "Tungsten",
-            OreType::Cobalt => "Cobalt",
-            OreType::Nickel => "Nickel",
-            OreType::Steel => "Steel",
-            OreType::Gold => "Gold",
-            OreType::Bauxite => "Bauxite",
-            OreType::Silver => "Silver",
-            OreType::Zinc => "Zinc",
-            OreType::Platinum => "Platinum",
-            OreType::Titanium => "Titanium",
-            OreType::Mythral => "Mythral",
-        }
-        .to_string()
-    }
-}
-
 lazy_static! {
     static ref SMELTING_PRODUCTS: HashMap<SmeltingType, SmeltingProduct> = {
         let mut m = HashMap::new();

@@ -1,42 +1,8 @@
 use super::*;
-use VeinType::*;
-
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum VeinType {
-    Dirt = 1,
-    Sand,
-    Stone,
-    Tin,
-    Copper,
-}
-
-impl ToString for VeinType {
-    fn to_string(&self) -> String {
-        match self {
-            Dirt => "Dirt".into(),
-            Sand => "Sand".into(),
-            Stone => "Stone".into(),
-            Tin => "Tin".into(),
-            Copper => "Copper".into(),
-        }
-    }
-}
-
-impl VeinType {
-    pub fn from(value: i128) -> Self {
-        match value {
-            1 => Dirt,
-            2 => Sand,
-            3 => Stone,
-            4 => Tin,
-            5 => Copper,
-            _ => panic!("unknown vein type"),
-        }
-    }
-}
+use OreType::*;
 
 pub struct ActivateVeinCommand<'a> {
-    vein_type: VeinType,
+    vein_type: OreType,
     player: &'a mut Player,
     facility_id: u64,
     timer: &'a mut Timer,
@@ -61,9 +27,9 @@ impl<'a> ActivateVeinCommand<'a> {
         }
     }
 
-    fn determine_vein_type(facility: &Facility) -> VeinType {
+    fn determine_vein_type(facility: &Facility) -> OreType {
         let ore_type = facility.get_property("ore_type");
-        VeinType::from(ore_type)
+        OreType::from(ore_type)
     }
 
     fn is_diggable(facility: &Facility) -> bool {
@@ -99,7 +65,13 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
             self.facility_id,
             Some(guard),
         );
-        Some(Box::new(activity))
+        let level = self.player.get_attribute(Attribute::SkillLevel(Mining), 0) as u8;
+
+        if MiningSkill::can_produce(self.vein_type, level) {
+            Some(Box::new(activity))
+        } else {
+            None
+        }
     }
 
     fn announce(
@@ -115,7 +87,7 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
 }
 
 pub struct VeinActivity {
-    vein_type: VeinType,
+    vein_type: OreType,
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
@@ -124,7 +96,7 @@ pub struct VeinActivity {
 
 impl VeinActivity {
     fn new(
-        vein_type: VeinType,
+        vein_type: OreType,
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
@@ -167,18 +139,11 @@ impl Activity for VeinActivity {
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let ore_type = match self.vein_type {
-            Dirt => "Dirt",
-            Sand => "Sand",
-            Stone => "Stone",
-            Tin => "Tin Ore",
-            Copper => "Copper Ore",
-        }
-        .to_string();
+        let (class, description) = MiningSkill::produce_results_for(self.vein_type, player, rng);
 
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(player.inventory_id(), ItemClass::Ore, ore_type),
+            Command::SpawnItem(player.inventory_id(), class, description),
         );
 
         let exhastion_chance = facility.get_property("chance_of_exhaustion");
