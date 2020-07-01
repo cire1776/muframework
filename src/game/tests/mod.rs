@@ -268,12 +268,13 @@ pub fn give_player_spawned_items<S: ToString>(
     player: &mut Player,
     inventories: &mut InventoryList,
     items: &mut ItemList,
-) {
+) -> Item {
     let inventory = inventories
         .get_mut(&player.id)
         .expect("unable to get inventory");
 
-    inventory.spawn_stack(class, description, quantity, items);
+    let item = inventory.spawn_stack(class, description, quantity, items);
+    item
 }
 
 pub fn assert_player_is_at(x: i32, y: i32, player: &Player) {
@@ -284,6 +285,75 @@ pub fn assert_player_is_at(x: i32, y: i32, player: &Player) {
     );
 }
 
+pub fn assert_character_facing_changed(
+    character_id: u64,
+    new_facing: Direction,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(GameUpdate::CharacterFacingChanged(id, facing)) => {
+            assert_eq!(id, character_id);
+            assert_eq!(facing, new_facing);
+        }
+        Err(error) => panic!("error received: {:?}", error),
+        _ => panic!("unexpected update: {:?}", update),
+    }
+}
+
+pub fn assert_external_inventory_opened(
+    exp_contents: &mut Vec<Item>,
+    exp_inventory_id: u64,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(GameUpdate::ExternalInventoryOpened(mut contents, inventory_id)) => {
+            contents.sort();
+            exp_contents.sort();
+            assert_eq!(&contents, exp_contents);
+            assert_eq!(inventory_id, exp_inventory_id);
+        }
+        Err(error) => panic!("error received: {:?}", error),
+        _ => panic!("unexpected update: {:?}", update),
+    }
+}
+
+pub fn assert_external_inventory_updated(
+    exp_contents: &mut Vec<Item>,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(GameUpdate::ExternalInventoryUpdated(mut contents)) => {
+            contents.sort();
+            exp_contents.sort();
+            assert_eq!(&contents, exp_contents);
+        }
+        Err(error) => panic!("error received: {:?}", error),
+        _ => panic!("unexpected update: {:?}", update),
+    }
+}
+
+pub fn assert_inventory_updated(
+    exp_contents: &mut Vec<Item>,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(GameUpdate::InventoryUpdated(mut contents)) => {
+            contents.sort();
+            exp_contents.sort();
+            assert_eq!(&contents, exp_contents);
+        }
+        Err(error) => panic!("error received: {:?}", error),
+        _ => panic!("unexpected update: {:?}", update),
+    }
+}
 pub fn assert_activity_started(
     duration: u32,
     exp_title: ui::pane::PaneTitle,
@@ -445,6 +515,9 @@ mod firepits;
 
 #[cfg(test)]
 mod lumbermills;
+
+#[cfg(test)]
+mod fruitpresses;
 
 #[cfg(test)]
 mod equipment;
