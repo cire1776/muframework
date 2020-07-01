@@ -163,6 +163,10 @@ impl Inventory {
         self.items.is_empty()
     }
 
+    pub fn clear(&mut self) {
+        self.items.clear()
+    }
+
     /// returns the number of items in the inventory
     ///
     /// # Examples:

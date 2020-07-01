@@ -179,6 +179,14 @@ pub fn count_of<S: ToString>(
     inventory.count_of(class, description)
 }
 
+pub fn clear_inventory(player: &Player, inventories: &mut InventoryList, items: &mut ItemList) {
+    let inventory = inventories
+        .get_mut(&player.inventory_id())
+        .expect("unable to get player's inventory.");
+
+    inventory.clear();
+}
+
 pub fn consume_all_supplies_from_inventory<S: ToString>(
     class: ItemClass,
     description: S,
