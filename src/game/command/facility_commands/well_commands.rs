@@ -224,9 +224,7 @@ impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
             .get(self.facility_id)
             .expect("unable to get facility.");
 
-        let level = self
-            .player
-            .get_attribute(Attribute::SkillLevel(Engineering), 0) as u8;
+        let level = self.player.get_level_for(Engineering);
 
         if EngineeringSkill::can_produce(level, facility) {
             Some(Box::new(activity))
@@ -300,7 +298,7 @@ impl Activity for WellDigActivity {
             Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
 
-        let level = player.get_attribute(Attribute::SkillLevel(Engineering), 0) as u8;
+        let level = player.get_level_for(Engineering);
 
         if !EngineeringSkill::can_produce(level, facility) {
             Command::send(Some(command_sender), Command::ActivityAbort);

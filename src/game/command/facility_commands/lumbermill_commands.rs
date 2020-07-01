@@ -136,7 +136,7 @@ impl Activity for LumbermillActivity {
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let level = player.get_attribute(Attribute::SkillLevel(Construction), 0) as u8;
+        let level = player.get_level_for(Construction);
 
         {
             let inventory = inventories
@@ -179,7 +179,7 @@ impl Activity for LumbermillActivity {
                 .get_mut(&player.inventory_id())
                 .expect("unable to find inventory");
 
-            let level = player.get_attribute(Attribute::SkillLevel(Construction), 0) as u8;
+            let level = player.get_level_for(Construction);
             if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
                 Command::send(Some(command_sender), Command::ActivityAbort);
             }

@@ -65,7 +65,7 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
             self.facility_id,
             Some(guard),
         );
-        let level = self.player.get_attribute(Attribute::SkillLevel(Mining), 0) as u8;
+        let level = self.player.get_level_for(Mining);
 
         if MiningSkill::can_produce(self.vein_type, level) {
             Some(Box::new(activity))

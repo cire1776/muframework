@@ -33,10 +33,7 @@ impl Player {
         };
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");
-        player.add_buff(
-            Attribute::SkillLevel(Smelting),
-            (45, 0, BuffTag::Level(Smelting)),
-        );
+        player.set_level_for(Smelting, 45);
         player.add_buff(
             Attribute::SkillTime(Smelting),
             (-45, 0, BuffTag::Level(Smelting)),
@@ -105,7 +102,16 @@ impl Player {
         self.attributes.remove(tag);
     }
 
-    // pub fn get_level_for()
+    pub fn set_level_for(&mut self, skill: Skill, level: u8) {
+        self.add_buff(
+            Attribute::SkillLevel(skill),
+            (level as i8, 0, BuffTag::Level(skill)),
+        );
+    }
+
+    pub fn get_level_for(&self, skill: Skill) -> u8 {
+        self.get_attribute(Attribute::SkillLevel(skill), 0) as u8
+    }
 
     pub fn increment_xp(&mut self, skill: Skill, value: u64) {
         let xp = self.xp.get_mut(&skill);

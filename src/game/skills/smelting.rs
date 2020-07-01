@@ -95,10 +95,7 @@ pub enum SmeltingSkill {}
 
 impl SmeltingSkill {
     pub fn products_for_player_level(player: &Player) -> Vec<SmeltingType> {
-        let level = std::cmp::max(
-            1,
-            player.get_attribute(Attribute::SkillLevel(Smelting.into()), 0),
-        ) as u8;
+        let level = std::cmp::max(1, player.get_level_for(Smelting));
 
         let mut sorted_product_list = SMELTING_PRODUCTS
             .iter()

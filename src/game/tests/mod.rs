@@ -244,10 +244,7 @@ pub fn compare_tuple_quantity_arrays(
 
 pub fn give_player_level(skill: Skill, level: u8, player: &mut Player) {
     player.remove_buff(BuffTag::Level(skill));
-    player.add_buff(
-        Attribute::SkillLevel(skill.clone()),
-        (level as i8, 0, BuffTag::Level(skill)),
-    );
+    player.set_level_for(skill, level);
 }
 
 #[allow(dead_code)]

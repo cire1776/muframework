@@ -100,7 +100,7 @@ impl CookingSkill {
     ) -> (ItemClass, String) {
         let recipe = &COOKING_RECIPES[&product];
 
-        let level = player.get_attribute(Attribute::SkillLevel(Cooking), 0) as u8;
+        let level = player.get_level_for(Cooking);
 
         let success = Self::succeeds(recipe, level, rng);
 
