@@ -464,7 +464,7 @@ fn can_fill_from_water_well() {
 }
 
 #[test]
-fn can_fill_from_water_oil() {
+fn can_fill_from_oil_well() {
     let (
         mut player,
         mut map,

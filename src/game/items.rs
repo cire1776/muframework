@@ -447,13 +447,21 @@ impl Item {
         items: &mut ItemList,
         inventories: &mut InventoryList,
     ) {
-        let re = Regex::new("(?m)^(\\w+)\\s(\\w+)").unwrap();
+        let re = Regex::new(r#"(?m)^(\w+)\s(\d+)?\s*(\w+)"#).unwrap();
 
         for string in stored_items {
             let captures = re.captures(&string).unwrap();
 
             let destination_alias = capture_string(&captures, 1);
-            let item_type_name = capture_string(&captures, 2);
+            let quantity_str = capture_optional_string(&captures, 2);
+            let quantity: u8 = if quantity_str == "" {
+                1
+            } else {
+                quantity_str
+                    .parse::<u8>()
+                    .expect("must be convertible to u8")
+            };
+            let item_type_name = capture_string(&captures, 3);
 
             let destination_id = *aliases.get(&destination_alias).unwrap();
 
@@ -465,7 +473,7 @@ impl Item {
                 ));
             }
             if let Some(inventory) = inventory {
-                let mut item = Item::spawn_from_type(item_type_name, 1, &items.item_types);
+                let mut item = Item::spawn_from_type(item_type_name, quantity, &items.item_types);
                 inventory.accept_stack(&mut item, items);
             } else {
                 panic!("unable to find or create inventory")

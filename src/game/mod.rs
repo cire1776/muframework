@@ -174,12 +174,6 @@ impl GameState {
 
         let item_class_specifiers = ItemClassSpecifier::initialize();
 
-        let players_inventory = inventories.get_mut(&1).unwrap();
-        players_inventory.spawn_by_type("apple", 63, &item_types.clone(), &mut items);
-        players_inventory.spawn_by_type("olive", 64, &item_types.clone(), &mut items);
-        players_inventory.spawn_by_type("apple", 16, &item_types.clone(), &mut items);
-        players_inventory.spawn_by_type("glass_bottle", 64, &item_types.clone(), &mut items);
-
         // consider adding a function to level to do these things
         Level::introduce_player(&player, inventories, update_tx);
         Level::introduce_other_characters(&characters, &mut obstacles, update_tx);

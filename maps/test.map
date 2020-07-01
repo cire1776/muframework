@@ -352,15 +352,10 @@ grilled_salmon food "Grilled Salmon"
 +smeltery 10,5 "An old smeltery"
 ^firepit 11,5 "A campfire"
 ===END OF FACILITIES===
-player amber_leather_cap
-player hardwood_log
-player hardwood_log
-player softwood_log
-player softwood_log
-player tin_ore
-player tin_ore
-player tin_ore
-player tin_ore
+player 1 amber_leather_cap
+player 4 hardwood_log
+player 2 softwood_log
+player 4 tin_ore
 player bronze_shovel
 test_chest shiny_dagger // a dagger
 test_chest sharp_short_sword
@@ -375,4 +370,8 @@ chest1 bronze_pickaxe
 chest1 simple_fishing_net
 chest1 simple_fishing_rod
 chest1 simple_fishing_trap
+player 63 apple
+player 16 apple
+player 64 olive
+player 64 glass_bottle
 ===END OF STORED ITEMS===
