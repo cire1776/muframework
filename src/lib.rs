@@ -60,7 +60,7 @@ pub enum Command {
     Move(Direction, MoveCommandMode),
     Teleport(u64, i32, i32),
     SpawnItem(u64, ItemClass, String), // (inventory_id, ItemClass, Description)
-    TakeItem(u64),
+    TakeItem(u64),                     // (item_index[not id])
     DropItem(u64),
     EquipItem(u64),
     UnequipItem(u64),
