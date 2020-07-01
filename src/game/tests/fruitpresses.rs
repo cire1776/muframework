@@ -38,6 +38,11 @@ fn fruitpress_can_be_opened() {
     );
 
     assert!(activity.is_none());
+
+    let facility_id = get_facility_id_at(11, 11, &map);
+    assert_external_inventory_opened(&mut vec![], facility_id, &mut update_rx);
+
+    assert_commands_are_empty(&mut command_rx)
 }
 
 #[test]
@@ -555,7 +560,6 @@ fn can_fill_bottles_when_apple_juice_is_available_aborting_when_empty() {
     );
 
     let facility_id = get_facility_id_at(11, 11, &map);
-    let player_id = player.id;
 
     let facility = facilities
         .get_mut(facility_id)
@@ -653,7 +657,6 @@ fn can_fill_bottles_when_olive_oil_is_available_aborting_when_empty() {
     );
 
     let facility_id = get_facility_id_at(11, 11, &map);
-    let player_id = player.id;
 
     let facility = facilities
         .get_mut(facility_id)

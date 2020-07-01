@@ -179,7 +179,7 @@ pub fn count_of<S: ToString>(
     inventory.count_of(class, description)
 }
 
-pub fn clear_inventory(player: &Player, inventories: &mut InventoryList, items: &mut ItemList) {
+pub fn clear_inventory(player: &Player, inventories: &mut InventoryList, _items: &mut ItemList) {
     let inventory = inventories
         .get_mut(&player.inventory_id())
         .expect("unable to get player's inventory.");
@@ -288,6 +288,18 @@ pub fn give_player_spawned_items<S: ToString>(
     item
 }
 
+fn spawn_item_at<S: ToString>(
+    x: i32,
+    y: i32,
+    class: ItemClass,
+    description: S,
+    quantity: u8,
+    items: &mut ItemList,
+) {
+    let item = Item::spawn_with_type(class, description, quantity, items);
+    items.bundle(&item, x, y);
+}
+
 pub fn assert_player_is_at(x: i32, y: i32, player: &Player) {
     assert_eq!(
         (player.x, player.y),
@@ -307,6 +319,18 @@ pub fn assert_character_facing_changed(
         Ok(GameUpdate::CharacterFacingChanged(id, facing)) => {
             assert_eq!(id, character_id);
             assert_eq!(facing, new_facing);
+        }
+        Err(error) => panic!("error received: {:?}", error),
+        _ => panic!("unexpected update: {:?}", update),
+    }
+}
+
+pub fn assert_item_removed(exp_item_id: u64, update_rx: &mut Receiver<GameUpdate>) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(GameUpdate::ItemRemoved(item_id)) => {
+            assert_eq!(item_id, exp_item_id);
         }
         Err(error) => panic!("error received: {:?}", error),
         _ => panic!("unexpected update: {:?}", update),
@@ -532,3 +556,6 @@ mod fruitpresses;
 
 #[cfg(test)]
 mod equipment;
+
+#[cfg(test)]
+mod pickup;
