@@ -221,6 +221,17 @@ pub fn get_facility_id_at(x: i32, y: i32, map: &TileMap) -> u64 {
     }
 }
 
+pub fn get_items_at(x: i32, y: i32, items: &ItemList) -> Vec<Item> {
+    items
+        .find_all_at(x, y)
+        .iter()
+        .map(|i| match i {
+            ItemState::Bundle(item, _, _) => item.clone(),
+            _ => panic!("non-bundled item found"),
+        })
+        .collect()
+}
+
 pub fn compare_tuple_quantity_arrays(
     array1: Vec<(ItemType, u16)>,
     array2: Vec<(ItemType, u16)>,

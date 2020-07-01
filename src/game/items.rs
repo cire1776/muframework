@@ -596,6 +596,15 @@ impl ItemList {
             Some((_, item_state)) => Some(item_state),
         }
     }
+
+    pub fn find_all_at(&self, x: i32, y: i32) -> Vec<ItemState> {
+        self.items
+            .iter()
+            .filter(|(_i, item_state)| item_state.is_bundled_at(x, y))
+            .map(|(_, i)| i.clone())
+            .collect()
+    }
+
     /// creates a bundle (or adds to an existing one) at the location given
     ///   for the given item.
     /// # Arguments
