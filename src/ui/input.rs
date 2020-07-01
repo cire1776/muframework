@@ -137,7 +137,9 @@ impl UIState {
                 }
                 VirtualKeyCode::D => self.handle_d(input),
                 VirtualKeyCode::T => {
-                    self.input_state = InputState::PickupSelection;
+                    if self.are_items_at_player_location() {
+                        self.input_state = InputState::PickupSelection;
+                    }
                     Command::None
                 }
 
@@ -182,6 +184,13 @@ impl UIState {
                 VirtualKeyCode::Backslash => Command::DumpPlayer,
                 _ => Command::None,
             },
+        }
+    }
+    fn are_items_at_player_location(&self) -> bool {
+        let items_at_location = self.items.at(self.player.x, self.player.y);
+        match items_at_location {
+            None => false,
+            _ => true,
         }
     }
 
