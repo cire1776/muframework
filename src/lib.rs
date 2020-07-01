@@ -124,7 +124,7 @@ pub enum GameUpdate {
     },
     EquipmentUpdated(Vec<Item>),
     InventoryUpdated(Vec<Item>),
-    ExternalInventoryOpened(Vec<Item>, u64),
+    ExternalInventoryOpened(Vec<Item>, u64), // (Contents, inventory_id?)
     ExternalInventoryUpdated(Vec<Item>),
     ExternalInventoryClosed,
     ActivityStarted(u32, ui::pane::PaneTitle), // (millis, title)
