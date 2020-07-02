@@ -50,11 +50,7 @@ impl<'a> CommandHandler<'a> for ActivateVeinCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (match self.vein_type {
-            Dirt => 40,
-            Sand => 20,
-            _ => 60,
-        } + self.player.get_attribute(Attribute::SkillTime(Mining), 0)) as u32
+        MiningSkill::expiration(self.vein_type, self.player)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {

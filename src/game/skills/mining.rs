@@ -138,6 +138,14 @@ impl MiningSkill {
         required_level <= level
     }
 
+    pub fn expiration(product: OreType, player: &Player) -> u32 {
+        (match product {
+            Dirt => 40,
+            Sand => 20,
+            _ => 60,
+        } + player.get_attribute(Attribute::SkillTime(Mining), 0)) as u32
+    }
+
     pub fn produce_results_for(
         product: OreType,
         player: &mut Player,
