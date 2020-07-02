@@ -84,8 +84,7 @@ impl<'a> CommandHandler<'a> for ActivateSmelteryCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        let time_bonus = self.player.get_attribute(Attribute::SkillTime(Smelting), 0);
-        (60 + time_bonus) as u32
+        SmeltingSkill::expiration(self.product, self.player)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
