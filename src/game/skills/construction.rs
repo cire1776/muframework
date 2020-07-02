@@ -10,6 +10,13 @@ impl ConstructionSkill {
         inventory.has_sufficient(Material, log_type, 1)
     }
 
+    pub fn expiration(product: LogType, player: &Player) -> u32 {
+        (match product {
+            LogType::Softwood => 40,
+            LogType::Hardwood => 60,
+        } + player.get_attribute(Attribute::SkillTime(Construction), 0)) as u32
+    }
+
     pub fn consume_from_inventory_for(
         product: LogType,
         player: &Player,
