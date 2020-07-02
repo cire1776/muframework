@@ -179,7 +179,6 @@ fn opening_external_inventory() {
 }
 
 #[test]
-#[ignore = "finish alias implementation"]
 fn game_state_closing_external_inventory() {
     let mut subject = game::GameState::new();
 
