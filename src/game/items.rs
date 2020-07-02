@@ -163,8 +163,9 @@ impl ItemType {
         let mut result = ItemTypeList::new();
         let long_string = items.join("\n");
 
-        let re = Regex::new(r#"(?m)^(\w+)\s+(\w+)\s*\s"([^"]+)"\s*(?:\{([^}]*)*\})?(?:\s*//.*)?$"#)
-            .unwrap();
+        let re =
+            Regex::new(r#"(?m)^(\w+)\s+(\w+)\s*\s"([^"]+)"\s*(?:\{([^}]*)*\})?\s*(?:\s*//.*)?$"#)
+                .unwrap();
 
         for captures in re.captures_iter(&long_string[..]) {
             let type_name = capture_string(&captures, 1);
