@@ -206,9 +206,7 @@ impl<'a> CommandHandler<'a> for ActivateWellDigCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (60 + self
-            .player
-            .get_attribute(Attribute::SkillTime(Engineering), 0)) as u32
+        EngineeringSkill::expiration(self.player)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {

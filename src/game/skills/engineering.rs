@@ -8,6 +8,10 @@ impl EngineeringSkill {
         level_of_well.1 <= level
     }
 
+    pub fn expiration(player: &Player) -> u32 {
+        (60 + player.get_attribute(Attribute::SkillTime(Engineering), 0)) as u32
+    }
+
     pub fn produce_results_for(
         player: &mut Player,
         facility: &mut Facility,
