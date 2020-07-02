@@ -614,6 +614,7 @@ fn use_at<'a>(
                     player,
                     facility_id,
                     inventories,
+                    items,
                     timer,
                 ))),
                 _ => None,

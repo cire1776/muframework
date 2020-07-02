@@ -49,9 +49,24 @@ impl Recipe {
 pub struct CookingSkill {}
 
 impl CookingSkill {
-    pub fn can_produce(product: FishType, _level: u8, inventory: &Inventory) -> bool {
+    pub fn can_produce(
+        product: FishType,
+        player: &Player,
+        inventory: &Inventory,
+        items: &ItemList,
+    ) -> bool {
         if !inventory.has_sufficient(Ingredient, product.to_string(), 1) {
-            return false;
+            let mounted_item_id = player.mounting_points.at(&MountingPoint::AtReady);
+
+            if let Some(mounted_item_id) = mounted_item_id {
+                let mounted_item = items
+                    .get_as_item(mounted_item_id)
+                    .expect("can't find item.");
+
+                return mounted_item.is_of_type(Ingredient, product.to_string());
+            } else {
+                return false;
+            }
         }
 
         if !inventory.has_sufficient(Material, "Softwood Log", 1)
@@ -64,13 +79,19 @@ impl CookingSkill {
     }
     pub fn consume_from_inventory_for(
         product: FishType,
-        player: &Player,
+        player: &mut Player,
         inventories: &mut InventoryList,
         items: &mut ItemList,
     ) {
         let inventory = inventories
             .get_mut(&player.inventory_id())
             .expect("unable to find inventory");
+
+        if !inventory.has_sufficient(Ingredient, product.to_string(), 1) {
+            player
+                .mounting_points
+                .unmount(&vec![&MountingPoint::AtReady], inventory, items);
+        }
 
         inventory.consume(Ingredient, product.to_string(), 1, items);
 

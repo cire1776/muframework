@@ -260,7 +260,7 @@ fn can_burn_fish() {
 }
 
 #[test]
-fn stops_cooking_when_supplies_run_out() {
+fn can_cook_item_at_ready() {
     let (
         mut player,
         mut map,
@@ -284,18 +284,11 @@ fn stops_cooking_when_supplies_run_out() {
     player.endorse_component_with(":wants_to_cook", "shrimp");
     give_player_level(Cooking, 4, &mut player);
 
+    let exp_xp = player.get_xp(Cooking) + 3;
+
     equip_player_with_spawned_item(
         Ingredient,
         "Shrimp",
-        &mut player,
-        &mut inventories,
-        &mut items,
-    );
-
-    give_player_spawned_items(
-        Ingredient,
-        "Shrimp",
-        1,
         &mut player,
         &mut inventories,
         &mut items,
@@ -309,6 +302,13 @@ fn stops_cooking_when_supplies_run_out() {
         &mut inventories,
         &mut items,
     );
+    let inventory = inventories
+        .get(&player.inventory_id())
+        .expect("unable to get inventory made long.")
+        .clone();
+
+    let exp_shrimp_count = 0;
+    let exp_log_count = inventory.count_of(Material, "Softwood Log") - 1;
 
     let activity = game_state.game_loop_iteration(
         &mut player,
@@ -323,14 +323,23 @@ fn stops_cooking_when_supplies_run_out() {
         &mut timer,
         None,
         &Command::Move(Direction::Up, MoveCommandMode::Use),
-        None,
+        Some(&update_tx),
         None,
     );
+
+    assert_player_is_at(11, 6, &player);
 
     assert_eq!(
         timer.tags["ActivityComplete"],
         chrono::Duration::seconds(60)
     );
+    assert!(activity.is_some());
+
+    assert_activity_started(60_000, PaneTitle::Cooking, &mut update_rx);
+
+    assert_updates_are_empty(&mut update_rx);
+    assert_commands_are_empty(&mut command_rx);
+
     game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -349,11 +358,28 @@ fn stops_cooking_when_supplies_run_out() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, PaneTitle::Cooking, &mut update_rx);
+    assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Food, "Grilled Shrimp", &mut command_rx);
     assert_is_activity_abort(&mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
+
+    let inventory = inventories
+        .get(&player.inventory_id())
+        .expect("unable to get inventory made long.")
+        .clone();
+
+    let shrimp_count = inventory.count_of(Ingredient, "Shrimp");
+    let log_count = inventory.count_of(Material, "Softwood Log");
+
+    let mounted_item_id = player.mounting_points.at(&MountingPoint::AtReady);
+
+    assert!(mounted_item_id.is_none());
+
+    assert_eq!(shrimp_count, exp_shrimp_count);
+    assert_eq!(log_count, exp_log_count);
+
+    assert_eq!(player.get_xp(Cooking), exp_xp);
 }

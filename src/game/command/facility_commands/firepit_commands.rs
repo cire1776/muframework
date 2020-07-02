@@ -5,6 +5,7 @@ pub struct ActivateFirepitCommand<'a> {
     player: &'a mut Player,
     facility_id: u64,
     inventories: &'a mut InventoryList,
+    items: &'a mut ItemList,
     timer: &'a mut Timer,
 }
 
@@ -13,6 +14,7 @@ impl<'a> ActivateFirepitCommand<'a> {
         player: &'a mut Player,
         facility_id: u64,
         inventories: &'a mut InventoryList,
+        items: &'a mut ItemList,
         timer: &'a mut Timer,
     ) -> Self {
         let component = player
@@ -26,6 +28,7 @@ impl<'a> ActivateFirepitCommand<'a> {
             player,
             facility_id,
             inventories,
+            items,
             timer,
         }
     }
@@ -61,7 +64,7 @@ impl<'a> CommandHandler<'a> for ActivateFirepitCommand<'a> {
             .get(&self.player.id)
             .expect("unable to get inventory.");
 
-        if CookingSkill::can_produce(self.fish_type, level as u8, inventory) {
+        if CookingSkill::can_produce(self.fish_type, self.player, inventory, self.items) {
             Some(Box::new(activity))
         } else {
             None
@@ -144,9 +147,7 @@ impl Activity for FirepitActivity {
             .get(&player.inventory_id())
             .expect("unable to get player inventory.");
 
-        let level = player.get_level_for(Cooking);
-
-        if !CookingSkill::can_produce(self.fish_type, level, inventory) {
+        if !CookingSkill::can_produce(self.fish_type, player, inventory, items) {
             Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
