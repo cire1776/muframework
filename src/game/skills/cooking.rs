@@ -77,6 +77,11 @@ impl CookingSkill {
 
         true
     }
+
+    pub fn expiration(_product: FishType, player: &Player) -> u32 {
+        (60 + player.get_attribute(Attribute::SkillTime(Cooking), 0)) as u32
+    }
+
     pub fn consume_from_inventory_for(
         product: FishType,
         player: &mut Player,

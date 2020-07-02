@@ -44,7 +44,7 @@ impl<'a> CommandHandler<'a> for ActivateFirepitCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (60 + self.player.get_attribute(Attribute::SkillTime(Cooking), 0)) as u32
+        CookingSkill::expiration(self.fish_type, self.player)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
