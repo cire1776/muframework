@@ -245,6 +245,10 @@ impl GameState {
                 update_tx,
                 command_tx,
             ),
+            Command::ChangeFacing(direction) => {
+                Command::change_facing(player, *direction, update_tx);
+                None
+            }
             Command::Teleport(id, _new_x, _new_y) => {
                 if *id != 1 {
                     todo!()

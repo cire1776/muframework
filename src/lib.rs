@@ -58,6 +58,7 @@ pub enum Command {
     QuitGame,
     DumpPlayer,
     Move(Direction, MoveCommandMode),
+    ChangeFacing(Direction),
     Teleport(u64, i32, i32),
     SpawnItem(u64, ItemClass, String), // (inventory_id, ItemClass, Description)
     TakeItem(u64),                     // (item_index[not id])

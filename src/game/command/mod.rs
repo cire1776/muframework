@@ -74,6 +74,20 @@ impl Command {
         }
     }
 
+    pub fn change_facing(
+        player: &mut Player,
+        direction: Direction,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
+        if player.facing != direction {
+            GameUpdate::send(
+                update_tx,
+                GameUpdate::CharacterFacingChanged(player.id, direction),
+            );
+            player.facing = direction;
+        }
+    }
+
     pub fn spawn_item(
         inventory_id: u64,
         class: ItemClass,

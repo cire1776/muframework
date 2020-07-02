@@ -556,3 +556,6 @@ mod equipment;
 
 #[cfg(test)]
 mod pickup;
+
+#[cfg(test)]
+mod change_facing;
