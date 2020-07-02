@@ -1,5 +1,6 @@
 use super::*;
 pub use Skill::*;
+
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum BuffTag {
     None,
