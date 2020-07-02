@@ -223,7 +223,7 @@ impl<'a> CommandHandler<'a> for ActivateTreeLoggingCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (60 + self.player.get_attribute(Attribute::SkillTime(Logging), 0)) as u32
+        LoggingSkill::expiration(self.tree_type, self.player)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {

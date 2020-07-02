@@ -5,6 +5,10 @@ use ItemClass::*;
 pub struct LoggingSkill {}
 
 impl LoggingSkill {
+    pub fn expiration(_product: TreeType, player: &Player) -> u32 {
+        (60 + player.get_attribute(Attribute::SkillTime(Logging), 0)) as u32
+    }
+
     pub fn produce_results_for(
         product: TreeType,
         player: &mut Player,
