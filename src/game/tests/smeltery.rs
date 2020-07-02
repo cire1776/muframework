@@ -32,6 +32,9 @@ fn can_open_a_smeltery_at_level_10() {
         &mut items,
     );
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
+
     let _activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -89,6 +92,9 @@ fn can_open_a_smeltery_at_level_45() {
         &mut inventories,
         &mut items,
     );
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
 
     let _activity = game_state.game_loop_iteration(
         &mut player,

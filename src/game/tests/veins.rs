@@ -26,6 +26,9 @@ fn can_dig_dirt_without_exhaustion() {
     give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_dig");
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -100,6 +103,9 @@ fn can_dig_dirt_with_exhaustion() {
     give_player_level(Mining, 1, &mut player);
 
     player.endorse_with(":can_dig");
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let activity = game_state.game_loop_iteration(
         &mut player,
@@ -179,6 +185,9 @@ fn can_dig_sand_without_exhaustion() {
     give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_dig");
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -253,6 +262,9 @@ fn can_dig_sand_with_exhaustion() {
     rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_dig");
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let activity = game_state.game_loop_iteration(
         &mut player,
@@ -331,6 +343,9 @@ fn can_mine_stone_without_exhaustion() {
     give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_mine");
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -406,6 +421,9 @@ fn can_mine_stone_with_exhaustion() {
 
     give_player_level(Mining, 1, &mut player);
     player.endorse_with(":can_mine");
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let activity = game_state.game_loop_iteration(
         &mut player,
@@ -485,6 +503,9 @@ fn can_mine_tin_without_exhaustion() {
 
     player.endorse_with(":can_mine");
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -560,6 +581,9 @@ fn can_mine_tin_with_exhaustion() {
     rng.set_succeed("chance_of_exhaustion");
 
     player.endorse_with(":can_mine");
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let activity = game_state.game_loop_iteration(
         &mut player,
@@ -639,6 +663,9 @@ fn can_mine_copper_without_exhaustion() {
     give_player_level(Mining, 3, &mut player);
     player.endorse_with(":can_mine");
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -714,6 +741,9 @@ fn can_mine_copper_with_exhaustion() {
 
     give_player_level(Mining, 3, &mut player);
     player.endorse_with(":can_mine");
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let activity = game_state.game_loop_iteration(
         &mut player,
@@ -795,6 +825,9 @@ fn tin_provides_5_xp() {
 
     let exp_xp = player.get_xp(Mining) + 5;
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -866,6 +899,9 @@ fn copper_provides_6_xp() {
     player.endorse_with(":can_mine");
 
     let exp_xp = player.get_xp(Mining) + 6;
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let activity = game_state.game_loop_iteration(
         &mut player,

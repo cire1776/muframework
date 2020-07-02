@@ -115,6 +115,9 @@ fn opening_external_inventory() {
     let mut game_state = GameState::new();
     game_state.teleport_player(8, 7, &mut player, &mut obstacles, &inventories, None, None);
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
+
     game_state.game_loop_iteration(
         &mut player,
         &mut map,

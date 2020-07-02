@@ -24,6 +24,9 @@ fn can_chop_pine_tree() {
 
     let exp_xp = player.get_xp(Logging) + 5;
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -104,6 +107,9 @@ fn can_chop_apple_tree() {
 
     let exp_xp = player.get_xp(Logging) + 6;
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -182,6 +188,9 @@ fn can_chop_olive_tree() {
 
     let exp_xp = player.get_xp(Logging) + 6;
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -256,6 +265,9 @@ fn can_chop_oak_tree() {
     ) = initialize_game_system_with_player_at(10, 11);
 
     let mut rng = Rng::new();
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
 
     player.endorse_with(":can_chop");
 
@@ -338,6 +350,9 @@ fn can_pick_apple_tree() {
 
     player.endorse_with(":can_pick");
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -412,6 +427,9 @@ fn can_pick_olive_tree() {
     let mut rng = Rng::new();
 
     player.endorse_with(":can_pick");
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
 
     let activity = game_state.game_loop_iteration(
         &mut player,

@@ -24,6 +24,9 @@ fn opening_a_chest_provides_client_with_external_inventory() {
 
     game_state.teleport_player(8, 7, &mut player, &mut obstacles, &inventories, None, None);
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
+
     game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -92,6 +95,9 @@ fn taking_all_from_a_chest() {
     let mut rng = Rng::new();
 
     game_state.teleport_player(6, 12, &mut player, &mut obstacles, &inventories, None, None);
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
 
     game_state.game_loop_iteration(
         &mut player,
@@ -182,6 +188,9 @@ fn stashing_all_to_a_chest() {
     let mut rng = Rng::new();
 
     game_state.teleport_player(6, 12, &mut player, &mut obstacles, &inventories, None, None);
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
 
     game_state.game_loop_iteration(
         &mut player,

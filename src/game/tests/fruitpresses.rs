@@ -20,6 +20,9 @@ fn fruitpress_can_be_opened() {
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 11);
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -294,6 +297,9 @@ fn cannot_fill_before_adding_fruit() {
         &mut items,
     );
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -313,7 +319,6 @@ fn cannot_fill_before_adding_fruit() {
 
     assert!(activity.is_none());
 
-    assert_character_facing_changed(player.id, Direction::Right, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
 }
@@ -354,6 +359,9 @@ fn can_press_when_apples_have_been_added() {
 
     let facility_id = get_facility_id_at(11, 11, &map);
     let player_id = player.id;
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
 
     let _activity = game_state.game_loop_iteration(
         &mut player,
@@ -458,6 +466,9 @@ fn can_press_when_olives_have_been_added() {
 
     let facility_id = get_facility_id_at(11, 11, &map);
     let player_id = player.id;
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
 
     let _activity = game_state.game_loop_iteration(
         &mut player,
@@ -568,6 +579,9 @@ fn can_fill_bottles_when_apple_juice_is_available_aborting_when_empty() {
     facility.set_property("output", 1);
     facility.set_property("item", 1);
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -664,6 +678,9 @@ fn can_fill_bottles_when_olive_oil_is_available_aborting_when_empty() {
 
     facility.set_property("output", 1);
     facility.set_property("item", 2);
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Right;
 
     let activity = game_state.game_loop_iteration(
         &mut player,

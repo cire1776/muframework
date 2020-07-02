@@ -47,6 +47,8 @@ impl Command {
     ) -> Option<Box<dyn Activity>> {
         let (dx, dy) = get_deltas_from_direction(direction);
 
+        Self::change_facing(player, direction, update_tx);
+
         let command = if mode == MoveCommandMode::Normal || mode == MoveCommandMode::Sneak {
             attempt_to_enter(mode, direction, dx, dy, player, obstacles, timer, activity)
         } else {
@@ -340,13 +342,7 @@ fn attempt_to_enter<'a>(
     let new_y = player.y + dy;
 
     if obstacles.is_blocked_at(new_x, new_y) {
-        if facing == player.facing {
-            return None;
-        } else {
-            return Some(std::boxed::Box::new(ChangeFacingCommand::new(
-                player, facing,
-            )));
-        }
+        return None;
     }
 
     Some(std::boxed::Box::new(MoveCommand::new(

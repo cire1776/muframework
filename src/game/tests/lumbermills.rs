@@ -43,6 +43,9 @@ fn can_saw_softwood_without_breaking_mill() {
         &mut items,
     );
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -143,6 +146,9 @@ fn can_saw_hardwood_without_breaking_mill() {
         &mut items,
     );
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -241,6 +247,9 @@ fn mills_can_break() {
         &mut items,
     );
 
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
     let activity = game_state.game_loop_iteration(
         &mut player,
         &mut map,
@@ -338,6 +347,9 @@ fn consumes_supplies_from_inventory() {
         &mut inventories,
         &mut items,
     );
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let exp_log_count = {
         let inventory = inventories
@@ -438,6 +450,9 @@ fn stops_when_supplies_run_out() {
         &mut inventories,
         &mut items,
     );
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
 
     let activity = game_state.game_loop_iteration(
         &mut player,
