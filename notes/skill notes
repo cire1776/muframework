@@ -192,7 +192,8 @@ Culture
         Cards
         Curation
 
-Intellectual
++Intellectual
+        {Reading}
         Teaching
         Writing
         Trade
@@ -227,13 +228,13 @@ Intellectual
         Brewing
         Vintnery
 
-*Logging
-        +Foraging
++Foraging
+        *Logging        
         Herbalism
         *Forestry
         *Fishing
         Healing
-        Navigation
+        Orienteering
         Trapping
 
 +Harvesting
