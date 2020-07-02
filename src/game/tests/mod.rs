@@ -559,3 +559,6 @@ mod pickup;
 
 #[cfg(test)]
 mod change_facing;
+
+#[cfg(test)]
+mod attributes;

@@ -34,10 +34,6 @@ impl Player {
         // temporary.  Not sure where this belongs once saving is in place.
         player.endorse_with(":newb");
         player.set_level_for(Smelting, 45);
-        player.add_buff(
-            Attribute::SkillTime(Smelting),
-            (-45, 0, BuffTag::Level(Smelting)),
-        );
         player
     }
 
@@ -103,9 +99,20 @@ impl Player {
     }
 
     pub fn set_level_for(&mut self, skill: Skill, level: u8) {
+        self.remove_buff(BuffTag::Level(skill));
+
         self.add_buff(
             Attribute::SkillLevel(skill),
             (level as i8, 0, BuffTag::Level(skill)),
+        );
+
+        self.set_skilltime_for_level(skill, level);
+    }
+
+    fn set_skilltime_for_level(&mut self, skill: Skill, level: u8) {
+        self.add_buff(
+            Attribute::SkillTime(skill),
+            (-(level as i8) + 1, 0, BuffTag::Level(skill)),
         );
     }
 

@@ -83,11 +83,11 @@ fn can_cook_fish_successfully() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        chrono::Duration::seconds(57)
     );
     assert!(activity.is_some());
 
-    assert_activity_started(60_000, PaneTitle::Cooking, &mut update_rx);
+    assert_activity_started(57_000, PaneTitle::Cooking, &mut update_rx);
 
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
@@ -110,7 +110,7 @@ fn can_cook_fish_successfully() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
+    assert_activity_started(57000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Food, "Grilled Shrimp", &mut command_rx);
@@ -331,11 +331,11 @@ fn can_cook_item_at_ready() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        chrono::Duration::seconds(57)
     );
     assert!(activity.is_some());
 
-    assert_activity_started(60_000, PaneTitle::Cooking, &mut update_rx);
+    assert_activity_started(57_000, PaneTitle::Cooking, &mut update_rx);
 
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
@@ -358,7 +358,7 @@ fn can_cook_item_at_ready() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
+    assert_activity_started(57_000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Food, "Grilled Shrimp", &mut command_rx);

@@ -195,10 +195,10 @@ fn can_smelt_tin_with_excess_quantities() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(15)
+        chrono::Duration::seconds(16)
     );
 
-    assert_activity_started(15_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
+    assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -218,7 +218,7 @@ fn can_smelt_tin_with_excess_quantities() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(15_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
+    assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Material, "Tin Bar", &mut command_rx);
@@ -289,10 +289,10 @@ fn stops_when_supplies_run_out() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(15)
+        chrono::Duration::seconds(16)
     );
 
-    assert_activity_started(15_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
+    assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -312,7 +312,7 @@ fn stops_when_supplies_run_out() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(15_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
+    assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(1, Material, "Copper Bar", &mut command_rx);

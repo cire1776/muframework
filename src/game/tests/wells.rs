@@ -806,7 +806,7 @@ fn stops_after_the_well_grows_too_deep_for_level_29() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60000, Digging, &mut update_rx);
+    assert_activity_started(32_000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_activity_abort(&mut command_rx);
@@ -885,7 +885,7 @@ fn stops_after_the_well_grows_too_deep_for_level_45() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60000, Digging, &mut update_rx);
+    assert_activity_started(16_000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_activity_abort(&mut command_rx);

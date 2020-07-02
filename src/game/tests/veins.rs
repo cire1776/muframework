@@ -525,10 +525,10 @@ fn can_mine_tin_without_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        chrono::Duration::seconds(59)
     );
 
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(59_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -548,7 +548,7 @@ fn can_mine_tin_without_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(59_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Tin Ore", &mut command_rx);
@@ -604,10 +604,10 @@ fn can_mine_tin_with_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        chrono::Duration::seconds(59)
     );
 
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(59_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -627,7 +627,7 @@ fn can_mine_tin_with_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(59_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Tin Ore", &mut command_rx);
@@ -685,10 +685,10 @@ fn can_mine_copper_without_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        chrono::Duration::seconds(58)
     );
 
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -708,7 +708,7 @@ fn can_mine_copper_without_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Copper Ore", &mut command_rx);
@@ -764,10 +764,10 @@ fn can_mine_copper_with_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        chrono::Duration::seconds(58)
     );
 
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -787,7 +787,7 @@ fn can_mine_copper_with_exhaustion() {
     );
 
     assert_activity_expired(&mut update_rx);
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ore, "Copper Ore", &mut command_rx);
@@ -847,10 +847,10 @@ fn tin_provides_5_xp() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        chrono::Duration::seconds(58)
     );
 
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
+    assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
@@ -887,7 +887,7 @@ fn copper_provides_6_xp() {
         mut rng,
         mut timer,
         update_tx,
-        mut update_rx,
+        _update_rx,
         _command_tx,
         _command_rx,
         mut game_state,
@@ -919,13 +919,6 @@ fn copper_provides_6_xp() {
         Some(&update_tx),
         None,
     );
-
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
-    );
-
-    assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
 
     game_state.game_loop_iteration(
         &mut player,
