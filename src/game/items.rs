@@ -100,6 +100,13 @@ impl ItemState {
     }
 }
 
+#[derive(Debug, Eq, PartialEq, Clone, Ord, PartialOrd)]
+pub enum PropertyValue {
+    String(String),
+    Integer(i128),
+    Skill(Skill),
+}
+
 #[derive(Debug, Eq, Clone)]
 pub struct ItemType {
     pub class: ItemClass,
@@ -107,6 +114,7 @@ pub struct ItemType {
     pub endorsements: Vec<String>,
     pub buffs: Vec<AttributeBuff>,
     pub components: HashMap<String, String>,
+    pub properties: HashMap<String, PropertyValue>,
 }
 
 impl Hash for ItemType {
@@ -142,7 +150,61 @@ impl ItemType {
             endorsements: vec![],
             buffs: vec![],
             components: HashMap::new(),
+            properties: HashMap::new(),
         }
+    }
+    pub fn get_property_as_string<S: ToString>(&self, property_name: S) -> String {
+        let property_name = property_name.to_string();
+
+        let property = self.properties.get(&property_name);
+
+        match property {
+            Some(PropertyValue::String(string)) => string.clone(),
+            Some(PropertyValue::Integer(value)) => format!("{}", value),
+            Some(PropertyValue::Skill(skill)) => skill.to_string(),
+            None => "".into(),
+        }
+    }
+
+    pub fn get_property_as_integer<S: ToString>(&self, property_name: S) -> i128 {
+        let property_name = property_name.to_string();
+
+        let property = self.properties.get(&property_name);
+
+        match property {
+            Some(PropertyValue::String(_string)) => 0,
+            Some(PropertyValue::Integer(value)) => *value,
+            Some(PropertyValue::Skill(skill)) => *skill as i128,
+            None => 0,
+        }
+    }
+
+    pub fn associated_skill(&self) -> Option<Skill> {
+        let property = self.properties.get::<String>(&("associated_skill".into()));
+
+        match property {
+            Some(PropertyValue::String(_string)) => None,
+            Some(PropertyValue::Integer(_value)) => None,
+            Some(PropertyValue::Skill(skill)) => Some(skill.clone()),
+            None => None,
+        }
+    }
+
+    pub fn set_associated_skill(&mut self, skill: Skill) {
+        self.properties
+            .insert("associated_skill".into(), PropertyValue::Skill(skill));
+    }
+
+    pub fn set_property_value_from_string<S: ToString>(&mut self, property_name: S, string: S) {
+        self.properties.insert(
+            property_name.to_string(),
+            PropertyValue::String(string.to_string()),
+        );
+    }
+
+    pub fn set_property_value_from_integer<S: ToString>(&mut self, property_name: S, value: i128) {
+        self.properties
+            .insert(property_name.to_string(), PropertyValue::Integer(value));
     }
 
     pub fn add_endorsement<S: ToString>(&mut self, endorsement: S) {
