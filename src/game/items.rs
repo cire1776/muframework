@@ -334,9 +334,21 @@ impl ItemTypeList {
         }
     }
 
+    /// inserts a new type into the list.const
+    /// Examples:
+    /// ```should_panic
+    /// use muframework::game::items::*;
+    /// let mut subject = ItemTypeList::new();
+    /// subject.insert("an_item", ItemType::new(ItemClass::Food,"A Croissant"));
+    /// subject.insert("an_item", ItemType::new(ItemClass::Food,"A Donut"));
+    /// ```
     pub fn insert<S: ToString>(&mut self, item_type_name: S, item_type: ItemType) {
-        self.item_types
-            .insert(item_type_name.to_string(), item_type);
+        let item_type_name = item_type_name.to_string();
+
+        if self.item_types.contains_key(&item_type_name) {
+            panic!("duplicate item_type name: {}", item_type_name);
+        }
+        self.item_types.insert(item_type_name, item_type);
     }
 
     pub fn lookup_or_insert<S: ToString>(
