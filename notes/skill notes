@@ -179,33 +179,29 @@ canoe and net
 Harvesting
 ----------
 0	Radish       seeds		1	1	        16 Hrs
-0	Carrot       seeds		1	2	        28 Hrs
-0	Beet         seeds		1	1	        16 Hrs
-0       Onion        seeds		-	5	        38 Hrs
+0	Carrot       seeds		1	1	        28 Hrs
+0	Beet         seeds		1	2	        16 Hrs
+0       Onion        seeds		-	2	        38 Hrs
 1	Cabbage      seeds		2	3	        34 Hrs
-2	Corn         seeds		3	13	        55 Hrs
-3  43   Potato       seeds	        3               1/3 26–29 Hours
-4  20   Jalapeno Pepper  seeds          2               1/2 28–31 Hours
-4	Strawberry  (cuttings)		3	17	        65 Hrs
-5	Hop         (cuttings)	        -	18	? Hrs
-6 48    Spinach	     seeds              3               1/3 28–31 Hours         
-7       Broccoli     seeds		3               	97 Hrs
-8       Asparagus   (cuttings)          4
-9  12   Wheat	     seeds              -               1/4 26–29 Hours         -
-10  14  Tomato	     seeds              4               1/4 26–29 Hours
-11 20   Parsnip	     seeds              5               1/3 30–33 Hours
-12 20   Turnip	     seeds              6               1/3 30–33 Hours
-13	Eggplant     seeds		7	27      	78 Hrs
-14 50   Garlic	     seeds              -               1/3 27–30 Hours
-16	Cucumber     seeds		7	31	        95 Hrs
-18	Pumpkin      seeds		8	35	        92 Hrs
-20 45   Sugarcane   (cuttings)	        -               1/4 31–34 Hours
-22	Watermelon   seeds		9	64	        149 Hrs
-25 30   Cilantro     seeds              -               1/2 24–27 Hours
-30 25   Green Pepper seeds              9               1/4 28–31 Hours
-35 26   Parsley	     seeds              -               1/2 24–27 Hours
-40 60   Sage	    (cuttings)          -               1/3 27–30 Hours
-45 55   Black Pepper(cuttings)	        -               1/3 27–30 Hours
+2	Corn         seeds		3	4	        55 Hrs
+3  43   Potato       seeds	        3       4        1/3 26–29 Hours
+4  20   Jalapeno Pepper  seeds          2       5        1/2 28–31 Hours
+4	Strawberry  (cuttings)		3	6	        65 Hrs
+5	Hop         (cuttings)	        -	7	? Hrs
+6 48    Spinach	     seeds              3       8        1/3 28–31 Hours         
+7       Broccoli     seeds		3       9        	97 Hrs
+8       Asparagus   (cuttings)          4      10
+9  12   Wheat	     seeds              -      10       1/4 26–29 Hours         -
+10  14  Tomato	     seeds              4      11        1/4 26–29 Hours
+11 20   Parsnip	     seeds              5      12         1/3 30–33 Hours
+13 20   Turnip	     seeds              6      15       1/3 30–33 Hours
+15	Eggplant     seeds		7      20      	78 Hrs
+20	Cucumber     seeds		7      25	        95 Hrs
+25	Pumpkin      seeds		8      30	        92 Hrs
+30 45   Sugarcane   (cuttings)	        -      40         1/4 31–34 Hours
+35	Watermelon   seeds		9      50	        149 Hrs
+40 25   Green Pepper seeds              9      60         1/4 28–31 Hours
+45 55   Black Pepper(cuttings)	        -      70       1/3 27–30 Hours
 
 
 
@@ -231,6 +227,7 @@ Culture
         Dancing
         Cards
         Curation
+        Illumination
 
 +Intellectual
         {Reading}
@@ -238,6 +235,7 @@ Culture
         Writing
         Trade
         Alchemy
+        Scribing
 
 +Hunting
         Currying/Leather Tanning
