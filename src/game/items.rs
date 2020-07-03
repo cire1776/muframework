@@ -224,7 +224,13 @@ impl ItemType {
         self.buffs.push(buff);
     }
 
-    pub fn read_in_item_types(items: &mut Vec<String>) -> ItemTypeList {
+    pub fn read_in_item_types(_items: &mut Vec<String>) -> ItemTypeList {
+        use std::fs;
+
+        let contents = fs::read_to_string("maps/item_types".to_string())
+            .expect("unable to read item_types file");
+        let items: Vec<String> = contents.lines().map(|l| l.to_string()).collect();
+
         let mut result = ItemTypeList::new();
         let long_string = items.join("\n");
 
