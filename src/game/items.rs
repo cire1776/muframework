@@ -250,7 +250,7 @@ impl ItemType {
             return;
         }
 
-        let re = Regex::new(r#"(?m)^\s*(?:(endorsement|buff)\s*:\s*)(?:(:\w+)(?:\((\w+)\))?|(?:(SkillTime|SkillChance|Fortune|SpellCastPeriod|SpellDamage|Defense|Attack|MaxHP|MaxMP)(?:\("(\w+)"\))?\s*=>\s*(-?\d+)))(?:\s*//.*)?$"#).unwrap();
+        let re = Regex::new(r#"(?m)^\s*(?:(endorsement|buff|property)\s*:\s*)(?:(:\w+)(?:\((\w+)\))?|(?:(SkillTime|SkillChance|Fortune|SpellCastPeriod|SpellDamage|Defense|Attack|MaxHP|MaxMP)(?:\("(\w+)"\))?\s*=>\s*(-?\d+))|(?:(\w+) => (\w+|\d+)))(?:\s*//.*)?$"#).unwrap();
 
         for captures in re.captures_iter(attributes) {
             let attribute_type = capture_string(&captures, 1);
@@ -294,6 +294,18 @@ impl ItemType {
                         _ => panic!("unrecognized attribute buff"),
                     };
                     new_type.add_buff(buff);
+                }
+                "property" => {
+                    let property = capture_string(&captures, 7);
+                    if property == "associated_skill" {
+                        let value = capture_string(&captures, 8);
+                        new_type.set_associated_skill(Skill::from_string(value));
+                    } else {
+                        let value = capture_string(&captures, 8)
+                            .parse::<i128>()
+                            .expect("must be convertible to i128");
+                        new_type.set_property_value_from_integer(property, value);
+                    }
                 }
                 _ => panic!("unrecognized attribute: {}", attribute_type),
             }
