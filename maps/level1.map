@@ -137,6 +137,10 @@ S 28,23 // spider at 28,23
 }
 +smeltery 10,5 "An old smeltery"
 ^firepit 11,5 "A campfire"
+%patch 1,1 "A patch of wild produce" {
+    property: produce => 17
+    property: quantity => 100
+}
 ===END OF FACILITIES===
 player 1 amber_leather_cap
 player 4 hardwood_log

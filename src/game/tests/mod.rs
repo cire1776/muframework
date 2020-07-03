@@ -552,6 +552,9 @@ mod lumbermills;
 mod fruitpresses;
 
 #[cfg(test)]
+mod patches;
+
+#[cfg(test)]
 mod equipment;
 
 #[cfg(test)]

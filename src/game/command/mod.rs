@@ -469,6 +469,7 @@ fn can_use_at(
                 }
                 FacilityClass::Smeltery => OpenSmelteryCommand::can_perform(player, facility),
                 FacilityClass::Firepit => ActivateFirepitCommand::can_perform(player, facility),
+                FacilityClass::Patch => ActivatePatchCommand::can_perform(player, facility),
                 _ => false,
             }
         }
@@ -630,6 +631,12 @@ fn use_at<'a>(
                     facility_id,
                     inventories,
                     items,
+                    timer,
+                ))),
+                FacilityClass::Patch => Some(Box::new(ActivatePatchCommand::new(
+                    player,
+                    facility_id,
+                    facilities,
                     timer,
                 ))),
                 _ => None,

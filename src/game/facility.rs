@@ -19,6 +19,7 @@ pub enum FacilityClass {
     FishingSpot,
     Smeltery,
     Firepit,
+    Patch,
 }
 
 impl FacilityClass {
@@ -36,6 +37,7 @@ impl FacilityClass {
             "~fishing_spot" => FacilityClass::FishingSpot,
             "+smeltery" => FacilityClass::Smeltery,
             "^firepit" => FacilityClass::Firepit,
+            "%patch" => FacilityClass::Patch,
             _ => panic!("unknown FacilityClass symbol: {}", symbol),
         }
     }

@@ -30,3 +30,6 @@ pub use smeltery_commands::*;
 
 pub mod firepit_commands;
 pub use firepit_commands::*;
+
+pub mod patch_commands;
+pub use patch_commands::*;
