@@ -36,6 +36,27 @@ pub enum Skill {
     Smithing,
 }
 
+impl ToString for Skill {
+    fn to_string(&self) -> String {
+        match self {
+            Alchemy => "Alchemy",
+            Skill::Character => "Character",
+            Combat => "Combat",
+            Construction => "Construction",
+            Cooking => "Cooking",
+            Engineering => "Engineering",
+            Fishing => "Fishing",
+            Harvesting => "Harvesting",
+            Lockpicking => "Lockpicking",
+            Locksmithing => "Locksmithing",
+            Logging => "Logging",
+            Mining => "Mining",
+            Smelting => "Smelting",
+            Smithing => "Smithing",
+        }
+        .to_string()
+    }
+}
 impl Skill {
     pub fn from_string<S: ToString>(string: S) -> Skill {
         match &string.to_string()[..] {
