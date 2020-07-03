@@ -11,6 +11,7 @@ description = "a rogue-like game designed to explore client-server architecture.
 rltk = "0.8.1"
 bracket-lib = "0.8.1"
 bracket-terminal = "0.8.1"
+serde = "1.0.114"
 regex = "1.3.7"
 chrono = "0.4.11"
 extern_timer = {package = "timer", version = "0.2.0" }
