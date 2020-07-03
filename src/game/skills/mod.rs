@@ -18,6 +18,9 @@ pub use mining::*;
 pub mod engineering;
 pub use engineering::*;
 
+pub mod intellectual;
+pub use intellectual::*;
+
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Skill {
     Alchemy,
@@ -25,9 +28,11 @@ pub enum Skill {
     Combat,
     Construction,
     Cooking,
+    Cultural,
     Engineering,
     Fishing,
     Harvesting,
+    Intellectual,
     Lockpicking,
     Locksmithing,
     Logging,
@@ -44,9 +49,11 @@ impl ToString for Skill {
             Combat => "Combat",
             Construction => "Construction",
             Cooking => "Cooking",
+            Cultural => "Cultural",
             Engineering => "Engineering",
             Fishing => "Fishing",
             Harvesting => "Harvesting",
+            Intellectual => "Intellectual",
             Lockpicking => "Lockpicking",
             Locksmithing => "Locksmithing",
             Logging => "Logging",
@@ -65,9 +72,11 @@ impl Skill {
             "combat" => Combat,
             "construction" => Construction,
             "cooking" => Cooking,
+            "cultural" => Cultural,
             "engineering" => Engineering,
             "fishing" => Fishing,
             "harvesting" => Harvesting,
+            "intellectual" => Intellectual,
             "lockpicking" => Lockpicking,
             "locksmithing" => Locksmithing,
             "logging" => Logging,

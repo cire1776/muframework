@@ -330,6 +330,10 @@ impl GameState {
                 None
             }
 
+            Command::UseItem => {
+                Command::use_item(player, items, timer, activity, update_tx, command_tx)
+            }
+
             Command::TransferEquipmentToInventory(mounting_point, inventory_id) => {
                 Command::transfer_equipment_to_inventory(
                     mounting_point,

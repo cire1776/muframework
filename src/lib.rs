@@ -67,6 +67,7 @@ pub enum Command {
     UnequipItem(u64),
     TransferItem(u64, u64, u64), // (item_id, src_inventory_id, dest_inventory_id)
     TransferAllItems(u64, u64),  // (src_inventory_id, dest_inventory_id )
+    UseItem,
     TransferEquipmentToInventory(MountingPoint, u64), // (mounting point, dest_inventory_id)
     CloseExternalInventory,
     RefreshInventory,

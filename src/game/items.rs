@@ -20,6 +20,7 @@ pub enum ItemClass {
     Material,
     Ingredient,
     Ore,
+    Book,
 }
 
 impl ItemClass {
@@ -30,6 +31,7 @@ impl ItemClass {
             "!" => BladeWeapon,
             "¡" => Potion,
             "♠" => Tool,
+            "=" => Book,
             _ => panic!("unknown item class"),
         }
     }
@@ -50,6 +52,7 @@ impl ItemClass {
             "material" => Material,
             "ingredient" => Ingredient,
             "ore" => Ore,
+            "book" => Book,
             _ => panic!("unknown item class"),
         }
     }

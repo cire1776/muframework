@@ -16,6 +16,9 @@ pub use item_commands::{
 pub mod facility_commands;
 pub use facility_commands::*;
 
+pub mod item_use_commands;
+pub use item_use_commands::*;
+
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
 
@@ -273,6 +276,18 @@ impl Command {
 
     pub fn close_external_inventory(update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>) {
         GameUpdate::send(update_tx, GameUpdate::ExternalInventoryClosed);
+    }
+
+    pub fn use_item<'a>(
+        player: &'a mut Player,
+        items: &'a ItemList,
+        timer: &'a mut Timer,
+        _activity: Option<Box<dyn Activity>>,
+        update_tx: Option<&GameUpdateSender>,
+        command_tx: Option<CommandSender>,
+    ) -> Option<Box<dyn Activity>> {
+        let mut command = ActivateBookReadingCommand::new(player, items, timer);
+        command.execute(update_tx, command_tx)
     }
 }
 
@@ -735,9 +750,22 @@ pub trait Activity {
         update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) {
-        let facility = facilities
-            .get_mut(self.facility_id())
-            .expect("can't find facility");
+        let mut null_facility = Facility::new(
+            0,
+            0,
+            0,
+            FacilityClass::Firepit,
+            "The null facility".into(),
+            inventories,
+        );
+
+        let facility = if self.facility_id() == 0 {
+            &mut null_facility
+        } else {
+            facilities
+                .get_mut(self.facility_id())
+                .expect("can't find facility")
+        };
 
         self.restart_loop(
             player,

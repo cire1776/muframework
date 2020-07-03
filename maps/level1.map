@@ -39,6 +39,47 @@ R 8,10  // rat at 8,44
 R 44,13  // rat at 8,44
 S 28,23 // spider at 28,23
 ===END OF CHARACTERS===
+book_0001 book "The Joy Of Firepits: A Cookbook" {
+    endorsement: :can_use
+    
+    property: depth => 1000
+    property: minimum_intellectual => 1
+    property: maximum_intellectual => 10
+    property: associated_skill => cooking
+    property: minimum_topic_skill => 1
+    property: maximum_topic_skill => 15
+}
+book_0002 book "The Compleat Engineer" {
+    endorsement: :can_use
+
+    property: depth => 1000
+    property: minimum_intellectual => 1
+    property: maximum_intellectual => 10
+    property: associated_skill => engineering
+    property: minimum_topic_skill => 2
+    property: maximum_topic_skill => 15
+}
+book_0003 book "Mines!" {
+    endorsement: :can_use
+
+    property: depth => 1000
+    property: minimum_intellectual => 1
+    property: maximum_intellectual => 10
+    property: associated_skill => mining
+    property: minimum_topic_skill => 0
+    property: maximum_topic_skill => 15
+}
+book_0004 book "Summer of the Blue" {
+    endorsement: :can_use
+
+    property: depth => 10000
+    property: minimum_intellectual => 5
+    property: maximum_intellectual => 20
+    property: associated_skill => cultural
+    property: minimum_topic_skill => 0
+    property: maximum_topic_skill => 20
+
+}
 crusty_dagger dagger "Crusty Dagger"
 shiny_dagger dagger "Shiny Dagger" // a shiny dagger
 very_old_leather_cap headwear "Very Old Leather Fishermans Cap" {

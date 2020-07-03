@@ -562,3 +562,6 @@ mod change_facing;
 
 #[cfg(test)]
 mod attributes;
+
+#[cfg(test)]
+mod books;
