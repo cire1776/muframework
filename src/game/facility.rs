@@ -55,8 +55,6 @@ pub struct Facility {
     pub background_tile: tile_map::Tile,
 }
 
-impl StaticData for Facility {}
-
 impl<'a> Facility {
     pub fn new<T, U>(
         id: T,
@@ -252,8 +250,6 @@ impl<'a> Facility {
 pub struct FacilityList {
     facilities: HashMap<u64, Facility>,
 }
-
-impl StaticData for FacilityList {}
 
 impl FacilityList {
     pub fn new() -> FacilityList {

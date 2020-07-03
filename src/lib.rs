@@ -149,8 +149,6 @@ impl GameUpdate {
 }
 use GameUpdate::*;
 
-pub trait StaticData: 'static {}
-
 #[cfg(test)]
 pub mod test_support {
     use super::*;

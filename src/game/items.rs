@@ -316,8 +316,6 @@ impl ItemType {
     }
 }
 
-impl StaticData for ItemType {}
-
 #[derive(Debug, Clone)]
 pub struct ItemTypeList {
     item_types: HashMap<String, ItemType>,
