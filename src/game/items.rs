@@ -110,6 +110,10 @@ pub enum PropertyValue {
     Skill(Skill),
 }
 
+lazy_static! {
+    static ref MASTER_ITEM_TYPE_LIST: ItemTypeList = ItemType::perform_read_in_item_types();
+}
+
 #[derive(Debug, Eq, Clone)]
 pub struct ItemType {
     pub class: ItemClass,
@@ -225,6 +229,10 @@ impl ItemType {
     }
 
     pub fn read_in_item_types(_items: &mut Vec<String>) -> ItemTypeList {
+        MASTER_ITEM_TYPE_LIST.clone()
+    }
+
+    fn perform_read_in_item_types() -> ItemTypeList {
         use std::fs;
 
         let contents = fs::read_to_string("maps/item_types".to_string())
