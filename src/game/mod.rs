@@ -183,9 +183,7 @@ impl GameState {
         // TODO: consider moving this to a function
         GameUpdate::send(update_tx, SetBackground(map.clone()));
 
-        let timer: Timer;
-
-        timer = Timer::new(command_tx.clone());
+        let timer = Timer::new(command_tx.clone());
 
         (
             player,
