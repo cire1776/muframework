@@ -29,6 +29,8 @@ lazy_static! {
         m.insert(Watermelon, HarvestingSkill::new(35, 45, 50));
         m.insert(GreenPepper, HarvestingSkill::new(40, 45, 60));
         m.insert(BlackPepper, HarvestingSkill::new(45, 45, 70));
+        m.insert(Apple, HarvestingSkill::new(0, 25, 10));
+        m.insert(Olive, HarvestingSkill::new(10, 35, 15));
 
         m
     };
@@ -61,6 +63,8 @@ pub enum ProduceType {
     Turnip = 22,
     Watermelon = 23,
     Wheat = 24,
+    Apple = 25,
+    Olive = 26,
 }
 
 impl ProduceType {
@@ -90,6 +94,8 @@ impl ProduceType {
             22 => Turnip,
             23 => Watermelon,
             24 => Wheat,
+            25 => Apple,
+            26 => Olive,
             _ => panic!("unknown produce type"),
         }
     }
@@ -122,6 +128,8 @@ impl ToString for ProduceType {
             Turnip => "Turnip",
             Watermelon => "Watermelon",
             Wheat => "Wheat",
+            Apple => "Apple",
+            Olive => "Olive",
         }
         .to_string()
     }
@@ -149,12 +157,20 @@ impl HarvestingSkill {
     }
 
     pub fn is_exhasuted(facility: &Facility) -> bool {
-        facility.get_property("quantity") == 0
+        let property_name = if facility.class == FacilityClass::Patch {
+            "quantity"
+        } else {
+            "fruit"
+        };
+
+        facility.get_property(property_name) == 0
     }
 
-    pub fn expiration(_product: ProduceType, player: &Player) -> u32 {
-        (60 + player.get_attribute(Attribute::SkillTime(Harvesting), 0)) as u32
-        // 60
+    pub fn expiration(product: ProduceType, player: &Player) -> u32 {
+        (match product {
+            Olive => 90,
+            _ => 60,
+        } + player.get_attribute(Attribute::SkillTime(Harvesting), 0)) as u32
     }
 
     pub fn produce_results_for(
@@ -163,10 +179,20 @@ impl HarvestingSkill {
         facility: &mut Facility,
         _rng: &mut Rng,
     ) -> (ItemClass, String) {
-        player.increment_xp(Harvesting, HARVESTING_PRODUCTS[&product].xp_gain as u64);
+        let rule = HARVESTING_PRODUCTS[&product];
+        player.increment_xp(Harvesting, rule.xp_gain as u64);
 
-        facility.decrement_property("quantity");
-        let produce = facility.get_property("produce");
-        (Food, ProduceType::from(produce).to_string())
+        let property_name: &str;
+        let produce: String;
+
+        if facility.class == FacilityClass::Patch {
+            property_name = "quantity";
+            produce = ProduceType::from(facility.get_property("produce")).to_string()
+        } else {
+            property_name = "fruit";
+            produce = product.to_string();
+        }
+        facility.decrement_property(property_name);
+        (Food, produce)
     }
 }

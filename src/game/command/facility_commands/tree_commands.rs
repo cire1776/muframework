@@ -26,7 +26,7 @@ impl TreeType {
 }
 
 pub struct ActivateTreePickingCommand<'a> {
-    tree_type: TreeType,
+    product: ProduceType,
     player: &'a mut Player,
     facility_id: u64,
     timer: &'a mut Timer,
@@ -39,8 +39,14 @@ impl<'a> ActivateTreePickingCommand<'a> {
         facility_id: u64,
         timer: &'a mut Timer,
     ) -> Self {
+        let product = match tree_type {
+            TreeType::Apple => ProduceType::Apple,
+            TreeType::Olive => ProduceType::Olive,
+            _ => panic!("{:?} is not a fruit tree.", tree_type),
+        };
+
         Self {
-            tree_type,
+            product,
             player,
             facility_id,
             timer,
@@ -63,15 +69,11 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (match self.tree_type {
-            TreeType::Apple => 60,
-            TreeType::Olive => 90,
-            _ => panic!("Non-fruit tree supplied"),
-        } + self.player.get_attribute(Attribute::SkillTime(Logging), 0)) as u32
+        HarvestingSkill::expiration(self.product, self.player)
     }
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
         let activity = TreePickingActivity::new(
-            self.tree_type,
+            self.product,
             self.expiration(),
             self.player.inventory_id(),
             self.facility_id,
@@ -94,7 +96,7 @@ impl<'a> CommandHandler<'a> for ActivateTreePickingCommand<'a> {
 
 #[allow(dead_code)]
 pub struct TreePickingActivity {
-    tree_type: TreeType,
+    product: ProduceType,
     expiration: u32,
     player_inventory_id: u64,
     facility_id: u64,
@@ -103,14 +105,14 @@ pub struct TreePickingActivity {
 
 impl<'a> TreePickingActivity {
     pub fn new(
-        tree_type: TreeType,
+        product: ProduceType,
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
         guard: Guard,
     ) -> Self {
         Self {
-            tree_type,
+            product,
             expiration,
             player_inventory_id,
             facility_id,
@@ -121,9 +123,9 @@ impl<'a> TreePickingActivity {
 
 impl<'a> Activity for TreePickingActivity {
     fn activity_title(&self) -> ui::pane::PaneTitle {
-        match self.tree_type {
-            TreeType::Apple => ui::pane::PaneTitle::PickingApples,
-            TreeType::Olive => ui::pane::PaneTitle::PickingOlives,
+        match self.product {
+            ProduceType::Apple => ui::pane::PaneTitle::PickingApples,
+            ProduceType::Olive => ui::pane::PaneTitle::PickingOlives,
             _ => panic!("Non-fruit tree specified"),
         }
     }
@@ -142,31 +144,18 @@ impl<'a> Activity for TreePickingActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
-        _rng: &mut Rng,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let item_class: ItemClass;
-        let item_description: &str;
-
-        match self.tree_type {
-            TreeType::Apple => {
-                item_class = ItemClass::Food;
-                item_description = "Apple"
-            }
-            TreeType::Olive => {
-                item_class = ItemClass::Food;
-                item_description = "Olive"
-            }
-            _ => panic!("{:?} is not a fruit tree.", self.tree_type),
-        }
-
+        let (class, description) =
+            HarvestingSkill::produce_results_for(self.product, player, facility, rng);
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(player.inventory_id(), item_class, item_description.into()),
+            Command::SpawnItem(player.inventory_id(), class, description),
         );
 
-        if facility.decrement_property("fruit") <= 0 {
+        if HarvestingSkill::is_exhasuted(facility) {
             Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
