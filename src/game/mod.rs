@@ -164,6 +164,9 @@ impl GameState {
             stored_item_vec,
         ) = TileMap::load_from_file(level_path.to_string());
 
+        let mut timer = Timer::new(command_tx.clone());
+        timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
+
         let mut obstacles = BlockingMap::new();
         obstacles.refresh(&map);
 
@@ -184,7 +187,8 @@ impl GameState {
 
         let inventories = &mut InventoryList::new();
 
-        let (mut facilities, aliases) = Facility::read_in_facilities(&facility_vec, inventories);
+        let (mut facilities, aliases) =
+            Facility::read_in_facilities(&facility_vec, inventories, &mut timer);
 
         // create the player's inventory
         Inventory::new_into_inventory_list(player.id, inventories);
@@ -201,9 +205,6 @@ impl GameState {
 
         // TODO: consider moving this to a function
         GameUpdate::send(update_tx, SetBackground(map.clone()));
-
-        let mut timer = Timer::new(command_tx.clone());
-        timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
 
         (
             player,
@@ -394,6 +395,7 @@ impl GameState {
                 GameUpdate::send(update_tx, GameUpdate::FacilityRemoved { id: *facility_id });
                 activity
             }
+            Command::FacilityMaintenance(_u64) => activity,
             Command::None => activity,
             Command::ActivityComplete => self.complete_activity(
                 player,
@@ -479,6 +481,7 @@ impl GameState {
                 | Command::RefreshInventory
                 | Command::TakeItem(_)
                 | Command::DropItem(_)
+                | Command::FacilityMaintenance(_)
                 | Command::ActivityComplete => {}
 
                 _ => {

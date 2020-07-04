@@ -566,7 +566,7 @@ fn player_earns_15_xp_harvesting_for_picking_an_olive() {
         mut items,
         mut facilities,
         mut inventories,
-        mut _rng,
+        mut rng,
         mut timer,
         update_tx,
         _update_rx,
@@ -574,8 +574,6 @@ fn player_earns_15_xp_harvesting_for_picking_an_olive() {
         _command_rx,
         mut game_state,
     ) = initialize_game_system_with_player_at(10, 10);
-
-    let mut rng = Rng::new();
 
     player.endorse_with(":can_pick");
     give_player_level(Harvesting, 10, &mut player);
@@ -619,4 +617,90 @@ fn player_earns_15_xp_harvesting_for_picking_an_olive() {
     );
 
     assert_eq!(player.get_xp(Harvesting), exp_xp);
+}
+
+#[test]
+fn a_timer_is_set_for_fruit_and_wood_regeneration() {
+    let (
+        _player,
+        map,
+        _obstacles,
+        _characters,
+        _item_class_specifiers,
+        _items,
+        _facilities,
+        _inventories,
+        _rng,
+        timer,
+        _update_tx,
+        _update_rx,
+        _command_tx,
+        _command_rx,
+        _game_state,
+    ) = initialize_game_system_with_player_at(10, 10);
+
+    let facility_id = get_facility_id_at(9, 8, &map);
+
+    let tag = format!("regeneration for {:?}", facility_id);
+    assert_eq!(timer.tags[&tag], TagType::Ticks(54000))
+}
+
+#[test]
+fn wood_regenerates_upon_maintenance() {
+    let (
+        _player,
+        map,
+        _obstacles,
+        _characters,
+        _item_class_specifiers,
+        _items,
+        mut facilities,
+        _inventories,
+        _rng,
+        _timer,
+        _update_tx,
+        _update_rx,
+        _command_tx,
+        _command_rx,
+        _game_state,
+    ) = initialize_game_system_with_player_at(10, 10);
+
+    let facility_id = get_facility_id_at(9, 8, &map);
+    let facility = facilities.get_mut(facility_id).expect("unable to get tree");
+
+    let exp_logs = facility.get_property("logs") + 1;
+
+    facility.maintenance();
+
+    assert_eq!(facility.get_property("logs"), exp_logs);
+}
+
+#[test]
+fn fruit_regenerates_upon_maintenance() {
+    let (
+        _player,
+        map,
+        _obstacles,
+        _characters,
+        _item_class_specifiers,
+        _items,
+        mut facilities,
+        _inventories,
+        _rng,
+        _timer,
+        _update_tx,
+        _update_rx,
+        _command_tx,
+        _command_rx,
+        _game_state,
+    ) = initialize_game_system_with_player_at(10, 10);
+
+    let facility_id = get_facility_id_at(9, 9, &map);
+    let facility = facilities.get_mut(facility_id).expect("unable to get tree");
+
+    let exp_fruit = facility.get_property("fruit") + 1;
+
+    facility.maintenance();
+
+    assert_eq!(facility.get_property("fruit"), exp_fruit);
 }

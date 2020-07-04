@@ -76,6 +76,7 @@ pub enum Command {
     ActivityAbort,
     ActivityComplete,
     DestroyFacility(u64), // (facility_id)
+    FacilityMaintenance(u64),
     ChoiceSelected(u8, ActionContinuation, u64),
 }
 

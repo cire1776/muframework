@@ -188,9 +188,44 @@ impl<'a> Facility {
         value - 1
     }
 
+    pub fn setup_timers(&self, timer: &mut Timer) {
+        match self.class {
+            FacilityClass::AppleTree
+            | FacilityClass::PineTree
+            | FacilityClass::OliveTree
+            | FacilityClass::OakTree => {
+                timer.repeating_by_tick(
+                    15 * 3600,
+                    Command::FacilityMaintenance(self.id),
+                    format!("regeneration for {:?}", self.id),
+                );
+            }
+            _ => {}
+        }
+    }
+
+    pub fn maintenance(&mut self) {
+        match self.class {
+            FacilityClass::AppleTree
+            | FacilityClass::PineTree
+            | FacilityClass::OliveTree
+            | FacilityClass::OakTree => {
+                self.increment_property("logs");
+            }
+            _ => {}
+        }
+        match self.class {
+            FacilityClass::AppleTree | FacilityClass::OliveTree => {
+                self.increment_property("fruit");
+            }
+            _ => {}
+        }
+    }
+
     pub fn read_in_facilities(
         facilities: &Vec<String>,
         inventories: &mut InventoryList,
+        timer: &mut Timer,
     ) -> (FacilityList, AliasList) {
         let mut aliases = AliasList::new(1);
         let mut result = FacilityList::new();
@@ -202,7 +237,7 @@ impl<'a> Facility {
         let facilities_string = facilities.join("\n");
 
         for captures in re.captures_iter(&facilities_string) {
-            let (facility, possible_alias) = Self::read_facility(&captures, inventories);
+            let (facility, possible_alias) = Self::read_facility(&captures, inventories, timer);
 
             aliases.insert_if_necessary(possible_alias, facility.id);
 
@@ -215,6 +250,7 @@ impl<'a> Facility {
     fn read_facility(
         captures: &'a regex::Captures,
         inventories: &'a mut InventoryList,
+        timer: &'a mut Timer,
     ) -> (Facility, Option<&'a str>) {
         let symbol = captures.get(1).expect("unable to find symbol").as_str();
 
@@ -239,6 +275,8 @@ impl<'a> Facility {
             facility.enable_properties();
             facility.set_property(property_name, property_value);
         }
+
+        facility.setup_timers(timer);
 
         (facility, inventory_alias)
     }
@@ -398,21 +436,25 @@ mod inventory_aliases {
 
     #[test]
     fn no_aliases_are_created_if_none_specified() {
+        let mut timer = Timer::new(None);
         let mut inventories = InventoryList::new();
         let facility_src = vec![r#"▲r 9,9 "An old Apple Tree" "#.into()];
-        let (_facilities, aliases) = Facility::read_in_facilities(&facility_src, &mut inventories);
+        let (_facilities, aliases) =
+            Facility::read_in_facilities(&facility_src, &mut inventories, &mut timer);
         // remember to include "player" alias
         assert_eq!(aliases.len(), 1);
     }
     #[test]
     fn multiple_aliases_are_created_when_multiple_are_specified() {
+        let mut timer = Timer::new(None);
         let mut inventories = InventoryList::new();
         let facility_src = vec![
             r#"▲r 9,9 "An old Apple Tree" alias1"#.into(),
             r#"▲r 10,10 "An old Apple Tree" alias2"#.into(),
             r#"▲r 11,11 "An old Apple Tree" alias3"#.into(),
         ];
-        let (facilities, aliases) = Facility::read_in_facilities(&facility_src, &mut inventories);
+        let (facilities, aliases) =
+            Facility::read_in_facilities(&facility_src, &mut inventories, &mut timer);
 
         // remember to include "player" alias
         assert_eq!(aliases.len(), 4);
