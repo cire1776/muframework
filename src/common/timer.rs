@@ -13,6 +13,12 @@ impl Guard {
     }
 }
 
+impl Drop for Guard {
+    fn drop(&mut self) {
+        println!("dropping");
+    }
+}
+
 pub struct Timer {
     timer: MessageTimer<Command>,
     test_mode: bool,
