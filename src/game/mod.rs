@@ -202,7 +202,8 @@ impl GameState {
         // TODO: consider moving this to a function
         GameUpdate::send(update_tx, SetBackground(map.clone()));
 
-        let timer = Timer::new(command_tx.clone());
+        let mut timer = Timer::new(command_tx.clone());
+        timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
 
         (
             player,
@@ -241,9 +242,11 @@ impl GameState {
         match command {
             Command::NextTick => {
                 self.ticks += 1;
-                if self.ticks % 3600 == 0 {
-                    println!("{}", self.ticks);
-                }
+                timer.tick(self.ticks);
+                activity
+            }
+            Command::DisplayTick => {
+                println!("{}", self.ticks);
                 activity
             }
             Command::QuitGame => {
@@ -471,6 +474,7 @@ impl GameState {
                 // list commands that do not abort activities here
                 Command::None
                 | Command::NextTick
+                | Command::DisplayTick
                 | Command::SpawnItem(_, _, _)
                 | Command::RefreshInventory
                 | Command::TakeItem(_)

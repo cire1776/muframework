@@ -56,6 +56,7 @@ pub enum ActionContinuation {
 pub enum Command {
     None,
     NextTick,
+    DisplayTick,
     QuitGame,
     DumpPlayer,
     Move(Direction, MoveCommandMode),

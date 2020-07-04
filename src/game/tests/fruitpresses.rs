@@ -1,4 +1,5 @@
 use super::*;
+use common::timer::TagType;
 
 #[test]
 fn fruitpress_can_be_opened() {
@@ -401,7 +402,7 @@ fn can_press_when_apples_have_been_added() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60000, Pressing, &mut update_rx);
@@ -508,7 +509,7 @@ fn can_press_when_olives_have_been_added() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60000, Pressing, &mut update_rx);
@@ -603,7 +604,7 @@ fn can_fill_bottles_when_apple_juice_is_available_aborting_when_empty() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(30)
+        TagType::Duration(chrono::Duration::seconds(30))
     );
 
     assert_activity_started(30000, Filling, &mut update_rx);
@@ -703,7 +704,7 @@ fn can_fill_bottles_when_olive_oil_is_available_aborting_when_empty() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(30)
+        TagType::Duration(chrono::Duration::seconds(30))
     );
 
     assert_activity_started(30000, Filling, &mut update_rx);

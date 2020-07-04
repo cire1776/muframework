@@ -1,4 +1,5 @@
 use super::*;
+use common::timer::TagType;
 
 #[test]
 fn can_saw_softwood_without_breaking_mill() {
@@ -67,7 +68,7 @@ fn can_saw_softwood_without_breaking_mill() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(40)
+        TagType::Duration(chrono::Duration::seconds(40))
     );
 
     assert_activity_started(40000, Sawing, &mut update_rx);
@@ -170,7 +171,7 @@ fn can_saw_hardwood_without_breaking_mill() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60000, Sawing, &mut update_rx);
@@ -271,7 +272,7 @@ fn mills_can_break() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, Sawing, &mut update_rx);

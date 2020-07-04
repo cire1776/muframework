@@ -1,4 +1,5 @@
 use super::*;
+use common::timer::TagType;
 
 #[test]
 fn can_equip_a_book_in_the_on_hand() {
@@ -154,7 +155,7 @@ fn can_read_a_book() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(56)
+        TagType::Duration(chrono::Duration::seconds(56))
     );
 
     assert_activity_started(56_000, Reading, &mut update_rx);
@@ -237,7 +238,7 @@ fn reading_a_book_earns_10_intellectual_xp() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(56)
+        TagType::Duration(chrono::Duration::seconds(56))
     );
 
     assert_activity_started(56_000, Reading, &mut update_rx);
@@ -311,7 +312,7 @@ fn reading_a_book_with_an_associated_skill_earns_10_points_for_that_skill() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, Reading, &mut update_rx);
@@ -384,7 +385,7 @@ fn skilltime_is_taken_into_account() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(51)
+        TagType::Duration(chrono::Duration::seconds(51))
     );
 
     assert_activity_started(51_000, Reading, &mut update_rx);
@@ -567,7 +568,7 @@ fn a_player_must_have_the_minimum_associated_skill_to_earn_xp_for_that_skill() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, Reading, &mut update_rx);
@@ -648,7 +649,7 @@ fn if_player_has_too_high_topic_skill_they_earn_no_topic_xp() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, Reading, &mut update_rx);

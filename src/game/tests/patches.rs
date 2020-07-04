@@ -1,4 +1,5 @@
 use super::*;
+use common::timer::TagType;
 
 #[test]
 fn cannot_pick_from_patch_without_endorcement_can_pick() {
@@ -86,7 +87,7 @@ fn picking_can_done_with_can_pick_endorsement() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::PaneTitle::Harvesting, &mut update_rx);
@@ -167,7 +168,7 @@ fn can_produce_multiple_types_of_produce() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::PaneTitle::Harvesting, &mut update_rx);
@@ -249,7 +250,7 @@ fn takes_skilltime_into_account() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(51)
+        TagType::Duration(chrono::Duration::seconds(51))
     );
 
     assert_activity_started(51_000, ui::PaneTitle::Harvesting, &mut update_rx);

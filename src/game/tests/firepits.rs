@@ -1,5 +1,6 @@
 use super::*;
 
+use common::timer::TagType;
 use ui::PaneTitle;
 
 #[test]
@@ -83,7 +84,7 @@ fn can_cook_fish_successfully() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(57)
+        TagType::Duration(chrono::Duration::seconds(57))
     );
     assert!(activity.is_some());
 
@@ -211,7 +212,7 @@ fn can_burn_fish() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
     assert!(activity.is_some());
 
@@ -331,7 +332,7 @@ fn can_cook_item_at_ready() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(57)
+        TagType::Duration(chrono::Duration::seconds(57))
     );
     assert!(activity.is_some());
 
@@ -463,7 +464,7 @@ fn timer_is_reduced_by_skill_time() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(51)
+        TagType::Duration(chrono::Duration::seconds(51))
     );
     assert!(activity.is_some());
 

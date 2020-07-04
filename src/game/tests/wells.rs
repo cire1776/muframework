@@ -1,4 +1,5 @@
 use super::*;
+use common::timer::TagType;
 
 #[test]
 fn can_dig_without_success() {
@@ -53,7 +54,7 @@ fn can_dig_without_success() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
     assert!(activity.is_some());
 
@@ -145,7 +146,7 @@ fn can_dig_striking_water() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
     assert!(activity.is_some());
 
@@ -240,7 +241,7 @@ fn can_dig_striking_oil() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
     assert!(activity.is_some());
 
@@ -335,7 +336,7 @@ fn can_dig_striking_bedrock() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
     assert!(activity.is_some());
 
@@ -427,7 +428,7 @@ fn can_fill_from_water_well() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(30)
+        TagType::Duration(chrono::Duration::seconds(30))
     );
     assert!(activity.is_some());
 
@@ -512,7 +513,7 @@ fn can_fill_from_oil_well() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(30)
+        TagType::Duration(chrono::Duration::seconds(30))
     );
     assert!(activity.is_some());
 

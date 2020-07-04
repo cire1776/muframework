@@ -1,4 +1,5 @@
 use super::*;
+use common::timer::TagType;
 
 #[test]
 fn can_open_a_smeltery_at_level_10() {
@@ -195,7 +196,7 @@ fn can_smelt_tin_with_excess_quantities() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(16)
+        TagType::Duration(chrono::Duration::seconds(16))
     );
 
     assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
@@ -289,7 +290,7 @@ fn stops_when_supplies_run_out() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(16)
+        TagType::Duration(chrono::Duration::seconds(16))
     );
 
     assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);

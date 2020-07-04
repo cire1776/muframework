@@ -1,4 +1,5 @@
 use super::*;
+use common::timer::TagType;
 
 #[test]
 fn can_chop_pine_tree() {
@@ -46,7 +47,7 @@ fn can_chop_pine_tree() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
@@ -129,7 +130,7 @@ fn can_chop_apple_tree() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
@@ -210,7 +211,7 @@ fn can_chop_olive_tree() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
@@ -292,7 +293,7 @@ fn can_chop_oak_tree() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
@@ -372,7 +373,7 @@ fn can_pick_apple_tree() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::pane::PaneTitle::PickingApples, &mut update_rx);
@@ -450,7 +451,7 @@ fn can_pick_olive_tree() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(90)
+        TagType::Duration(chrono::Duration::seconds(90))
     );
 
     assert_activity_started(90_000, ui::pane::PaneTitle::PickingOlives, &mut update_rx);
@@ -529,7 +530,7 @@ fn player_earns_10_xp_harvesting_for_picking_an_apple() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        chrono::Duration::seconds(60)
+        TagType::Duration(chrono::Duration::seconds(60))
     );
 
     assert_activity_started(60_000, ui::pane::PaneTitle::PickingApples, &mut update_rx);
