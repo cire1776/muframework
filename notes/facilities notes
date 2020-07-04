@@ -63,13 +63,15 @@ LockedChest
 *Fruit Press
 *Lumbermill
 *Vein
-*Stove or Firepit
+Stove
+*Firepit
 *Smeltery
 Smithy
 Crafting Station
 Greenhouse
 *Fishing Spot
 *Well
+Bookshelf
 Rubble Pile
 
 Fruit Press
@@ -125,3 +127,10 @@ well x, y "A water well" {
         ordinary wells are less than 1000 feet deep.  Master wells are those deeper than 1000 feet.
         once bedrock has been reached only a master engineer can drill further.
 
+Trees
+=====
+
+Trees produce 96 wood per rlday: 1 per every 15 minutes or 54000 ticks.
+
+The are grown from saplings.  a sapling grows and has a 1/24 chance of become a tree every 12 hours.
+Once every four rldays a tree will spawn a sapling within an empty adjacent space.

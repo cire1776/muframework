@@ -18,7 +18,7 @@ Items to be completed
 - RT action
 - chests
 - √ facing
-- xp
+- √ xp
 - levelling
 - min time
 - drinking and eating
