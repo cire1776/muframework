@@ -55,6 +55,7 @@ pub enum ActionContinuation {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Command {
     None,
+    NextTick,
     QuitGame,
     DumpPlayer,
     Move(Direction, MoveCommandMode),

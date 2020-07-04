@@ -461,6 +461,15 @@ pub fn assert_commands_are_empty(command_rx: &mut Receiver<Command>) {
     }
 }
 
+pub fn assert_is_next_tick(command_rx: &mut Receiver<Command>) {
+    let command = command_rx.try_recv();
+
+    match command {
+        Ok(Command::NextTick) => {}
+        Ok(command) => panic!("unexpected command found: {:?}", command),
+        Err(_) => panic!("command not found."),
+    }
+}
 pub fn assert_is_refresh_inventory(command_rx: &mut Receiver<Command>) {
     let command = command_rx.try_recv();
 
@@ -568,3 +577,6 @@ mod attributes;
 
 #[cfg(test)]
 mod books;
+
+#[cfg(test)]
+mod system;

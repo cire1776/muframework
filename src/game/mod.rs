@@ -59,11 +59,13 @@ pub fn NEXT_ITEM_ID() -> u64 {
     GLOBAL_NEXT_ITEM_ID.fetch_add(1, Ordering::SeqCst)
 }
 
-pub struct GameState {}
+pub struct GameState {
+    ticks: u128,
+}
 
 impl GameState {
     pub fn new() -> Self {
-        Self {}
+        Self { ticks: 0 }
     }
 
     pub fn game_loop(
@@ -88,6 +90,9 @@ impl GameState {
         );
 
         let game_state = &mut GameState::new();
+
+        let _guard = game_state.start_heartbeat(&mut timer);
+
         let mut activity: Option<Box<dyn Activity>> = None;
 
         loop {
@@ -118,6 +123,20 @@ impl GameState {
                 return;
             }
         }
+    }
+
+    fn start_heartbeat(&self, timer: &mut Timer) -> Guard {
+        let duration = chrono::Duration::microseconds(1_000_000 / 60);
+        timer.repeating(duration, Command::NextTick, "Heartbeat")
+    }
+
+    pub fn current_tick(&self) -> u128 {
+        self.ticks
+    }
+
+    #[cfg(test)]
+    pub fn test_start_heartbeat(&self, timer: &mut Timer) -> Guard {
+        self.start_heartbeat(timer)
     }
 
     /// public for testing purposes
@@ -220,6 +239,13 @@ impl GameState {
         activity = self.abort_activity_if_necessary(activity, command, update_tx);
 
         match command {
+            Command::NextTick => {
+                self.ticks += 1;
+                if self.ticks % 3600 == 0 {
+                    println!("{}", self.ticks);
+                }
+                activity
+            }
             Command::QuitGame => {
                 GameUpdate::send(update_tx, Exit);
                 return None;
@@ -444,6 +470,7 @@ impl GameState {
             match command {
                 // list commands that do not abort activities here
                 Command::None
+                | Command::NextTick
                 | Command::SpawnItem(_, _, _)
                 | Command::RefreshInventory
                 | Command::TakeItem(_)
