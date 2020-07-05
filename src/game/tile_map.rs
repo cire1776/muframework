@@ -31,11 +31,32 @@ impl Tile {
     }
 }
 
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum Realm {
+    Inaccessible,
+    Outdoors,
+    Indoors,
+    Subterranean,
+}
+
+impl Realm {
+    pub fn from_string<S: ToString>(string: S) -> Realm {
+        match &string.to_string()[..] {
+            "O" => Realm::Outdoors,
+            "S" => Realm::Subterranean,
+            "I" => Realm::Indoors,
+            " " => Realm::Inaccessible,
+            _ => panic!("unknown realm type: {:?}", string.to_string()),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct TileMap {
     pub map_width: usize,
     pub map_height: usize,
     map: Vec<Tile>,
+    realms: Vec<Realm>,
 }
 
 impl fmt::Debug for TileMap {
@@ -68,6 +89,7 @@ impl TileMap {
             map_width: 0,
             map_height: 0,
             map: vec![],
+            realms: vec![],
         }
     }
 
@@ -87,7 +109,7 @@ impl TileMap {
         let contents = fs::read_to_string(filename.to_string()).expect("unable to read level file");
 
         let re = Regex::new(
-            r"(?s)(.+)===END OF MAP===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEM TYPES===\n(.*)===END OF ITEMS===\n(.*)===END OF FACILITIES===\n(.*)===END OF STORED ITEMS===",
+            r"(?s)(.+)===END OF MAP===\n(.+)===END OF REALMS===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEM TYPES===\n(.*)===END OF ITEMS===\n(.*)===END OF FACILITIES===\n(.*)===END OF STORED ITEMS===",
         )
         .expect("unable to initialize regex");
 
@@ -97,20 +119,18 @@ impl TileMap {
         let map_height: usize = Self::get_map_row_count(&map_rows);
         let map_width: usize = Self::get_map_column_count(&map_rows);
 
-        let characters = capture_section(&captures, 2);
-        let item_types = capture_section(&captures, 3);
-        let items = capture_section(&captures, 4);
-        let facilities: Vec<String> = capture_section(&captures, 5);
-        let stored_items = capture_section(&captures, 6);
+        let realms = capture_section(&captures, 2);
 
-        (
-            Self::load_map_from_vector(&map_rows, map_width, map_height),
-            characters,
-            item_types,
-            items,
-            facilities,
-            stored_items,
-        )
+        let characters = capture_section(&captures, 3);
+        let item_types = capture_section(&captures, 4);
+        let items = capture_section(&captures, 5);
+        let facilities: Vec<String> = capture_section(&captures, 6);
+        let stored_items = capture_section(&captures, 7);
+
+        let mut map = Self::load_map_from_vector(&map_rows, map_width, map_height);
+        map.load_realms(&realms);
+
+        (map, characters, item_types, items, facilities, stored_items)
     }
 
     /// returns the number of elements in the map.
@@ -208,6 +228,7 @@ impl TileMap {
             map_width: width as usize,
             map_height: height as usize,
             map: vec![Tile::Empty; width * height],
+            realms: vec![Realm::Outdoors; width * height],
         };
 
         let mut index: usize = 0;
@@ -232,6 +253,24 @@ impl TileMap {
             }
         }
         map
+    }
+
+    fn load_realms(&mut self, realms: &Vec<String>) {
+        let mut index = 0;
+        for row in realms {
+            for c in 0..self.map_width {
+                let character = row.chars().nth(c);
+
+                if let Some(character) = character {
+                    let realm = Realm::from_string(character);
+                    self.realms[index] = realm;
+                }
+                index += 1;
+            }
+            if index % self.map_width != 0 {
+                index = index + self.map_width - index % self.map_width;
+            }
+        }
     }
 
     /// returns the empty tile

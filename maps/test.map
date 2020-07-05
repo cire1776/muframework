@@ -12,28 +12,64 @@
 #..................#           #.......................#
 #..................#           #.......................#
 #..................#           #.......................#
-####################           ############/############
-                                          #.#
-                                          #.#
-                                          #.#
-            ###############################/############
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
-            #..........................................#
+#..........#########           ############/############
+#..........#            ###########       #.#           
+#.........##          ###.........###     #.#           
+#........##        ####.............##    #.#           
+#......##   ########.................######/############
+#...####   ##..........................................#
+#...#      #...........................................#
+#..##     ##...........................................#
+#..#     ##............................................#
+#.##     #.............................................#
+###     ##.............................................#
+        #..............................................#
+        #..............................................#
+        #..............................................#
+        ##.............................................#
+         #.............................................#
+         #.............................................#
+         ##............................................#
+          #............................................#
+          ###..........................................#
             ############################################
 ===END OF MAP===
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOOIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOOIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOOIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOOOOOOOOOO           IIIIIIIIIIIIIIIIIIIIIIIII 
+OOOOOOOOOOOO            SSSSSSSSSS        SSS            
+OOOOOOOOOOOO          SSSSSSSSSSSSSSS     SSS            
+OOOOOOOOOOO        SSSSSSSSSSSSSSSSSSS    SSS            
+OOOOOOOOO   SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+OOOOOOOO   SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+OOOOO      SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+OOOOO     SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+OOOO     SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+OOOO     SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+OOO     SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+        SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+        SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+        SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+        SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+         SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+         SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+         SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+          SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+          SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+            SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS 
+===END OF REALMS===
 8,7    // Default Player Starting Position
 R 8,10  // rat at 8,44
 R 44,13  // rat at 8,44
