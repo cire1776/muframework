@@ -159,7 +159,7 @@ S 28,23 // spider at 28,23
     property: chance_of_gem => 10000
 }
 ~fishing_spot 15, 1 "A quiet coastline" {
-    property: body_of_waster => 1
+    property: body_of_water => 1
     property: net_1_product => 1
     property: net_2_product => 2
     property: net_2_chance => 50
