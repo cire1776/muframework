@@ -842,6 +842,12 @@ impl ItemList {
         self.items
             .insert(item.id, ItemState::Equipped(item.clone(), inventory_id));
     }
+
+    pub fn merge(&mut self, other: &ItemList) {
+        for (key, state) in &other.items {
+            self.items.insert(*key, state.clone());
+        }
+    }
 }
 
 impl Index<u64> for ItemList {
