@@ -683,6 +683,45 @@ impl ItemList {
         }
     }
 
+    pub fn bundled_items(&self) -> ItemList {
+        let mut result = ItemList::new(None);
+
+        for (_, state) in &self.items {
+            match state {
+                ItemState::Bundle(item, x, y) => result.bundle(item, *x, *y),
+                _ => {}
+            }
+        }
+
+        result
+    }
+
+    pub fn stored_items(&self) -> ItemList {
+        let mut result = ItemList::new(None);
+
+        for (_, state) in &self.items {
+            match state {
+                ItemState::Stored(item, inventory_id) => result.store(item, *inventory_id),
+                _ => {}
+            }
+        }
+
+        result
+    }
+
+    pub fn equipped_items(&self) -> ItemList {
+        let mut result = ItemList::new(None);
+
+        for (_, state) in &self.items {
+            match state {
+                ItemState::Equipped(item, inventory_id) => result.equip(item, *inventory_id),
+                _ => {}
+            }
+        }
+
+        result
+    }
+
     pub fn does_item_match_description<S: ToString>(&self, item_id: u64, description: S) -> bool {
         let item = self.get_as_item(item_id).expect("Item not found.");
         item.raw_description() == description.to_string()
