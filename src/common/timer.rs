@@ -69,6 +69,9 @@ impl Timer {
             tags: HashMap::new(),
         }
     }
+    pub fn current_tick(&self) -> u128 {
+        self.current_tick
+    }
 
     pub fn repeating<S: ToString>(
         &mut self,
