@@ -12,6 +12,35 @@ lazy_static! {
         m.insert(Crab, Recipe::new("Crab Legs", 5, 45, 23, 8, 3));
         m.insert(Catfish, Recipe::new("Grilled Catfish", 7, 75, 8, 5, 2));
         m.insert(Salmon, Recipe::new("Grilled Salmon", 8, 35, 21, 10, 3));
+        m.insert(Bass, Recipe::new("Cooked Bass", 11, 40, 20, 11, 4));
+        m.insert(Flounder, Recipe::new("Cooked Flounder", 15, 45, 30, 12, 4));
+        m.insert(Haddock, Recipe::new("Cooked Haddock", 17, 50, 13, 13, 5));
+        m.insert(Swordfish, Recipe::new("Swordfish Steak", 19, 80, 16, 12, 5));
+        m.insert(Eel, Recipe::new("Cooked Eel", 21, 20, 5, 20, 5));
+        m.insert(Sardines, Recipe::new("Canned Sardines", 23, 100, 0, 10, 0));
+        m.insert(SandbarShark, Recipe::new("Shark Steaks", 25, 20, 20, 15, 6));
+        m.insert(Pike, Recipe::new("Cooked Pike", 27, 10, 13, 20, 7));
+        m.insert(Lobster, Recipe::new("Steamed Lobster", 29, 90, 5, 17, 5));
+        m.insert(Tuna, Recipe::new("Tuna Steaks", 31, 30, 11, 22, 8));
+        m.insert(
+            StripedMarlin,
+            Recipe::new("Grilled Marlin", 33, 50, 6, 20, 8),
+        );
+        m.insert(Herring, Recipe::new("Pickled Herring", 35, 40, 5, 22, 9));
+        m.insert(Trout, Recipe::new("Grilled Trout", 37, 50, 5, 22, 9));
+        m.insert(Snapper, Recipe::new("Grilled Snapper", 39, 20, 6, 25, 10));
+        m.insert(Cod, Recipe::new("Fishsticks", 41, 80, 4, 20, 10));
+        m.insert(Sturgeon, Recipe::new("Grilled Sturgeon", 43, 40, 2, 22, 10));
+        m.insert(
+            GiantCatfish,
+            Recipe::new("Breaded Catfish", 45, 80, 1, 25, 10),
+        );
+        m.insert(Grouper, Recipe::new("Cooked Grouper", 45, 90, 1, 25, 10));
+        m.insert(
+            BlackSeaBass,
+            Recipe::new("Grilled Black Seabass", 45, 80, 1, 26, 10),
+        );
+
         m
     };
 }
