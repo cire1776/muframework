@@ -10,12 +10,14 @@ impl GameSaver {
         facilities: &FacilityList,
         game_state: &GameState,
     ) -> String {
+        use ron::ser::*;
+
         let mut save_text = format!(
             "tick => {}\nNEXT_ITEM_ID => {:?}\nNEXT_ID => {:?}\n===END OF SERVERDATA===\n",
             game_state.ticks, GLOBAL_NEXT_ITEM_ID, GLOBAL_NEXT_ID,
         );
 
-        save_text += &match ron::to_string(&player) {
+        save_text += &match ron::ser::to_string_pretty(&player, PrettyConfig::new()) {
             Err(error) => {
                 println!("unable to save: {:?}", error);
                 return "".into();
@@ -24,7 +26,7 @@ impl GameSaver {
         };
         save_text += "\n===END OF PLAYERS===\n";
 
-        save_text += &match ron::to_string(&characters) {
+        save_text += &match ron::ser::to_string_pretty(&characters, PrettyConfig::new()) {
             Err(error) => {
                 println!("unable to save: {:?}", error);
                 return "".into();
@@ -36,7 +38,7 @@ impl GameSaver {
 
         let bundled_items = items.bundled_items();
 
-        save_text += &match ron::to_string(&bundled_items) {
+        save_text += &match ron::ser::to_string_pretty(&bundled_items, PrettyConfig::new()) {
             Err(error) => {
                 println!("unable to save: {:?}", error);
                 return "".into();
@@ -46,7 +48,7 @@ impl GameSaver {
 
         save_text += "\n===END OF ITEMS===\n";
 
-        save_text += &match ron::to_string(&facilities) {
+        save_text += &match ron::ser::to_string_pretty(&facilities, PrettyConfig::new()) {
             Err(error) => {
                 println!("unable to save: {:?}", error);
                 return "".into();
@@ -58,7 +60,7 @@ impl GameSaver {
 
         let stored_items = items.stored_items();
 
-        save_text += &match ron::to_string(&stored_items) {
+        save_text += &match ron::ser::to_string_pretty(&stored_items, PrettyConfig::new()) {
             Err(error) => {
                 println!("unable to save: {:?}", error);
                 return "".into();
@@ -70,7 +72,7 @@ impl GameSaver {
 
         let equipped_items = items.equipped_items();
 
-        save_text += &match ron::to_string(&equipped_items) {
+        save_text += &match ron::ser::to_string_pretty(&equipped_items, PrettyConfig::new()) {
             Err(error) => {
                 println!("unable to save: {:?}", error);
                 return "".into();
