@@ -4,3 +4,4 @@ kcov-*
 .VSCodeCounter
 .vscode
 testbed/
+saves/
