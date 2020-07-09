@@ -215,8 +215,6 @@ impl GameState {
 
         let mut items = Item::read_in_items(&item_vec, item_types.clone());
 
-        // find home for activity guard and activity timer
-
         let mut player = Player::new();
 
         player.x = player_x;
