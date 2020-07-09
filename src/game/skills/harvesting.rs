@@ -177,10 +177,10 @@ impl HarvestingSkill {
         product: ProduceType,
         player: &mut Player,
         facility: &mut Facility,
-        _rng: &mut Rng,
+        rng: &mut Rng,
     ) -> (ItemClass, String) {
         let rule = HARVESTING_PRODUCTS[&product];
-        player.increment_xp(Harvesting, rule.xp_gain as u64);
+        player.increment_xp(Harvesting, rule.xp_gain as u64, rng);
 
         let property_name: &str;
         let produce: String;

@@ -12,7 +12,7 @@ impl LoggingSkill {
     pub fn produce_results_for(
         product: TreeType,
         player: &mut Player,
-        _rng: &mut Rng,
+        rng: &mut Rng,
     ) -> (ItemClass, String) {
         let xp_gain = match product {
             TreeType::Pine => 5,
@@ -20,7 +20,7 @@ impl LoggingSkill {
             TreeType::Oak => 8,
         };
 
-        player.increment_xp(Logging, xp_gain);
+        player.increment_xp(Logging, xp_gain, rng);
 
         let wood_type = match product {
             TreeType::Apple | TreeType::Olive | TreeType::Oak => "Hardwood Log",

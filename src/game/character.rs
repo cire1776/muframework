@@ -124,14 +124,16 @@ impl Player {
         self.get_attribute(Attribute::SkillLevel(skill), 0) as u8
     }
 
-    pub fn increment_xp(&mut self, skill: Skill, value: u64) {
+    pub fn increment_xp(&mut self, skill: Skill, gain: u64, rng: &mut Rng) {
         let xp = self.xp.get_mut(&skill);
         match xp {
-            Some(xp) => *xp += value,
+            Some(xp) => *xp += gain,
             None => {
-                self.xp.insert(skill, value);
+                self.xp.insert(skill, gain);
             }
         }
+
+        Levelling::check_for_levelling(self, skill, gain as u32, rng);
     }
 
     pub fn get_xp(&mut self, skill: Skill) -> u64 {

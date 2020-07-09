@@ -93,11 +93,11 @@ impl Activity for BookReadingActivity {
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
-        _rng: &mut Rng,
+        rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         _command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        IntellectualSkill::produce_results_for(&self.book, player);
+        IntellectualSkill::produce_results_for(&self.book, player, rng);
 
         RefreshInventoryFlag::DontRefreshInventory
     }

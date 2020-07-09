@@ -23,6 +23,8 @@ fn can_cook_fish_successfully() {
         mut game_state,
     ) = initialize_game_system_with_player_at(11, 6);
 
+    rng.set_fail("levelling check");
+
     rng.set_succeed("cooking_success");
 
     player.endorse_component_with(":wants_to_cook", "shrimp");

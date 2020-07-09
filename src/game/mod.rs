@@ -45,6 +45,9 @@ pub use parsing::*;
 pub mod saving;
 pub use saving::{GameLoader, GameSaver};
 
+pub mod levelling;
+pub use levelling::*;
+
 use std::sync::atomic::{AtomicU64, Ordering};
 
 // starts at two to reserve one for the player.

@@ -123,6 +123,8 @@ fn can_read_a_book() {
         mut game_state,
     ) = initialize_game_system();
 
+    rng.set_fail("levelling check");
+
     player.endorse_with(":can_use");
     give_player_level(Intellectual, 5, &mut player);
 
@@ -205,6 +207,8 @@ fn reading_a_book_earns_10_intellectual_xp() {
         mut game_state,
     ) = initialize_game_system();
 
+    rng.set_fail("levelling check");
+
     player.endorse_with(":can_use");
     let exp_xp = player.get_xp(Intellectual) + 10;
     give_player_level(Intellectual, 5, &mut player);
@@ -284,6 +288,8 @@ fn reading_a_book_with_an_associated_skill_earns_10_points_for_that_skill() {
         mut command_rx,
         mut game_state,
     ) = initialize_game_system();
+
+    rng.set_fail("levelling check");
 
     player.endorse_with(":can_use");
     let exp_xp = player.get_xp(Mining) + 10;
@@ -534,6 +540,8 @@ fn a_player_must_have_the_minimum_associated_skill_to_earn_xp_for_that_skill() {
         mut game_state,
     ) = initialize_game_system();
 
+    rng.set_fail("levelling check");
+
     player.endorse_with(":can_use");
     let exp_xp = player.get_xp(Engineering);
     give_player_level(Intellectual, 1, &mut player);
@@ -614,6 +622,8 @@ fn if_player_has_too_high_topic_skill_they_earn_no_topic_xp() {
         mut command_rx,
         mut game_state,
     ) = initialize_game_system();
+
+    rng.set_fail("levelling check");
 
     player.endorse_with(":can_use");
     let exp_xp = player.get_xp(Engineering);

@@ -34,14 +34,14 @@ impl ConstructionSkill {
     pub fn produce_results_for(
         product: LogType,
         player: &mut Player,
-        _rng: &mut Rng,
+        rng: &mut Rng,
     ) -> (ItemClass, String) {
         let xp_gain = match product {
             LogType::Softwood => 5,
             LogType::Hardwood => 10,
         };
 
-        player.increment_xp(Construction, xp_gain);
+        player.increment_xp(Construction, xp_gain, rng);
 
         (Material, format!("{} Plank", Self::wood(product)))
     }

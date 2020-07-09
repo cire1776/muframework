@@ -149,10 +149,10 @@ impl MiningSkill {
     pub fn produce_results_for(
         product: OreType,
         player: &mut Player,
-        _rng: &mut Rng,
+        rng: &mut Rng,
     ) -> (ItemClass, String) {
         let xp_gain = MINE_PRODUCTS[&product].mining_xp;
-        player.increment_xp(Mining, xp_gain as u64);
+        player.increment_xp(Mining, xp_gain as u64, rng);
 
         let description = product.to_ore_product();
         (Ore, description)

@@ -131,10 +131,10 @@ impl CookingSkill {
         let success = Self::succeeds(recipe, level, rng);
 
         if success {
-            player.increment_xp(Cooking, recipe.xp_on_success as u64);
+            player.increment_xp(Cooking, recipe.xp_on_success as u64, rng);
             (Food, recipe.success_product.clone())
         } else {
-            player.increment_xp(Cooking, recipe.xp_on_failure as u64);
+            player.increment_xp(Cooking, recipe.xp_on_failure as u64, rng);
             (Material, format!("Burnt {}", product.to_string()))
         }
     }
