@@ -211,12 +211,14 @@ impl<'a> Facility {
             | FacilityClass::OliveTree
             | FacilityClass::OakTree => {
                 self.increment_property("logs");
+                println!("incrementing wood");
             }
             _ => {}
         }
         match self.class {
             FacilityClass::AppleTree | FacilityClass::OliveTree => {
                 self.increment_property("fruit");
+                println!("incrementing fruit");
             }
             _ => {}
         }

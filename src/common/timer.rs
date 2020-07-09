@@ -119,13 +119,26 @@ impl Timer {
     }
 
     pub fn tick(&mut self, tick: u128) {
+        let delta_tick = tick - self.current_tick;
+
         self.current_tick = tick;
+
+        if delta_tick != 1 {
+            let alarms = self.alarms.clone();
+            let expired_alarms: Vec<&u128> =
+                { alarms.keys().filter(|a| **a < tick).collect::<Vec<&u128>>() };
+
+            for alarm in expired_alarms {
+                let alarms = &self.alarms[alarm];
+
+                #[allow(mutable_borrow_reservation_conflict)]
+                self.trigger_alarms(alarms.clone());
+            }
+        }
 
         match self.alarms.remove(&tick) {
             Some(alarms) => {
-                for alarm in alarms {
-                    self.trigger_alarm(&alarm);
-                }
+                self.trigger_alarms(alarms);
             }
             None => {}
         };
@@ -159,6 +172,12 @@ impl Timer {
     fn trigger_alarm(&mut self, alarm: &Alarm) {
         self.schedule_next(alarm.clone(), None);
         Command::send(self.command_tx.clone(), alarm.command.clone())
+    }
+
+    fn trigger_alarms(&mut self, alarms: Vec<Alarm>) {
+        for alarm in alarms {
+            self.trigger_alarm(&alarm);
+        }
     }
 
     fn schedule_next(&mut self, alarm: Alarm, rng: Option<&mut Rng>) {

@@ -444,7 +444,14 @@ impl GameState {
                 GameUpdate::send(update_tx, GameUpdate::FacilityRemoved { id: *facility_id });
                 activity
             }
-            Command::FacilityMaintenance(_u64) => activity,
+            Command::FacilityMaintenance(facility_id) => {
+                let facility = facilities
+                    .get_mut(*facility_id)
+                    .expect("Unable to find facility");
+
+                facility.maintenance();
+                activity
+            }
             Command::None => activity,
             Command::ActivityComplete => self.complete_activity(
                 player,
