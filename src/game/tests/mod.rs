@@ -470,6 +470,16 @@ pub fn assert_is_next_tick(command_rx: &mut Receiver<Command>) {
         Err(_) => panic!("command not found."),
     }
 }
+
+pub fn optional_is_next_tick(command_rx: &mut Receiver<Command>) {
+    let command = command_rx.try_recv();
+
+    match command {
+        Ok(Command::NextTick) => {}
+        Ok(command) => panic!("unexpected command found: {:?}", command),
+        Err(_) => {}
+    }
+}
 pub fn assert_is_refresh_inventory(command_rx: &mut Receiver<Command>) {
     let command = command_rx.try_recv();
 
