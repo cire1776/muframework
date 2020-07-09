@@ -1,7 +1,7 @@
 use super::*;
 pub use Skill::*;
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum BuffTag {
     None,
     Equipment(u64),
@@ -14,7 +14,7 @@ pub enum BuffTag {
     Level(Skill),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum Attribute {
     SkillTime(Skill),
     SkillChance(Skill),
@@ -28,7 +28,7 @@ pub enum Attribute {
     MaxMP,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum AttributeBuff {
     SkillTime(Skill, i8, u128),
     SkillChance(Skill, i8, u128),
@@ -84,7 +84,7 @@ impl AttributeBuff {
 
 pub type Buff = (i8, u128, BuffTag);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AttributeList {
     attributes: HashMap<Attribute, Vec<Buff>>,
 }

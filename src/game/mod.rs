@@ -42,6 +42,9 @@ pub use tile_map::TileMap;
 pub mod parsing;
 pub use parsing::*;
 
+pub mod saving;
+pub use saving::{GameLoader, GameSaver};
+
 use std::sync::atomic::{AtomicU64, Ordering};
 
 // starts at two to reserve one for the player.
@@ -73,6 +76,7 @@ impl GameState {
         command_rx: std::sync::mpsc::Receiver<Command>,
         command_tx: CommandSender,
     ) {
+        #[allow(unused_assignments)]
         let (
             mut player,
             mut map,
@@ -91,15 +95,45 @@ impl GameState {
 
         let game_state = &mut GameState::new();
 
-        let _guard = game_state.start_heartbeat(&mut timer);
+        let (new_player, new_obstacles, new_characters, new_items, new_facilities, new_inventories) =
+            GameLoader::load_game(
+                GameLoader::find_latest_save_file(),
+                &mut map,
+                game_state,
+                Some(&update_tx),
+            );
 
+        player = new_player;
+        obstacles = new_obstacles;
+        characters = new_characters;
+        items = new_items;
+        facilities = new_facilities;
+        inventories = new_inventories;
+
+        let _guard = game_state.start_heartbeat(&mut timer);
         let mut activity: Option<Box<dyn Activity>> = None;
 
         loop {
             let command = command_rx.recv();
             let mut rng = random::Rng::new();
 
-            if let Ok(command) = command {
+            if command == Ok(Command::LoadGame) {
+                let (
+                    new_player,
+                    new_obstacles,
+                    new_characters,
+                    new_items,
+                    new_facilities,
+                    new_inventories,
+                ) = GameLoader::load_game("level1.sav", &mut map, game_state, Some(&update_tx));
+
+                player = new_player;
+                obstacles = new_obstacles;
+                characters = new_characters;
+                items = new_items;
+                facilities = new_facilities;
+                inventories = new_inventories;
+            } else if let Ok(command) = command {
                 activity = game_state.game_loop_iteration(
                     &mut player,
                     &mut map,
@@ -197,11 +231,16 @@ impl GameState {
 
         let item_class_specifiers = ItemClassSpecifier::initialize();
 
-        // consider adding a function to level to do these things
-        Level::introduce_player(&player, inventories, update_tx);
-        Level::introduce_other_characters(&characters, &mut obstacles, update_tx);
-        Level::introduce_items(&items, update_tx);
-        Level::introduce_facilities(&mut facilities, &mut map, &mut obstacles, update_tx);
+        Level::introduce(
+            &player,
+            &mut map,
+            &mut obstacles,
+            &characters,
+            &mut facilities,
+            &items,
+            &inventories,
+            update_tx,
+        );
 
         // TODO: consider moving this to a function
         GameUpdate::send(update_tx, SetBackground(map.clone()));
@@ -225,7 +264,7 @@ impl GameState {
         player: &mut Player,
         map: &mut TileMap,
         obstacles: &mut BlockingMap,
-        _characters: &mut CharacterList,
+        characters: &mut CharacterList,
         item_class_specifiers: &mut ItemClassSpecifierList,
         items: &mut ItemList,
         facilities: &mut FacilityList,
@@ -241,6 +280,13 @@ impl GameState {
         activity = self.abort_activity_if_necessary(activity, command, update_tx);
 
         match command {
+            Command::LoadGame => activity,
+            Command::SaveGame => {
+                let save_data =
+                    GameSaver::save_game_to_string(player, characters, items, facilities, self);
+                GameSaver::save_to_file(save_data);
+                activity
+            }
             Command::NextTick => {
                 self.ticks += 1;
                 timer.tick(self.ticks);
@@ -475,6 +521,7 @@ impl GameState {
             match command {
                 // list commands that do not abort activities here
                 Command::None
+                | Command::SaveGame
                 | Command::NextTick
                 | Command::DisplayTick
                 | Command::SpawnItem(_, _, _)

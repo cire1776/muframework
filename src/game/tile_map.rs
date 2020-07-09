@@ -4,7 +4,7 @@ use regex::Regex;
 use std::fmt;
 use std::fs;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub enum Tile {
     Empty,
     StoneWall,

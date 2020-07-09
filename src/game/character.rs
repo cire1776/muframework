@@ -1,7 +1,8 @@
 use super::*;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
     pub id: u64,
     pub x: i32,
@@ -9,7 +10,10 @@ pub struct Player {
     pub facing: Direction,
     pub character_type: CharacterType,
     pub mounting_points: MountingPointMap,
+
+    #[serde(skip)]
     pub external_inventory: Option<Vec<Item>>,
+
     endorsements: HashMap<String, u32>,
     endorsement_components: HashMap<String, String>,
     attributes: AttributeList,
@@ -147,7 +151,7 @@ pub enum CharacterFacing {
     Down,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Character {
     pub id: u64,
     pub x: i32,
@@ -194,7 +198,7 @@ impl Character {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize)]
 pub enum CharacterType {
     Player,
     Rat,
@@ -211,7 +215,7 @@ impl CharacterType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CharacterList {
     characters: Vec<Character>,
 }

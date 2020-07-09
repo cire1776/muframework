@@ -3,7 +3,7 @@ use inventory::{AliasList, InventoryList};
 use std::collections::HashMap;
 use std::ops::{Index, IndexMut};
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub enum FacilityClass {
     ClosedChest,
     OpenChest,
@@ -45,7 +45,7 @@ impl FacilityClass {
 
 pub type NumericPropertyList = HashMap<String, i128>;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct Facility {
     pub id: u64,
     pub x: i32,
@@ -286,7 +286,7 @@ impl<'a> Facility {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FacilityList {
     facilities: HashMap<u64, Facility>,
 }

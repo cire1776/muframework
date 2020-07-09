@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::hash::*;
 use std::ops::{Index, IndexMut};
 use ItemClass::*;
-#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone, Ord, PartialOrd)]
+#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum ItemClass {
     BladeWeapon,
     Dagger,
@@ -75,7 +75,7 @@ impl ItemClass {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub enum ItemState {
     Equipped(Item, u64),    // (item, inventory_id)
     Stored(Item, u64),      // (item, inventory_id)
@@ -103,7 +103,7 @@ impl ItemState {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Ord, PartialOrd)]
+#[derive(Debug, Eq, PartialEq, Clone, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum PropertyValue {
     String(String),
     Integer(i128),
@@ -114,7 +114,7 @@ lazy_static! {
     static ref MASTER_ITEM_TYPE_LIST: ItemTypeList = ItemType::perform_read_in_item_types();
 }
 
-#[derive(Debug, Eq, Clone)]
+#[derive(Debug, Eq, Clone, Deserialize, Serialize)]
 pub struct ItemType {
     pub class: ItemClass,
     pub description: String,
@@ -330,7 +330,7 @@ impl ItemType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ItemTypeList {
     item_types: HashMap<String, ItemType>,
 }
@@ -340,6 +340,10 @@ impl ItemTypeList {
         Self {
             item_types: HashMap::new(),
         }
+    }
+
+    pub fn get_default() -> ItemTypeList {
+        MASTER_ITEM_TYPE_LIST.clone()
     }
 
     /// inserts a new type into the list.const
@@ -393,7 +397,7 @@ impl Index<&String> for ItemTypeList {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Deserialize, Serialize)]
 pub struct Item {
     pub id: u64,
     pub quantity: u8,
@@ -623,9 +627,12 @@ impl Item {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ItemList {
     items: HashMap<u64, ItemState>,
+
+    #[serde(skip)]
+    #[serde(default = "ItemTypeList::get_default")]
     pub item_types: ItemTypeList,
 }
 

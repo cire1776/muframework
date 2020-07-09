@@ -1,7 +1,7 @@
 use super::*;
 use std::collections::HashSet;
 
-#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
+#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone, Deserialize, Serialize)]
 pub enum MountingPoint {
     Head,
     Face,
@@ -38,7 +38,7 @@ static ALL_MOUNTING_POINTS: [MountingPoint; 15] = [
     MountingPoint::AtReady,
 ];
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct MountingPointMap {
     mounts: HashMap<MountingPoint, Option<u64>>,
 }

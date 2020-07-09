@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 pub fn capture_coordinate(captures: &regex::Captures, index: usize) -> i32 {
     captures
         .get(index)
@@ -6,6 +8,17 @@ pub fn capture_coordinate(captures: &regex::Captures, index: usize) -> i32 {
         .as_str()
         .parse::<i32>()
         .unwrap()
+}
+
+pub fn capture_integer<U: FromStr>(captures: &regex::Captures, index: usize) -> U {
+    captures
+        .get(index)
+        .unwrap()
+        .clone()
+        .as_str()
+        .parse::<U>()
+        .ok()
+        .expect("must be convertible to U")
 }
 
 pub fn capture_symbol<'a>(captures: &'a regex::Captures, index: usize) -> char {

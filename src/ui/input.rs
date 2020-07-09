@@ -182,6 +182,13 @@ impl UIState {
                     }
                 }
                 VirtualKeyCode::Backslash => Command::DumpPlayer,
+                VirtualKeyCode::F12 => {
+                    if input.shift {
+                        Command::LoadGame
+                    } else {
+                        Command::SaveGame
+                    }
+                }
                 _ => Command::None,
             },
         }

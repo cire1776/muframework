@@ -5,6 +5,8 @@ extern crate lazy_static;
 
 extern crate chrono;
 
+use ::serde::{Deserialize, Serialize};
+
 use bracket_lib::prelude::*;
 use std::collections::HashMap;
 pub mod common;
@@ -23,7 +25,7 @@ use game::{
 pub mod ui;
 use ui::window::{BasicWindow, InventoryWindow, MapWindow, MouseReceiver, Window};
 
-#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone, Deserialize, Serialize)]
 pub enum Direction {
     Up,
     Down,
@@ -55,6 +57,8 @@ pub enum ActionContinuation {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Command {
     None,
+    LoadGame,
+    SaveGame,
     NextTick,
     DisplayTick,
     QuitGame,

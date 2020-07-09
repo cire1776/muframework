@@ -3,6 +3,22 @@ use super::*;
 pub struct Level {}
 
 impl Level {
+    pub fn introduce(
+        player: &Player,
+        map: &mut TileMap,
+        obstacles: &mut BlockingMap,
+        characters: &CharacterList,
+        facilities: &mut FacilityList,
+        items: &ItemList,
+        inventories: &InventoryList,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
+        Level::introduce_player(&player, inventories, update_tx);
+        Level::introduce_other_characters(&characters, obstacles, update_tx);
+        Level::introduce_items(&items, update_tx);
+        Level::introduce_facilities(facilities, map, obstacles, update_tx);
+    }
+
     pub fn introduce_player(
         player: &Player,
         inventories: &InventoryList,
