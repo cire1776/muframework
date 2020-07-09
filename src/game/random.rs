@@ -4,6 +4,7 @@ use extern_rand::Rng as extern_Rng;
 
 pub struct Rng {
     tags: HashMap<&'static str, i128>,
+    ignored_tags: HashMap<&'static str, bool>,
     test_mode: bool,
 }
 
@@ -11,6 +12,7 @@ impl Rng {
     pub fn new() -> Self {
         Self {
             tags: HashMap::new(),
+            ignored_tags: HashMap::new(),
             test_mode: false,
         }
     }
@@ -68,6 +70,12 @@ impl Rng {
 
     pub fn set(&mut self, tag: &'static str, value: i128) {
         self.tags.insert(tag, value);
+        self.ignored_tags.remove(tag);
+    }
+
+    pub fn ignore(&mut self, tag: &'static str) {
+        self.ignored_tags.insert(tag, true);
+        self.tags.remove(tag);
     }
 
     pub fn set_fail(&mut self, tag: &'static str) {
@@ -86,8 +94,9 @@ impl Rng {
     }
 
     fn check_for_test_mode(&self, tag: &'static str) {
-        if self.test_mode {
-            panic!("tag not set in test mode: {}", tag)
+        if !self.test_mode || self.ignored_tags.contains_key(tag) {
+            return;
         }
+        panic!("tag not set in test mode: {}", tag)
     }
 }

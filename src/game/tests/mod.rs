@@ -43,6 +43,7 @@ pub fn initialize_game_system() -> (
     let game_state = GameState::new();
 
     let mut rng = Rng::new();
+    rng.ignore("levelling check");
     rng.set_test_mode();
 
     timer.set_test_mode();
