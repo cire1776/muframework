@@ -112,7 +112,22 @@ impl Timer {
 
         let alarm = Alarm::new(duration_in_ticks, command, tag);
 
-        self.schedule_next(alarm, None);
+        self.schedule_next(alarm, None, None);
+    }
+
+    pub fn repeating_by_tick_starting_at<S: ToString>(
+        &mut self,
+        first: u128,
+        duration_in_ticks: u128,
+        command: Command,
+        tag: S,
+    ) {
+        self.tags
+            .insert(tag.to_string(), TagType::Ticks(duration_in_ticks));
+
+        let alarm = Alarm::new(duration_in_ticks, command, tag);
+
+        self.schedule_next(alarm, Some(first), None);
     }
 
     pub fn stagger_repeating_by_tick<S: ToString>(
@@ -126,15 +141,15 @@ impl Timer {
             .insert(tag.to_string(), TagType::Ticks(duration_in_ticks));
 
         let alarm = Alarm::new(duration_in_ticks, command, tag);
-        self.schedule_next(alarm, Some(rng));
+        self.schedule_next(alarm, None, Some(rng));
     }
 
     pub fn tick(&mut self, tick: u128) {
-        let delta_tick = tick - self.current_tick;
+        let old_tick = self.current_tick;
 
         self.current_tick = tick;
 
-        if delta_tick != 1 {
+        if self.current_tick - old_tick != 1 {
             let alarms = self.alarms.clone();
             let expired_alarms: Vec<&u128> =
                 { alarms.keys().filter(|a| **a < tick).collect::<Vec<&u128>>() };
@@ -181,7 +196,7 @@ impl Timer {
     }
 
     fn trigger_alarm(&mut self, alarm: &Alarm) {
-        self.schedule_next(alarm.clone(), None);
+        self.schedule_next(alarm.clone(), None, None);
         Command::send(self.command_tx.clone(), alarm.command.clone())
     }
 
@@ -191,13 +206,14 @@ impl Timer {
         }
     }
 
-    fn schedule_next(&mut self, alarm: Alarm, rng: Option<&mut Rng>) {
-        let target_tick = if let Some(rng) = rng {
-            self.current_tick
-                + rng.range(0, alarm.duration_in_ticks as i128, "timer_stagger") as u128
+    fn schedule_next(&mut self, alarm: Alarm, first: Option<u128>, rng: Option<&mut Rng>) {
+        let target_tick = if let Some(tick) = first {
+            tick
+        } else if let Some(rng) = rng {
+            rng.range(0, alarm.duration_in_ticks as i128, "timer_stagger") as u128
         } else {
-            self.current_tick + alarm.duration_in_ticks
-        };
+            alarm.duration_in_ticks
+        } + self.current_tick;
 
         if self.alarms.contains_key(&target_tick) {
             self.alarms.get_mut(&target_tick).unwrap().push(alarm);

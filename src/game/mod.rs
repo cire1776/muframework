@@ -113,12 +113,17 @@ impl GameState {
         facilities = new_facilities;
         inventories = new_inventories;
 
-        Self::setup_alarms(&mut timer);
-
         let _guard = game_state.start_heartbeat(&mut timer);
         let mut activity: Option<Box<dyn Activity>> = None;
 
+        let mut alarms_set = false;
+
         loop {
+            if timer.current_tick() != 0 && !alarms_set {
+                Self::setup_alarms(&mut timer);
+                alarms_set = true;
+            }
+
             let command = command_rx.recv();
             let mut rng = random::Rng::new();
 
@@ -179,8 +184,27 @@ impl GameState {
     }
 
     fn setup_alarms(timer: &mut Timer) {
+        use chrono::Timelike;
+
         timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
-        timer.repeating_by_tick(10 * 3600, Command::SaveGame, "Autosave");
+
+        let minute = chrono::Local::now().minute();
+        let mut offset: u128 = (10 - minute % 10) as u128;
+
+        if offset > 5 {
+            offset -= 5;
+        } else {
+            offset += 5;
+        };
+
+        println!("offset: {}", offset);
+
+        timer.repeating_by_tick_starting_at(
+            offset * 3600 as u128,
+            10 * 3600,
+            Command::SaveGame,
+            "Autosave",
+        );
     }
 
     /// public for testing purposes
