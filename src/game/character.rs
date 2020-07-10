@@ -36,7 +36,6 @@ impl Player {
             xp: HashMap::new(),
         };
         // temporary.  Not sure where this belongs once saving is in place.
-        player.endorse_with(":newb");
         player.set_level_for(Smelting, 45);
         player
     }
