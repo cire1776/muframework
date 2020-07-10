@@ -51,6 +51,17 @@ pub struct Timer {
     pub tags: HashMap<String, TagType>,
 }
 
+impl std::fmt::Debug for Timer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Timer")
+            .field("alarms", &self.alarms)
+            .field("current_tick", &self.current_tick)
+            .field("test_mode", &self.test_mode)
+            .field("command_tx", &self.command_tx)
+            .finish()
+    }
+}
+
 impl Timer {
     pub fn new(command_tx: Option<CommandSender>) -> Self {
         let command_tx = if command_tx.is_some() {
