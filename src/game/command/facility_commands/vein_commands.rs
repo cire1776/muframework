@@ -132,10 +132,11 @@ impl Activity for VeinActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let (class, description) = MiningSkill::produce_results_for(self.vein_type, player, rng);
+        let (class, description) =
+            MiningSkill::produce_results_for(self.vein_type, player, rng, Some(update_sender));
 
         Command::send(
             Some(command_sender.clone()),

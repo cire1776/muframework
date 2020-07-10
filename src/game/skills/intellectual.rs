@@ -24,18 +24,23 @@ impl IntellectualSkill {
         (60 + player.get_attribute(Attribute::SkillTime(Intellectual), 0)) as u32
     }
 
-    pub fn produce_results_for(book: &Item, player: &mut Player, rng: &mut Rng) {
+    pub fn produce_results_for(
+        book: &Item,
+        player: &mut Player,
+        rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
         if player.get_level_for(Intellectual)
             <= book
                 .item_type
                 .get_property_as_integer("maximum_intellectual") as u8
         {
-            player.increment_xp(Intellectual, 10, rng);
+            player.increment_xp(Intellectual, 10, rng, update_tx);
         }
 
         if let Some(skill) = book.item_type.associated_skill() {
             if Self::book_is_in_skill_range(book, player) {
-                player.increment_xp(skill, 10, rng);
+                player.increment_xp(skill, 10, rng, update_tx);
             }
         }
     }

@@ -286,10 +286,11 @@ impl Activity for WellDigActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let result = EngineeringSkill::produce_results_for(player, facility, rng);
+        let result =
+            EngineeringSkill::produce_results_for(player, facility, rng, Some(update_sender));
 
         if result != Dry {
             facility.set_property("fluid", result as u128);

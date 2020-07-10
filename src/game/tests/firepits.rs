@@ -91,7 +91,6 @@ fn can_cook_fish_successfully() {
     assert!(activity.is_some());
 
     assert_activity_started(57_000, PaneTitle::Cooking, &mut update_rx);
-
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
 
@@ -113,6 +112,7 @@ fn can_cook_fish_successfully() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Cooking, exp_xp, &mut update_rx);
     assert_activity_started(57000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -241,6 +241,7 @@ fn can_burn_fish() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Cooking, exp_xp, &mut update_rx);
     assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -361,6 +362,7 @@ fn can_cook_item_at_ready() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Cooking, exp_xp, &mut update_rx);
     assert_activity_started(57_000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -493,6 +495,7 @@ fn timer_is_reduced_by_skill_time() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Cooking, 3, &mut update_rx);
     assert_activity_started(51_000, PaneTitle::Cooking, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 

@@ -128,7 +128,13 @@ impl Player {
         self.get_attribute(Attribute::SkillLevel(skill), 0) as u8
     }
 
-    pub fn increment_xp(&mut self, skill: Skill, gain: u64, rng: &mut Rng) {
+    pub fn increment_xp(
+        &mut self,
+        skill: Skill,
+        gain: u64,
+        rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
         let xp = self.xp.get_mut(&skill);
         match xp {
             Some(xp) => *xp += gain,
@@ -136,6 +142,11 @@ impl Player {
                 self.xp.insert(skill, gain);
             }
         }
+
+        GameUpdate::send(
+            update_tx,
+            GameUpdate::PlayerXPUpdated(self.id, skill, self.get_xp(skill)),
+        );
 
         Levelling::check_for_levelling(self, skill, gain as u32, rng);
     }

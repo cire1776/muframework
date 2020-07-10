@@ -444,6 +444,22 @@ pub fn assert_is_inventory_updated(update_rx: &mut Receiver<GameUpdate>) {
     }
 }
 
+pub fn assert_xp_is_updated(
+    exp_player_id: u64,
+    exp_skill: Skill,
+    exp_xp_value: u64,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(PlayerXPUpdated(player_id, skill, xp_value))
+            if player_id == exp_player_id && skill == exp_skill && xp_value == exp_xp_value => {}
+        Ok(update) => panic!("unexpected update:{:?}", update),
+        Err(_) => {}
+    }
+}
+
 pub fn assert_updates_are_empty(update_rx: &mut Receiver<GameUpdate>) {
     let update = update_rx.try_recv();
 

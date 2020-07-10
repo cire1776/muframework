@@ -128,7 +128,7 @@ impl Activity for LumbermillActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let level = player.get_level_for(Construction);
@@ -152,7 +152,7 @@ impl Activity for LumbermillActivity {
             );
         }
         let (class, description) =
-            ConstructionSkill::produce_results_for(self.log_type, player, rng);
+            ConstructionSkill::produce_results_for(self.log_type, player, rng, Some(update_sender));
 
         Command::send(
             Some(command_sender.clone()),

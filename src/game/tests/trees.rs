@@ -72,6 +72,7 @@ fn can_chop_pine_tree() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Logging, 5, &mut update_rx);
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -153,6 +154,7 @@ fn can_chop_apple_tree() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Logging, 6, &mut update_rx);
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -234,6 +236,7 @@ fn can_chop_olive_tree() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Logging, 6, &mut update_rx);
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -316,6 +319,7 @@ fn can_chop_oak_tree() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Logging, 8, &mut update_rx);
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -396,6 +400,7 @@ fn can_pick_apple_tree() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 10, &mut update_rx);
 
     assert_activity_started(60_000, ui::pane::PaneTitle::PickingApples, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -474,6 +479,7 @@ fn can_pick_olive_tree() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 15, &mut update_rx);
 
     assert_activity_started(90_000, ui::pane::PaneTitle::PickingOlives, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -689,6 +695,7 @@ fn skilltime_is_accounted_for_while_picking_apples() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 10, &mut update_rx);
 
     assert_activity_started(49_000, ui::pane::PaneTitle::PickingApples, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -768,6 +775,7 @@ fn skilltime_is_accounted_for_while_picking_olives() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 15, &mut update_rx);
 
     assert_activity_started(71_000, ui::pane::PaneTitle::PickingOlives, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);

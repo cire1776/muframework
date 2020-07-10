@@ -119,11 +119,16 @@ impl Activity for PatchActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let (class, description) =
-            HarvestingSkill::produce_results_for(self.product, player, facility, rng);
+        let (class, description) = HarvestingSkill::produce_results_for(
+            self.product,
+            player,
+            facility,
+            rng,
+            Some(update_sender),
+        );
 
         Command::send(
             Some(command_sender.clone()),

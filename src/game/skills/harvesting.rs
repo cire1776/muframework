@@ -178,9 +178,10 @@ impl HarvestingSkill {
         player: &mut Player,
         facility: &mut Facility,
         rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
     ) -> (ItemClass, String) {
         let rule = HARVESTING_PRODUCTS[&product];
-        player.increment_xp(Harvesting, rule.xp_gain as u64, rng);
+        player.increment_xp(Harvesting, rule.xp_gain as u64, rng, update_tx);
 
         let property_name: &str;
         let produce: String;

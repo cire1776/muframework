@@ -150,9 +150,10 @@ impl MiningSkill {
         product: OreType,
         player: &mut Player,
         rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
     ) -> (ItemClass, String) {
         let xp_gain = MINE_PRODUCTS[&product].mining_xp;
-        player.increment_xp(Mining, xp_gain as u64, rng);
+        player.increment_xp(Mining, xp_gain as u64, rng, update_tx);
 
         let description = product.to_ore_product();
         (Ore, description)

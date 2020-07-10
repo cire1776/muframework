@@ -13,6 +13,7 @@ impl LoggingSkill {
         product: TreeType,
         player: &mut Player,
         rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
     ) -> (ItemClass, String) {
         let xp_gain = match product {
             TreeType::Pine => 5,
@@ -20,7 +21,7 @@ impl LoggingSkill {
             TreeType::Oak => 8,
         };
 
-        player.increment_xp(Logging, xp_gain, rng);
+        player.increment_xp(Logging, xp_gain, rng, update_tx);
 
         let wood_type = match product {
             TreeType::Apple | TreeType::Olive | TreeType::Oak => "Hardwood Log",

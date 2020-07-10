@@ -110,6 +110,8 @@ fn picking_can_done_with_can_pick_endorsement() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 1, &mut update_rx);
+
     assert_activity_started(60000, ui::PaneTitle::Harvesting, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -191,6 +193,7 @@ fn can_produce_multiple_types_of_produce() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 1, &mut update_rx);
     assert_activity_started(60000, ui::PaneTitle::Harvesting, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -273,6 +276,7 @@ fn takes_skilltime_into_account() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 11, &mut update_rx);
     assert_activity_started(51_000, ui::PaneTitle::Harvesting, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -447,6 +451,7 @@ fn can_be_exhausted_at_which_point_it_is_removed() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Harvesting, 10, &mut update_rx);
     assert_activity_started(21_000, ui::PaneTitle::Harvesting, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 

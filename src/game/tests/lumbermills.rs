@@ -94,6 +94,7 @@ fn can_saw_softwood_without_breaking_mill() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Construction, exp_xp, &mut update_rx);
     assert_activity_started(40000, Sawing, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -197,6 +198,7 @@ fn can_saw_hardwood_without_breaking_mill() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Construction, exp_xp, &mut update_rx);
     assert_activity_started(60000, Sawing, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -298,6 +300,7 @@ fn mills_can_break() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Construction, 10, &mut update_rx);
     assert_activity_started(60_000, Sawing, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -490,6 +493,7 @@ fn stops_when_supplies_run_out() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Construction, 5, &mut update_rx);
     assert_activity_started(40000, Sawing, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
     assert_is_spawning_item(

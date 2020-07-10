@@ -82,6 +82,7 @@ fn can_dig_without_success() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 10, &mut update_rx);
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
@@ -174,6 +175,9 @@ fn can_dig_striking_water() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 10, &mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 110, &mut update_rx);
+
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -269,6 +273,8 @@ fn can_dig_striking_oil() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 10, &mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 1010, &mut update_rx);
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -364,6 +370,8 @@ fn can_dig_striking_bedrock() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 10, &mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 15010, &mut update_rx);
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -728,6 +736,7 @@ fn stops_after_the_well_grows_too_deep_for_level_1() {
     // assert!(activity.is_none());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 18, &mut update_rx);
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -807,6 +816,7 @@ fn stops_after_the_well_grows_too_deep_for_level_29() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 23, &mut update_rx);
     assert_activity_started(32_000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -886,6 +896,7 @@ fn stops_after_the_well_grows_too_deep_for_level_45() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Engineering, 0, &mut update_rx);
     assert_activity_started(16_000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 

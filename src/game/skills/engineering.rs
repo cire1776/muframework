@@ -16,31 +16,32 @@ impl EngineeringSkill {
         player: &mut Player,
         facility: &mut Facility,
         rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
     ) -> WellType {
         facility.increment_property("depth");
         let well_level = Self::get_well_level(facility);
 
         let xp_gain = well_level.2;
-        player.increment_xp(Engineering, xp_gain as u64, rng);
+        player.increment_xp(Engineering, xp_gain as u64, rng, update_tx);
 
         let water_chance = facility.get_property("chance_of_hitting_water");
         if rng.succeeds(0, water_chance, "water_chance") {
             // bonus xp gain for completing water well
-            player.increment_xp(Engineering, well_level.3 as u64, rng);
+            player.increment_xp(Engineering, well_level.3 as u64, rng, update_tx);
             return WellType::Water;
         }
 
         let oil_chance = facility.get_property("chance_of_hitting_oil");
         if rng.succeeds(0, oil_chance, "oil_chance") {
             // bonus xp gain for completing oil well
-            player.increment_xp(Engineering, well_level.4 as u64, rng);
+            player.increment_xp(Engineering, well_level.4 as u64, rng, update_tx);
             return WellType::Oil;
         }
 
         let bedrock_chance = facility.get_property("chance_of_hitting_bedrock");
         if rng.succeeds(0, bedrock_chance, "bedrock_chance") {
             // bonus xp gain for striking bedrock
-            player.increment_xp(Engineering, well_level.5 as u64, rng);
+            player.increment_xp(Engineering, well_level.5 as u64, rng, update_tx);
             return WellType::Bedrock;
         }
 

@@ -182,6 +182,8 @@ fn can_read_a_book() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Intellectual, 10, &mut update_rx);
+    assert_xp_is_updated(player.id, Cultural, 10, &mut update_rx);
     assert_activity_started(56_000, Reading, &mut update_rx);
 
     assert_commands_are_empty(&mut command_rx);

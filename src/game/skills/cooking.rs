@@ -152,6 +152,7 @@ impl CookingSkill {
         product: FishType,
         player: &mut Player,
         rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
     ) -> (ItemClass, String) {
         let recipe = &COOKING_RECIPES[&product];
 
@@ -160,10 +161,10 @@ impl CookingSkill {
         let success = Self::succeeds(recipe, level, rng);
 
         if success {
-            player.increment_xp(Cooking, recipe.xp_on_success as u64, rng);
+            player.increment_xp(Cooking, recipe.xp_on_success as u64, rng, update_tx);
             (Food, recipe.success_product.clone())
         } else {
-            player.increment_xp(Cooking, recipe.xp_on_failure as u64, rng);
+            player.increment_xp(Cooking, recipe.xp_on_failure as u64, rng, update_tx);
             (Material, format!("Burnt {}", product.to_string()))
         }
     }

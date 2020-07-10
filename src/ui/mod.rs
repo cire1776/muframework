@@ -183,6 +183,11 @@ impl UIState {
                 variant: _,
             } => {}
             FacilityRemoved { id: facility_id } => self.facilities.remove(facility_id),
+            PlayerXPUpdated(player_id, skill, xp_value) => {
+                if player_id == 1 {
+                    println!("{:?}: {:?} xp", skill, xp_value);
+                }
+            }
             EquipmentUpdated(items) => {
                 self.inventory_window.max_selection_equipment = items.len() as u8;
                 self.inventory_window

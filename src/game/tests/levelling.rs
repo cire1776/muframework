@@ -10,7 +10,7 @@ fn if_roll_fails_doesnt_advance_to_level_2() {
 
     player.set_level_for(Cooking, 1);
 
-    player.increment_xp(Cooking, 5, &mut rng);
+    player.increment_xp(Cooking, 5, &mut rng, None);
 
     assert_eq!(player.get_level_for(Cooking), 1);
 }
@@ -25,7 +25,7 @@ fn if_roll_succeed_advances_to_level_2() {
 
     player.set_level_for(Cooking, 1);
 
-    player.increment_xp(Cooking, 5, &mut rng);
+    player.increment_xp(Cooking, 5, &mut rng, None);
 
     assert_eq!(player.get_level_for(Cooking), 2);
 }
@@ -40,7 +40,7 @@ fn at_level_45_success_does_not_advance_level() {
 
     player.set_level_for(Cooking, 45);
 
-    player.increment_xp(Cooking, 5, &mut rng);
+    player.increment_xp(Cooking, 5, &mut rng, None);
 
     assert_eq!(player.get_level_for(Cooking), 45);
 }
@@ -55,7 +55,7 @@ fn at_level_0_success_does_not_advance_level() {
 
     player.set_level_for(Cooking, 0);
 
-    player.increment_xp(Cooking, 5, &mut rng);
+    player.increment_xp(Cooking, 5, &mut rng, None);
 
     assert_eq!(player.get_level_for(Cooking), 0);
 }

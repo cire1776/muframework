@@ -145,11 +145,16 @@ impl<'a> Activity for TreePickingActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let (class, description) =
-            HarvestingSkill::produce_results_for(self.product, player, facility, rng);
+        let (class, description) = HarvestingSkill::produce_results_for(
+            self.product,
+            player,
+            facility,
+            rng,
+            Some(update_sender),
+        );
         Command::send(
             Some(command_sender.clone()),
             Command::SpawnItem(player.inventory_id(), class, description),
@@ -286,11 +291,12 @@ impl<'a> Activity for TreeLoggingActivity {
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         #[allow(unreachable_patterns)]
-        let (class, description) = LoggingSkill::produce_results_for(self.tree_type, player, rng);
+        let (class, description) =
+            LoggingSkill::produce_results_for(self.tree_type, player, rng, Some(update_sender));
 
         Command::send(
             Some(command_sender.clone()),
