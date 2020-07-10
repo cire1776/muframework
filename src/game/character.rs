@@ -83,6 +83,8 @@ impl Player {
             }
             None => {}
         };
+        // these are not designed to stack, so we can just remove it.
+        self.endorsement_components.remove(&endorsement);
     }
 
     pub fn get_endorsement_component<S: ToString>(&self, endorsement: S) -> Option<&String> {

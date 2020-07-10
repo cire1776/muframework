@@ -69,3 +69,58 @@ fn unequip_command_removes_endorsements() {
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
 }
+
+#[test]
+fn unequip_removes_endorsement_components() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        _command_tx,
+        mut command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(10, 8);
+
+    player.endorse_component_with(":wants_to_mill", "Softwood");
+
+    let item_id = equip_player_with_spawned_item(
+        Material,
+        "Softwood Log",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let _activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::UnequipItem(item_id),
+        Some(&update_tx),
+        None,
+    );
+
+    assert_is_equipment_updated(vec![], &mut update_rx);
+    assert_is_inventory_updated(&mut update_rx);
+    assert_updates_are_empty(&mut update_rx);
+    assert_commands_are_empty(&mut command_rx);
+
+    assert_eq!(player.get_endorsement_component(":wants_to_mill"), None)
+}

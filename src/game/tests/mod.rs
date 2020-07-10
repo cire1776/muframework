@@ -257,7 +257,7 @@ pub fn equip_player_with_spawned_item<S: ToString>(
     player: &mut Player,
     inventories: &mut InventoryList,
     items: &mut ItemList,
-) {
+) -> u64 {
     let inventory = inventories
         .get_mut(&player.id)
         .expect("unable to get inventory");
@@ -269,6 +269,8 @@ pub fn equip_player_with_spawned_item<S: ToString>(
     player
         .mounting_points
         .mount(&item, &item_class_specifiers, inventory, items);
+
+    item.id
 }
 
 #[cfg(test)]
