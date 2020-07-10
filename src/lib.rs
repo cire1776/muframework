@@ -132,6 +132,7 @@ pub enum GameUpdate {
         id: u64,
     },
     PlayerXPUpdated(u64, game::skills::Skill, u64), // (player, skill, xp_value)
+    PlayerSkillUpdated(u64, game::skills::Skill, u8), // (player, skill, level)
     EquipmentUpdated(Vec<Item>),
     InventoryUpdated(Vec<Item>),
     ExternalInventoryOpened(Vec<Item>, u64), // (Contents, inventory_id?)

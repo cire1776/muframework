@@ -10,21 +10,24 @@ const LEVEL_REQUIREMENTS: [u32; 44] = [
 pub struct Levelling {}
 
 impl Levelling {
-    pub fn check_for_levelling(player: &mut Player, skill: Skill, gain: u32, rng: &mut Rng) {
+    pub fn check_for_levelling(
+        player: &mut Player,
+        skill: Skill,
+        gain: u32,
+        rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
         let current_level = player.get_level_for(skill);
 
         if current_level == 45 || current_level == 0 {
             return;
         }
 
-        let roll = rng.range(
-            0,
-            LEVEL_REQUIREMENTS[(current_level - 1) as usize] as i128,
-            "levelling check",
-        );
+        let target = LEVEL_REQUIREMENTS[(current_level - 1) as usize] as i128;
+        let roll = rng.range(0, target, "levelling check");
 
-        if roll <= (gain as i128) {
-            player.set_level_for(Cooking, current_level + 1);
+        if roll < gain as i128 {
+            player.set_level_for(skill, current_level + 1, update_tx);
         }
     }
 }

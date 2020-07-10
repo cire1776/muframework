@@ -131,6 +131,22 @@ impl AttributeList {
                 .collect()
         }
     }
+
+    pub fn skills<'a>(&'a self) -> impl Iterator<Item = (Skill, i8)> + 'a {
+        self.attributes
+            .iter()
+            .filter(|(a, _)| match a {
+                Attribute::SkillLevel(_) => true,
+                _ => false,
+            })
+            .map(|(a, b)| {
+                if let Attribute::SkillLevel(skill) = a {
+                    (*skill, b.iter().fold(0, |accum, (l, _, _)| l + accum))
+                } else {
+                    panic!("unable to find skilllevel.")
+                }
+            })
+    }
 }
 
 #[cfg(test)]

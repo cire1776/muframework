@@ -8,7 +8,7 @@ fn if_roll_fails_doesnt_advance_to_level_2() {
 
     let mut player = Player::new();
 
-    player.set_level_for(Cooking, 1);
+    player.set_level_for(Cooking, 1, None);
 
     player.increment_xp(Cooking, 5, &mut rng, None);
 
@@ -23,7 +23,7 @@ fn if_roll_succeed_advances_to_level_2() {
 
     let mut player = Player::new();
 
-    player.set_level_for(Cooking, 1);
+    player.set_level_for(Cooking, 1, None);
 
     player.increment_xp(Cooking, 5, &mut rng, None);
 
@@ -38,7 +38,7 @@ fn at_level_45_success_does_not_advance_level() {
 
     let mut player = Player::new();
 
-    player.set_level_for(Cooking, 45);
+    player.set_level_for(Cooking, 45, None);
 
     player.increment_xp(Cooking, 5, &mut rng, None);
 
@@ -53,7 +53,7 @@ fn at_level_0_success_does_not_advance_level() {
 
     let mut player = Player::new();
 
-    player.set_level_for(Cooking, 0);
+    player.set_level_for(Cooking, 0, None);
 
     player.increment_xp(Cooking, 5, &mut rng, None);
 

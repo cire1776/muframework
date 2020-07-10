@@ -36,7 +36,7 @@ impl Player {
             xp: HashMap::new(),
         };
         // temporary.  Not sure where this belongs once saving is in place.
-        player.set_level_for(Smelting, 45);
+        player.set_level_for(Smelting, 45, None);
         player
     }
 
@@ -101,11 +101,15 @@ impl Player {
         self.attributes.remove(tag);
     }
 
+    pub fn skills(&self) -> impl Iterator<Item = (Skill, i8)> + '_ {
+        self.attributes.skills()
+    }
+
     pub fn skills_with_xp(&self) -> impl Iterator<Item = (&Skill, &u64)> {
         self.xp.iter()
     }
 
-    pub fn set_level_for(&mut self, skill: Skill, level: u8) {
+    pub fn set_level_for(&mut self, skill: Skill, level: u8, update_tx: Option<&GameUpdateSender>) {
         self.remove_buff(BuffTag::Level(skill));
 
         self.add_buff(
@@ -114,6 +118,11 @@ impl Player {
         );
 
         self.set_skilltime_for_level(skill, level);
+
+        GameUpdate::send(
+            update_tx,
+            GameUpdate::PlayerSkillUpdated(self.id, skill, level),
+        )
     }
 
     fn set_skilltime_for_level(&mut self, skill: Skill, level: u8) {
@@ -147,7 +156,7 @@ impl Player {
             GameUpdate::PlayerXPUpdated(self.id, skill, self.get_xp(skill)),
         );
 
-        Levelling::check_for_levelling(self, skill, gain as u32, rng);
+        Levelling::check_for_levelling(self, skill, gain as u32, rng, update_tx);
     }
 
     pub fn get_xp(&mut self, skill: Skill) -> u64 {

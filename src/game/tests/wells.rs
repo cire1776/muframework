@@ -21,6 +21,7 @@ fn can_dig_without_success() {
         mut game_state,
     ) = initialize_game_system_with_player_at(13, 12);
 
+    rng.set_fail("levelling check");
     rng.set_fail("water_chance");
     rng.set_fail("oil_chance");
     rng.set_fail("bedrock_chance");
@@ -116,6 +117,7 @@ fn can_dig_striking_water() {
         mut game_state,
     ) = initialize_game_system_with_player_at(13, 12);
 
+    rng.set_fail("levelling check");
     rng.set_succeed("water_chance");
     rng.set_fail("oil_chance");
 
@@ -213,6 +215,7 @@ fn can_dig_striking_oil() {
         mut game_state,
     ) = initialize_game_system_with_player_at(13, 12);
 
+    rng.set_fail("levelling check");
     rng.set_fail("water_chance");
     rng.set_succeed("oil_chance");
     rng.set_fail("bedrock_chance");
@@ -310,6 +313,7 @@ fn can_dig_striking_bedrock() {
         mut game_state,
     ) = initialize_game_system_with_player_at(13, 12);
 
+    rng.set_fail("levelling check");
     rng.set_fail("water_chance");
     rng.set_fail("oil_chance");
     rng.set_succeed("bedrock_chance");
@@ -612,7 +616,7 @@ fn cannot_fill_from_dry_well() {
 }
 
 #[test]
-fn level_1_cannot_mine_a_level_2_well() {
+fn level_1_cannot_dig_a_level_2_well() {
     let (
         mut player,
         mut map,
@@ -684,6 +688,7 @@ fn stops_after_the_well_grows_too_deep_for_level_1() {
         mut game_state,
     ) = initialize_game_system_with_player_at(13, 12);
 
+    rng.set_fail("levelling check");
     rng.set_fail("water_chance");
     rng.set_fail("oil_chance");
     rng.set_fail("bedrock_chance");

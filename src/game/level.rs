@@ -38,6 +38,13 @@ impl Level {
             GameUpdate::send(update_tx, PlayerXPUpdated(player.id, *skill, *xp_value))
         }
 
+        for (skill, _) in player.skills() {
+            GameUpdate::send(
+                update_tx,
+                PlayerSkillUpdated(player.id, skill, player.get_level_for(skill)),
+            )
+        }
+
         let inventory = inventories.get(&1).unwrap();
         GameUpdate::send(update_tx, InventoryUpdated(inventory.to_vec()));
     }

@@ -188,6 +188,11 @@ impl UIState {
                     println!("{:?}: {:?} xp", skill, xp_value);
                 }
             }
+            PlayerSkillUpdated(player_id, skill, level) => {
+                if player_id == 1 {
+                    println!("{:?}: level {:?} ", skill, level);
+                }
+            }
             EquipmentUpdated(items) => {
                 self.inventory_window.max_selection_equipment = items.len() as u8;
                 self.inventory_window

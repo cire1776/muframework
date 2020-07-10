@@ -44,6 +44,8 @@ pub fn initialize_game_system() -> (
 
     let mut rng = Rng::new();
     rng.ignore("levelling check");
+    rng.set_fail("levelling check");
+
     rng.set_test_mode();
 
     timer.set_test_mode();
@@ -245,7 +247,7 @@ pub fn compare_tuple_quantity_arrays(
 
 pub fn give_player_level(skill: Skill, level: u8, player: &mut Player) {
     player.remove_buff(BuffTag::Level(skill));
-    player.set_level_for(skill, level);
+    player.set_level_for(skill, level, None);
 }
 
 #[allow(dead_code)]
