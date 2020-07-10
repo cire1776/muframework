@@ -91,9 +91,21 @@ pub enum MoveCommandMode {
     SneakUse,
 }
 
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum MessageType {
+    System,
+    GameEvent,
+    Chat,
+    SysopChat,
+}
+
 #[derive(Debug, Clone)]
 pub enum GameUpdate {
-    Message(String),
+    Message {
+        message: String,
+        message_type: MessageType,
+        timestamp: String,
+    },
     SetBackground(TileMap),
     TileChangedAt(i32, i32, game::tile_map::Tile),
     CharacterEntered {

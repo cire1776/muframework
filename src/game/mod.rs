@@ -116,6 +116,15 @@ impl GameState {
         let _guard = game_state.start_heartbeat(&mut timer);
         let mut activity: Option<Box<dyn Activity>> = None;
 
+        GameUpdate::send(
+            Some(&update_tx),
+            GameUpdate::Message {
+                message: "Welcome to the World of Mufra!".to_string(),
+                message_type: MessageType::System,
+                timestamp: "07:12:45".to_string(),
+            },
+        );
+
         let mut alarms_set = false;
 
         loop {

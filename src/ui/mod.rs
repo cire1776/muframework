@@ -64,7 +64,7 @@ pub struct UIState {
     pub command_tx: game::command::CommandSender,
 
     pub map_window: MapWindow,
-    pub message_window: Window,
+    pub message_window: MessageWindow,
     pub inventory_window: InventoryWindow,
     pub info_window: Window,
     pub skill_window: SkillWindow,
@@ -127,7 +127,16 @@ impl UIState {
                 let new_style = Self::style_from_tile(new_tile);
                 self.background.set_at(x, y, new_style);
             }
-            Message(m) => println!("Message: {}", m),
+            Message {
+                message,
+                message_type,
+                timestamp,
+            } => {
+                println!("Message: {}: {} ({:?})", timestamp, message, message_type);
+                self.message_window
+                    .messages
+                    .push((message, message_type, timestamp));
+            }
             CharacterTeleported(id, new_x, new_y) => {
                 self.player.locate(new_x, new_y);
                 self.characters.reposition(id, new_x, new_y);
@@ -287,7 +296,7 @@ impl UIState {
             command_tx,
 
             map_window: MapWindow::new(21, 0, 41, 35),
-            message_window: Window::new(21, 35, 41, 24),
+            message_window: MessageWindow::new(21, 35, 41, 24),
             inventory_window: InventoryWindow::new(62, 0, 21, 59),
             info_window: Window::new(0, 0, 21, 20),
             skill_window: SkillWindow::new(0, 20, 21, 39),

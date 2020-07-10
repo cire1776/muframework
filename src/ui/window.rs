@@ -754,3 +754,113 @@ impl BasicWindow for SkillWindow {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct MessageWindow {
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
+
+    scroll_x: i32,
+    scroll_y: i32,
+
+    max_scroll_x: i32,
+    max_scroll_y: i32,
+
+    pub messages: Vec<(String, MessageType, String)>,
+}
+
+impl MessageWindow {
+    pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
+        Self {
+            x,
+            y,
+            width,
+            height,
+
+            scroll_x: 0,
+            scroll_y: 0,
+
+            max_scroll_x: 0,
+            max_scroll_y: 0,
+
+            messages: vec![],
+        }
+    }
+}
+
+impl ScreenObject for MessageWindow {
+    fn x(&self) -> i32 {
+        self.x
+    }
+    fn y(&self) -> i32 {
+        self.y
+    }
+    fn width(&self) -> i32 {
+        self.width
+    }
+    fn height(&self) -> i32 {
+        self.height
+    }
+}
+impl BasicWindow for MessageWindow {
+    fn scroll_x(&self) -> i32 {
+        self.scroll_x
+    }
+
+    fn scroll_y(&self) -> i32 {
+        self.scroll_y
+    }
+
+    fn set_scroll(&mut self, x: i32, y: i32) {
+        self.scroll_x = x;
+        self.scroll_y = y;
+    }
+
+    fn set_max_scroll(&mut self, width: i32, height: i32) {
+        use std::cmp::max;
+        self.max_scroll_x = max(width - self.width + 1, 0);
+        self.max_scroll_y = max(height - self.height + 1, 0);
+    }
+
+    fn max_scroll(&self) -> (i32, i32) {
+        (self.max_scroll_x, self.max_scroll_y)
+    }
+
+    fn draw_text(&self, string: &str, x: i32, y: i32, context: &mut BTerm) {
+        let local_x = x + self.x();
+        let local_y = y + self.y();
+
+        let fg = RGB::named(rltk::WHITE);
+        let bg = RGB::named(rltk::BLACK);
+
+        context.print_color(local_x, local_y, fg, bg, string);
+    }
+
+    fn draw_frame(&self, context: &mut BTerm, message: &str) {
+        self.internal_draw_frame(context, message);
+
+        let y = if self.messages.len() < 20 {
+            self.messages.len()
+        } else {
+            20
+        } as i32;
+
+        for (message, _message_type, timestamp) in self.messages.iter().rev().take(20) {
+            self.draw_text(&format!("{}: {}", timestamp, message), 1, y, context);
+        }
+    }
+}
+
+impl MouseReceiver for MessageWindow {
+    fn mouse_point(&self, context: &mut BTerm) -> Point {
+        let result = context.mouse_point();
+
+        result - Point::constant(self.x(), self.y())
+    }
+
+    fn handle_left_click(&mut self, _x: i32, _y: i32, _context: &mut BTerm) {
+        println!("mouse clicked in message window");
+    }
+}
