@@ -165,38 +165,22 @@ impl Activity for SmeltingActivity {
         _facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
-        _rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        rng: &mut Rng,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let inventory = inventories
             .get_mut(&player.inventory_id())
             .expect("unable to find inventory");
 
-        inventory.consume(
-            ItemClass::Ore,
-            format!("{} Ore", self.product.to_string()),
-            4,
-            items,
-        );
+        SmeltingSkill::consume_from_inventory_for(self.product, inventory, items);
 
-        let wood_type = if inventory.count_of(ItemClass::Material, "Softwood Log") >= 1 {
-            "Softwood Log"
-        } else if inventory.count_of(ItemClass::Material, "Hardwood Log") >= 1 {
-            "Hardwood Log"
-        } else {
-            panic!("wood not found");
-        };
-
-        inventory.consume(ItemClass::Material, wood_type, 1, items);
+        let (class, description) =
+            SmeltingSkill::produce_results_for(self.product, player, rng, Some(update_sender));
 
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(
-                player.inventory_id(),
-                ItemClass::Material,
-                format!("{} Bar", self.product.to_string()),
-            ),
+            Command::SpawnItem(player.inventory_id(), class, description),
         );
 
         if !SmeltingSkill::can_produce(self.product, inventory) {

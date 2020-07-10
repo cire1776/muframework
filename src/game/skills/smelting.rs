@@ -324,4 +324,15 @@ impl SmeltingSkill {
             }
         }
     }
+
+    pub fn produce_results_for(
+        product: SmeltingType,
+        _player: &mut Player,
+        _rng: &mut Rng,
+        _update_tx: Option<&GameUpdateSender>,
+    ) -> (ItemClass, String) {
+        let _smelting_product = SMELTING_PRODUCTS[&product];
+
+        (ItemClass::Material, format!("{} Bar", product.to_string()))
+    }
 }
