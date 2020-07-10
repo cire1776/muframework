@@ -188,7 +188,7 @@ impl SmeltingSkill {
                     return false;
                 }
 
-                if !inventory.has_sufficient(ItemClass::Material, "Coal", 1) {
+                if !inventory.has_sufficient(ItemClass::Ore, "Coal", 1) {
                     return false;
                 }
                 true
@@ -198,7 +198,7 @@ impl SmeltingSkill {
                     return false;
                 }
 
-                if !inventory.has_sufficient(ItemClass::Material, "Coal", 2) {
+                if !inventory.has_sufficient(ItemClass::Ore, "Coal", 2) {
                     return false;
                 }
                 true
@@ -212,7 +212,7 @@ impl SmeltingSkill {
                     return false;
                 }
 
-                if !inventory.has_sufficient(ItemClass::Material, "Coal", 1) {
+                if !inventory.has_sufficient(ItemClass::Ore, "Coal", 1) {
                     return false;
                 }
                 true
@@ -226,7 +226,7 @@ impl SmeltingSkill {
                     return false;
                 }
 
-                if !inventory.has_sufficient(ItemClass::Material, "Coal", 1) {
+                if !inventory.has_sufficient(ItemClass::Ore, "Coal", 1) {
                     return false;
                 }
                 true

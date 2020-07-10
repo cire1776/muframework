@@ -97,6 +97,7 @@ simple_fishing_trap tool "Simple Fishing Trap" {
 dirt ore "Dirt"
 sand ore "Sand"
 stone ore "Stone"
+coal ore "Coal"
 tin_ore ore "Tin Ore"
 copper_ore ore "Copper Ore"
 lead_ore ore "Lead Ore"
