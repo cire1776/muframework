@@ -102,6 +102,10 @@ impl Player {
         self.attributes.remove(tag);
     }
 
+    pub fn skills_with_xp(&self) -> impl Iterator<Item = (&Skill, &u64)> {
+        self.xp.iter()
+    }
+
     pub fn set_level_for(&mut self, skill: Skill, level: u8) {
         self.remove_buff(BuffTag::Level(skill));
 
