@@ -306,32 +306,38 @@ impl SmeltingSkill {
                     4,
                     items,
                 );
-                inventory.consume(ItemClass::Material, "Coal", 1, items)
+                inventory.consume(ItemClass::Ore, "Coal", 1, items)
             }
             Steel => {
                 inventory.consume(ItemClass::Ore, "Iron Ore", 3, items);
-                inventory.consume(ItemClass::Material, "Coal", 2, items)
+                inventory.consume(ItemClass::Ore, "Coal", 2, items)
             }
             StainlessSteel => {
                 inventory.consume(ItemClass::Ore, "Iron Ore", 3, items);
                 inventory.consume(ItemClass::Ore, "Zince", 1, items);
-                inventory.consume(ItemClass::Material, "Coal", 1, items)
+                inventory.consume(ItemClass::Ore, "Coal", 1, items)
             }
             Stellite => {
                 inventory.consume(ItemClass::Ore, "Iron Ore", 2, items);
                 inventory.consume(ItemClass::Ore, "Tungsten Ore", 2, items);
-                inventory.consume(ItemClass::Material, "Coal", 1, items)
+                inventory.consume(ItemClass::Ore, "Coal", 1, items)
             }
         }
     }
 
     pub fn produce_results_for(
         product: SmeltingType,
-        _player: &mut Player,
-        _rng: &mut Rng,
-        _update_tx: Option<&GameUpdateSender>,
+        player: &mut Player,
+        rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
     ) -> (ItemClass, String) {
-        let _smelting_product = SMELTING_PRODUCTS[&product];
+        let smelting_product = SMELTING_PRODUCTS[&product];
+        player.increment_xp(
+            Smelting,
+            smelting_product.smelting_xp as u64,
+            rng,
+            update_tx,
+        );
 
         (ItemClass::Material, format!("{} Bar", product.to_string()))
     }
