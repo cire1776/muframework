@@ -35,13 +35,16 @@ impl Level {
         );
 
         for (skill, xp_value) in player.skills_with_xp() {
-            GameUpdate::send(update_tx, PlayerXPUpdated(player.id, *skill, *xp_value))
+            GameUpdate::send(
+                update_tx,
+                PlayerXPUpdated(player.id, skill.to_string(), *xp_value),
+            )
         }
 
         for (skill, _) in player.skills() {
             GameUpdate::send(
                 update_tx,
-                PlayerSkillUpdated(player.id, skill, player.get_level_for(skill)),
+                PlayerSkillUpdated(player.id, skill.to_string(), player.get_level_for(skill)),
             )
         }
 

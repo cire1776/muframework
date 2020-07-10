@@ -10,8 +10,9 @@ use game::items::Item;
 
 use game::tile_map::{Tile, TileMap};
 use maps::{BackgroundMap, SparseMap};
+
 pub mod window;
-use window::MapWindowMode;
+use window::*;
 
 pub mod pane;
 pub use pane::*;
@@ -66,6 +67,7 @@ pub struct UIState {
     pub message_window: Window,
     pub inventory_window: InventoryWindow,
     pub info_window: Window,
+    pub skill_window: SkillWindow,
 
     pub characters: SparseMap,
     pub items: SparseMap,
@@ -185,12 +187,14 @@ impl UIState {
             FacilityRemoved { id: facility_id } => self.facilities.remove(facility_id),
             PlayerXPUpdated(player_id, skill, xp_value) => {
                 if player_id == 1 {
-                    println!("{:?}: {:?} xp", skill, xp_value);
+                    let entry = self.skill_window.skills.entry(skill).or_insert((0, 0));
+                    entry.1 = xp_value;
                 }
             }
             PlayerSkillUpdated(player_id, skill, level) => {
                 if player_id == 1 {
-                    println!("{:?}: level {:?} ", skill, level);
+                    let entry = self.skill_window.skills.entry(skill).or_insert((0, 0));
+                    entry.0 = level;
                 }
             }
             EquipmentUpdated(items) => {
@@ -285,7 +289,8 @@ impl UIState {
             map_window: MapWindow::new(21, 0, 41, 35),
             message_window: Window::new(21, 35, 41, 24),
             inventory_window: InventoryWindow::new(62, 0, 21, 59),
-            info_window: Window::new(0, 0, 21, 59),
+            info_window: Window::new(0, 0, 21, 20),
+            skill_window: SkillWindow::new(0, 20, 21, 39),
 
             characters: SparseMap::new(),
             items: SparseMap::new(),
@@ -405,6 +410,8 @@ impl UIState {
         let equipment: Vec<String> = self.equipment.iter().map(|i| i.description()).collect();
 
         self.inventory_window.set_inventory_items(items, equipment);
+
+        self.skill_window.draw_frame(context, "Skills");
 
         self.info_window.draw_frame(context, "info");
 

@@ -458,7 +458,9 @@ pub fn assert_xp_is_updated(
 
     match update {
         Ok(PlayerXPUpdated(player_id, skill, xp_value))
-            if player_id == exp_player_id && skill == exp_skill && xp_value == exp_xp_value => {}
+            if player_id == exp_player_id
+                && skill == exp_skill.to_string()
+                && xp_value == exp_xp_value => {}
         Ok(update) => panic!("unexpected update:{:?}", update),
         Err(_) => {}
     }

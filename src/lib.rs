@@ -23,7 +23,6 @@ use game::{
     items::{Item, ItemClass},
 };
 pub mod ui;
-use ui::window::{BasicWindow, InventoryWindow, MapWindow, MouseReceiver, Window};
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone, Deserialize, Serialize)]
 pub enum Direction {
@@ -131,8 +130,8 @@ pub enum GameUpdate {
     FacilityRemoved {
         id: u64,
     },
-    PlayerXPUpdated(u64, game::skills::Skill, u64), // (player, skill, xp_value)
-    PlayerSkillUpdated(u64, game::skills::Skill, u8), // (player, skill, level)
+    PlayerXPUpdated(u64, String, u64), // (player, skill, xp_value)
+    PlayerSkillUpdated(u64, String, u8), // (player, skill, level)
     EquipmentUpdated(Vec<Item>),
     InventoryUpdated(Vec<Item>),
     ExternalInventoryOpened(Vec<Item>, u64), // (Contents, inventory_id?)

@@ -123,7 +123,7 @@ impl Player {
 
         GameUpdate::send(
             update_tx,
-            GameUpdate::PlayerSkillUpdated(self.id, skill, level),
+            GameUpdate::PlayerSkillUpdated(self.id, skill.to_string(), level),
         )
     }
 
@@ -155,7 +155,7 @@ impl Player {
 
         GameUpdate::send(
             update_tx,
-            GameUpdate::PlayerXPUpdated(self.id, skill, self.get_xp(skill)),
+            GameUpdate::PlayerXPUpdated(self.id, skill.to_string(), self.get_xp(skill)),
         );
 
         Levelling::check_for_levelling(self, skill, gain as u32, rng, update_tx);

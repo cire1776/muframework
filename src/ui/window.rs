@@ -653,3 +653,104 @@ impl MouseReceiver for InventoryWindow {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct SkillWindow {
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
+
+    scroll_x: i32,
+    scroll_y: i32,
+
+    max_scroll_x: i32,
+    max_scroll_y: i32,
+
+    pub skills: HashMap<String, (u8, u64)>,
+}
+
+impl SkillWindow {
+    pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
+        Self {
+            skills: HashMap::new(),
+
+            x,
+            y,
+            width,
+            height,
+
+            scroll_x: 0,
+            scroll_y: 0,
+
+            max_scroll_x: 0,
+            max_scroll_y: 0,
+        }
+    }
+}
+
+impl ScreenObject for SkillWindow {
+    fn x(&self) -> i32 {
+        self.x
+    }
+    fn y(&self) -> i32 {
+        self.y
+    }
+    fn width(&self) -> i32 {
+        self.width
+    }
+    fn height(&self) -> i32 {
+        self.height
+    }
+}
+impl BasicWindow for SkillWindow {
+    fn scroll_x(&self) -> i32 {
+        self.scroll_x
+    }
+
+    fn scroll_y(&self) -> i32 {
+        self.scroll_y
+    }
+
+    fn set_scroll(&mut self, x: i32, y: i32) {
+        self.scroll_x = x;
+        self.scroll_y = y;
+    }
+
+    fn set_max_scroll(&mut self, width: i32, height: i32) {
+        use std::cmp::max;
+        self.max_scroll_x = max(width - self.width + 1, 0);
+        self.max_scroll_y = max(height - self.height + 1, 0);
+    }
+
+    fn max_scroll(&self) -> (i32, i32) {
+        (self.max_scroll_x, self.max_scroll_y)
+    }
+
+    fn draw_text(&self, string: &str, x: i32, y: i32, context: &mut BTerm) {
+        let local_x = x + self.x();
+        let local_y = y + self.y();
+
+        let fg = RGB::named(rltk::WHITE);
+        let bg = RGB::named(rltk::BLACK);
+
+        context.print_color(local_x, local_y, fg, bg, string);
+    }
+
+    fn draw_frame(&self, context: &mut BTerm, message: &str) {
+        use num_format::{Locale, ToFormattedString};
+        self.internal_draw_frame(context, message);
+        let mut y = 1;
+        let mut skills: Vec<&String> = self.skills.keys().collect();
+        skills.sort();
+
+        for skill in &skills {
+            let (level, xp) = self.skills[*skill];
+            self.draw_static_text(&format!("{:0>2} {}", level, skill), 1, y, context);
+
+            let xp_string = &*xp.to_formatted_string(&Locale::en);
+            self.draw_static_text(xp_string, (21 - xp_string.len()) as i32, y + 1, context);
+            y += 2;
+        }
+    }
+}
