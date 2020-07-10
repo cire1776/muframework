@@ -113,6 +113,8 @@ impl GameState {
         facilities = new_facilities;
         inventories = new_inventories;
 
+        Self::setup_alarms(&mut timer);
+
         let _guard = game_state.start_heartbeat(&mut timer);
         let mut activity: Option<Box<dyn Activity>> = None;
 
@@ -176,6 +178,11 @@ impl GameState {
         self.start_heartbeat(timer)
     }
 
+    fn setup_alarms(timer: &mut Timer) {
+        timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
+        timer.repeating_by_tick(10 * 3600, Command::SaveGame, "Autosave");
+    }
+
     /// public for testing purposes
     pub fn initialize_game<S: ToString>(
         level_path: S,
@@ -202,7 +209,6 @@ impl GameState {
         ) = TileMap::load_from_file(level_path.to_string());
 
         let mut timer = Timer::new(command_tx.clone());
-        timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
 
         let mut obstacles = BlockingMap::new();
         obstacles.refresh(&map);

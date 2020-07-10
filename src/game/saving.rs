@@ -81,7 +81,6 @@ impl GameSaver {
         };
 
         save_text += "\n===END OF EQUIPPED ITEMS===\n";
-        println!("{}", save_text);
 
         save_text
     }
