@@ -597,6 +597,9 @@ mod fruitpresses;
 mod patches;
 
 #[cfg(test)]
+mod fishingspot;
+
+#[cfg(test)]
 mod equipment;
 
 #[cfg(test)]
