@@ -224,6 +224,19 @@ pub fn get_facility_id_at(x: i32, y: i32, map: &TileMap) -> u64 {
     }
 }
 
+pub fn get_facility_at<'a>(
+    x: i32,
+    y: i32,
+    map: &TileMap,
+    facilities: &'a mut FacilityList,
+) -> &'a mut Facility {
+    let id = get_facility_id_at(x, y, &map);
+
+    facilities
+        .get_mut(id)
+        .expect("unable to find specified facility")
+}
+
 pub fn get_items_at(x: i32, y: i32, items: &ItemList) -> Vec<Item> {
     items
         .find_all_at(x, y)
@@ -475,6 +488,39 @@ pub fn assert_updates_are_empty(update_rx: &mut Receiver<GameUpdate>) {
     }
 }
 
+pub fn assert_transfer_equipement_to_inventory(
+    exp_mounting_point: MountingPoint,
+    exp_inventory_id: u64,
+    command_rx: &mut Receiver<Command>,
+) {
+    let command = command_rx.try_recv();
+
+    match command {
+        Ok(Command::TransferEquipmentToInventory(mounting_point, inventory_id))
+            if mounting_point == exp_mounting_point && inventory_id == exp_inventory_id => {}
+        Ok(command) => panic!("unexpected command found: {:?}", command),
+        Err(_) => panic!("command not found"),
+    }
+}
+
+pub fn assert_transfer_item(
+    exp_item_id: u64,
+    exp_src_inventory_id: u64,
+    exp_dest_inventory_id: u64,
+    command_rx: &mut Receiver<Command>,
+) {
+    let command = command_rx.try_recv();
+
+    match command {
+        Ok(Command::TransferItem(item_id, src_inventory_id, dest_inventory_id))
+            if item_id == exp_item_id
+                && src_inventory_id == exp_src_inventory_id
+                && dest_inventory_id == exp_dest_inventory_id => {}
+        Ok(command) => panic!("unexpected command found: {:?}", command),
+        Err(_) => panic!("command not found"),
+    }
+}
+
 pub fn assert_commands_are_empty(command_rx: &mut Receiver<Command>) {
     let command = command_rx.try_recv();
 
@@ -597,7 +643,7 @@ mod fruitpresses;
 mod patches;
 
 #[cfg(test)]
-mod fishingspot;
+mod fishingspots;
 
 #[cfg(test)]
 mod equipment;
