@@ -13,7 +13,7 @@ impl Level {
         inventories: &InventoryList,
         update_tx: Option<&GameUpdateSender>,
     ) {
-        Level::introduce_player(&player, inventories, update_tx);
+        Level::introduce_player(&player, items, inventories, update_tx);
         Level::introduce_other_characters(&characters, obstacles, update_tx);
         Level::introduce_items(&items, update_tx);
         Level::introduce_facilities(facilities, map, obstacles, update_tx);
@@ -21,6 +21,7 @@ impl Level {
 
     pub fn introduce_player(
         player: &Player,
+        items: &ItemList,
         inventories: &InventoryList,
         update_tx: Option<&GameUpdateSender>,
     ) {
@@ -50,6 +51,13 @@ impl Level {
 
         let inventory = inventories.get(&1).unwrap();
         GameUpdate::send(update_tx, InventoryUpdated(inventory.to_vec()));
+
+        let equipment = player.mounting_points.to_vec();
+        let equipment: Vec<Item> = equipment
+            .iter()
+            .map(|id| items.get_as_item(*id).expect("unable to find item"))
+            .collect();
+        GameUpdate::send(update_tx, EquipmentUpdated(equipment));
     }
 
     pub fn introduce_other_characters(

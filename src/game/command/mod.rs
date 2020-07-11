@@ -268,10 +268,7 @@ impl Command {
 
         let equipment_list: Vec<Item> = player.mounting_points.to_vec_of_items(items);
 
-        GameUpdate::send(
-            Some(update_tx.expect("unable to find command_tx")),
-            GameUpdate::EquipmentUpdated(equipment_list),
-        )
+        GameUpdate::send(update_tx, GameUpdate::EquipmentUpdated(equipment_list))
     }
 
     pub fn close_external_inventory(update_tx: Option<&std::sync::mpsc::Sender<GameUpdate>>) {
