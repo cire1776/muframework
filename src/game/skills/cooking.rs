@@ -140,9 +140,14 @@ impl CookingSkill {
         let success_rate = if level < recipe.required_level {
             0
         } else {
-            let delta_level = std::cmp::min(level - recipe.required_level, recipe.learning_period);
-            let factor = (100 - recipe.success_rate) / delta_level;
-            recipe.success_rate + delta_level * factor
+            let delta_level = level - recipe.required_level;
+
+            if delta_level >= recipe.learning_period {
+                100
+            } else {
+                let factor = (100 - recipe.success_rate) / recipe.learning_period;
+                recipe.success_rate + delta_level * factor
+            }
         };
 
         rng.percentile(success_rate, "cooking_success")
