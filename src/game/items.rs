@@ -855,20 +855,6 @@ impl ItemList {
             self.items.insert(*key, state.clone());
         }
     }
-
-    pub fn populate_inventories(&self, inventories: &mut InventoryList) {
-        for (_, state) in &self.items {
-            match state {
-                ItemState::Stored(item, inventory_id) => {
-                    let inventory = inventories
-                        .entry(*inventory_id)
-                        .or_insert(Inventory::new(*inventory_id));
-                    inventory.force_accept(item);
-                }
-                _ => {}
-            }
-        }
-    }
 }
 
 impl Index<u64> for ItemList {
