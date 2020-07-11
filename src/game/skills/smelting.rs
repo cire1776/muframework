@@ -338,7 +338,10 @@ impl SmeltingSkill {
             rng,
             update_tx,
         );
-
-        (ItemClass::Material, format!("{} Bar", product.to_string()))
+        if product != Mercury {
+            (ItemClass::Material, format!("{} Bar", product.to_string()))
+        } else {
+            (ItemClass::Material, "Mercury".to_string())
+        }
     }
 }
