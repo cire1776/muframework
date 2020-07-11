@@ -98,20 +98,23 @@ impl GameState {
 
         let game_state = &mut GameState::new();
 
-        let (new_player, new_obstacles, new_characters, new_items, new_facilities, new_inventories) =
-            GameLoader::load_game(
-                GameLoader::find_latest_save_file(),
-                &mut map,
-                game_state,
-                Some(&update_tx),
-            );
+        if let Some(filename) = GameLoader::find_latest_save_file() {
+            let (
+                new_player,
+                new_obstacles,
+                new_characters,
+                new_items,
+                new_facilities,
+                new_inventories,
+            ) = GameLoader::load_game(filename, &mut map, game_state, Some(&update_tx));
 
-        player = new_player;
-        obstacles = new_obstacles;
-        characters = new_characters;
-        items = new_items;
-        facilities = new_facilities;
-        inventories = new_inventories;
+            player = new_player;
+            obstacles = new_obstacles;
+            characters = new_characters;
+            items = new_items;
+            facilities = new_facilities;
+            inventories = new_inventories;
+        }
 
         let _guard = game_state.start_heartbeat(&mut timer);
         let mut activity: Option<Box<dyn Activity>> = None;
@@ -322,8 +325,14 @@ impl GameState {
         match command {
             Command::LoadGame => activity,
             Command::SaveGame => {
-                let save_data =
-                    GameSaver::save_game_to_string(player, characters, items, facilities, self);
+                let save_data = GameSaver::save_game_to_string(
+                    player,
+                    characters,
+                    items,
+                    inventories,
+                    facilities,
+                    self,
+                );
                 GameSaver::save_to_file(save_data);
                 activity
             }

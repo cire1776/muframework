@@ -7,6 +7,7 @@ impl GameSaver {
         player: &Player,
         characters: &CharacterList,
         items: &ItemList,
+        inventories: &InventoryList,
         facilities: &FacilityList,
         game_state: &GameState,
     ) -> String {
@@ -35,6 +36,16 @@ impl GameSaver {
         };
 
         save_text += "\n===END OF CHARACTERS===\n===END OF ITEM TYPES===\n";
+
+        save_text += &match ron::ser::to_string_pretty(&inventories, PrettyConfig::new()) {
+            Err(error) => {
+                println!("unable to save: {:?}", error);
+                return "".into();
+            }
+            Ok(text) => text,
+        };
+
+        save_text += "\n===END OF INVENTORIES===\n";
 
         let bundled_items = items.bundled_items();
 
@@ -124,7 +135,7 @@ impl GameSaver {
 pub struct GameLoader {}
 
 impl GameLoader {
-    pub fn find_latest_save_file() -> String {
+    pub fn find_latest_save_file() -> Option<String> {
         use glob::glob;
 
         let mut files: Vec<String> = glob("saves/*-20??-*.sav")
@@ -144,7 +155,11 @@ impl GameLoader {
         files.sort();
         files.reverse();
 
-        files[0].clone()
+        if files.len() > 0 {
+            Some(files[0].clone())
+        } else {
+            None
+        }
     }
 
     pub fn load_game<S: ToString>(
@@ -192,7 +207,7 @@ impl GameLoader {
         game_state: &mut GameState,
         save_data: String,
     ) -> (Player, CharacterList, ItemList, FacilityList, InventoryList) {
-        let re = regex::Regex::new("(?sm)(.+)===END OF SERVERDATA===\n(.+)===END OF PLAYERS===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEM TYPES===\n(.+)===END OF ITEMS===\n(.+)===END OF FACILITIES===\n(.+)===END OF STORED ITEMS===\n(.+)===END OF EQUIPPED ITEMS===\n").expect("unable to parse regex.");
+        let re = regex::Regex::new("(?sm)(.+)===END OF SERVERDATA===\n(.+)===END OF PLAYERS===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEM TYPES===\n(.+)===END OF INVENTORIES===\n(.+)===END OF ITEMS===\n(.+)===END OF FACILITIES===\n(.+)===END OF STORED ITEMS===\n(.+)===END OF EQUIPPED ITEMS===\n").expect("unable to parse regex.");
 
         let captures = re.captures(&save_data).expect("unable to form captures.");
 
@@ -222,25 +237,27 @@ impl GameLoader {
             .ok()
             .expect("unable to deserialize characters");
 
-        let items_data = capture_string(&captures, 5);
+        let inventories_data = capture_string(&captures, 5);
+        let inventories: InventoryList = ron::from_str(&inventories_data)
+            .ok()
+            .expect("unable to deserialize inventories");
+
+        let items_data = capture_string(&captures, 6);
         let mut items: ItemList = ron::from_str(&items_data)
             .ok()
             .expect("unable to deserialize items");
 
-        let facilities_data = capture_string(&captures, 6);
+        let facilities_data = capture_string(&captures, 7);
         let facilities: FacilityList = ron::from_str(&facilities_data)
             .ok()
             .expect("unable to deserialize facilities.");
 
-        let stored_items_data = capture_string(&captures, 7);
+        let stored_items_data = capture_string(&captures, 8);
         let stored_items: ItemList = ron::from_str(&stored_items_data)
             .ok()
             .expect("unable to deserialize stored items.");
 
         items.merge(&stored_items);
-
-        let mut inventories = InventoryList::new();
-        stored_items.populate_inventories(&mut inventories);
 
         let equipped_items_data = capture_string(&captures, 8);
         let equipped_items: ItemList = ron::from_str(&equipped_items_data)

@@ -67,10 +67,14 @@ pub trait InventoryFilter {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Inventory {
     id: u64,
     permitted_types: Vec<ItemType>,
+
+    #[serde(skip)]
     item_filter: Option<Box<dyn InventoryFilter>>,
+
     pub items: HashMap<u64, Item>,
     pub prohibit_manual_extraction: bool,
 }

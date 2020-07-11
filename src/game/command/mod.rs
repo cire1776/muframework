@@ -257,7 +257,7 @@ impl Command {
 
         let inventory = inventories
             .get_mut(&inventory_id)
-            .expect("unable to find inventory");
+            .expect(&format!("unable to find inventory: {}", inventory_id));
 
         player
             .mounting_points
