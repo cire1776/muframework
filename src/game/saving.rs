@@ -259,7 +259,7 @@ impl GameLoader {
 
         items.merge(&stored_items);
 
-        let equipped_items_data = capture_string(&captures, 8);
+        let equipped_items_data = capture_string(&captures, 9);
         let equipped_items: ItemList = ron::from_str(&equipped_items_data)
             .ok()
             .expect("unable to deserialize equipped items.");
