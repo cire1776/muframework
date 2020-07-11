@@ -692,6 +692,7 @@ impl<'a> ActivateCollectFishingTrapCommand<'a> {
 
         let expiration = facility.get_property("trap_expiration");
 
+        // check to make sure a trap has been placed
         if expiration == 0 {
             return false;
         }
