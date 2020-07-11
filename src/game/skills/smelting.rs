@@ -132,11 +132,11 @@ impl SmeltingSkill {
                 true
             }
             Bronze => {
-                if !inventory.has_sufficient(ItemClass::Ore, "Tin Ore", 2) {
+                if !inventory.has_sufficient(ItemClass::Ore, "Tin Ore", 1) {
                     return false;
                 }
 
-                if !inventory.has_sufficient(ItemClass::Ore, "Copper Ore", 2) {
+                if !inventory.has_sufficient(ItemClass::Ore, "Copper Ore", 3) {
                     return false;
                 }
 
@@ -263,8 +263,8 @@ impl SmeltingSkill {
                 }
             }
             Bronze => {
-                inventory.consume(ItemClass::Ore, "Tin Ore", 2, items);
-                inventory.consume(ItemClass::Ore, "Copper Ore", 2, items);
+                inventory.consume(ItemClass::Ore, "Tin Ore", 1, items);
+                inventory.consume(ItemClass::Ore, "Copper Ore", 3, items);
 
                 if !inventory.has_sufficient(ItemClass::Material, "Softwood Log", 1) {
                     inventory.consume(ItemClass::Material, "Softwood Log", 1, items);
