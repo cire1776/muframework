@@ -24,6 +24,9 @@ pub use intellectual::*;
 pub mod harvesting;
 pub use harvesting::*;
 
+pub mod fishing;
+pub use fishing::*;
+
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Deserialize, Serialize)]
 pub enum Skill {
     Alchemy,

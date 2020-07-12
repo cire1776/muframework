@@ -138,87 +138,6 @@ impl ToString for FishType {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct FishingSpotProperties {
-    facility: Facility,
-}
-
-impl<'a> FishingSpotProperties {
-    pub fn new(facility: Facility) -> Self {
-        Self { facility }
-    }
-    pub fn body_of_waster(&self) -> u64 {
-        self.facility.get_property("body_of_waster") as u64
-    }
-
-    pub fn net_products(&self) -> (FishType, Option<FishType>) {
-        let fish_type_1 = FishType::from(self.facility.get_property("net_1_product") as u8);
-        let fish_type_2 = FishType::from(self.facility.get_property("net_2_product") as u8);
-        (fish_type_1.expect("unable to find fish"), fish_type_2)
-    }
-
-    pub fn net_product_chance(&self) -> u8 {
-        (100 - self.facility.get_property("net_2_chance")) as u8
-    }
-
-    pub fn net_timer(&self) -> u32 {
-        self.facility.get_property("net_timer") as u32
-    }
-
-    pub fn rod_products(&self) -> (FishType, Option<FishType>) {
-        let fish_type_1 = FishType::from(self.facility.get_property("rod_1_product") as u8);
-        let fish_type_2 = FishType::from(self.facility.get_property("rod_2_product") as u8);
-        (fish_type_1.expect("unable to find fish"), fish_type_2)
-    }
-
-    pub fn rod_product_chance(&self) -> u8 {
-        (100 - self.facility.get_property("rod_2_chance")) as u8
-    }
-
-    pub fn rod_timer(&self) -> u32 {
-        self.facility.get_property("rod_timer") as u32
-    }
-
-    pub fn trap_products(&self) -> (FishType, Option<FishType>) {
-        let fish_type_1 = FishType::from(self.facility.get_property("trap_1_product") as u8);
-        let fish_type_2 = FishType::from(self.facility.get_property("trap_2_product") as u8);
-        (fish_type_1.expect("unable to find fish"), fish_type_2)
-    }
-
-    pub fn trap_product_chance(&self) -> u8 {
-        (100 - self.facility.get_property("trap_2_chance")) as u8
-    }
-
-    pub fn trap_timer(&self) -> u32 {
-        self.facility.get_property("trap_timer") as u32
-    }
-
-    pub fn trap_spawn(&self) -> u8 {
-        self.facility.get_property("trap_spawn") as u8
-    }
-
-    pub fn trap_cooldown(&self) -> u32 {
-        self.facility.get_property("trap_cooldown") as u32
-    }
-
-    pub fn fish_type(
-        product_1: FishType,
-        product_2: Option<FishType>,
-        product_chance: u8,
-        rng: &mut Rng,
-    ) -> FishType {
-        if product_2.is_none() {
-            product_1
-        } else {
-            if rng.percentile(product_chance, "fish_type") {
-                product_1
-            } else {
-                product_2.unwrap()
-            }
-        }
-    }
-}
-
 pub struct ActivateNetFishingCommand<'a> {
     fishing_spot_properties: FishingSpotProperties,
     player: &'a mut Player,
@@ -255,21 +174,11 @@ impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        let base_time = self.fishing_spot_properties.net_timer();
-        let modifier = self
-            .player
-            .get_attribute(Attribute::SkillTime(Fishing.into()), 0);
-
-        (base_time as i64 + modifier as i64) as u32
+        FishingSkill::expiration(self.player, FishingType::Net, &self.fishing_spot_properties)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
-        let (product1, product2) = self.fishing_spot_properties.net_products();
-
         let activity = NetFishingActivity::new(
-            product1,
-            product2,
-            self.fishing_spot_properties.net_product_chance(),
             self.expiration(),
             self.player.id,
             self.facility.id,
@@ -291,9 +200,6 @@ impl<'a> CommandHandler<'a> for ActivateNetFishingCommand<'a> {
 }
 
 pub struct NetFishingActivity {
-    product_1: FishType,
-    product_2: Option<FishType>,
-    product_chance: u8,
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
@@ -302,18 +208,12 @@ pub struct NetFishingActivity {
 
 impl<'a> NetFishingActivity {
     fn new(
-        product_1: FishType,
-        product_2: Option<FishType>,
-        product_chance: u8,
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
     ) -> Self {
         Self {
-            product_1,
-            product_2,
-            product_chance,
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
@@ -338,28 +238,25 @@ impl<'a> Activity for NetFishingActivity {
     fn on_completion(
         &self,
         player: &mut Player,
-        _facility: &mut Facility,
+        facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let fish_type = FishingSpotProperties::fish_type(
-            self.product_1,
-            self.product_2,
-            self.product_chance,
+        for (class, description) in FishingSkill::produce_results_for(
+            FishingType::Net,
+            player,
+            facility,
             rng,
-        );
-
-        Command::send(
-            Some(command_sender),
-            Command::SpawnItem(
-                player.inventory_id(),
-                ItemClass::Ingredient,
-                fish_type.to_string(),
-            ),
-        );
+            Some(update_sender),
+        ) {
+            Command::send(
+                Some(command_sender.clone()),
+                Command::SpawnItem(player.inventory_id(), class, description),
+            );
+        }
 
         RefreshInventoryFlag::RefreshInventory
     }
@@ -405,21 +302,15 @@ impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        let base_time = self.fishing_spot_properties.rod_timer();
-        let modifier = self
-            .player
-            .get_attribute(Attribute::SkillTime(Fishing.into()), 0);
-
-        (base_time as i64 + modifier as i64) as u32
+        FishingSkill::expiration(
+            &self.player,
+            FishingType::Rod,
+            &self.fishing_spot_properties,
+        )
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
-        let (product1, product2) = self.fishing_spot_properties.rod_products();
-
         let activity = FishingActivity::new(
-            product1,
-            product2,
-            self.fishing_spot_properties.rod_product_chance(),
             self.expiration(),
             self.player.id,
             self.facility.id,
@@ -441,9 +332,6 @@ impl<'a> CommandHandler<'a> for ActivateFishingCommand<'a> {
 }
 
 pub struct FishingActivity {
-    product_1: FishType,
-    product_2: Option<FishType>,
-    product_chance: u8,
     expiration: u32,
     _player_inventory_id: u64,
     facility_id: u64,
@@ -452,18 +340,12 @@ pub struct FishingActivity {
 
 impl<'a> FishingActivity {
     fn new(
-        product_1: FishType,
-        product_2: Option<FishType>,
-        product_chance: u8,
         expiration: u32,
         player_inventory_id: u64,
         facility_id: u64,
         guard: Option<Guard>,
     ) -> Self {
         Self {
-            product_1,
-            product_2,
-            product_chance,
             expiration,
             _player_inventory_id: player_inventory_id,
             facility_id,
@@ -488,28 +370,25 @@ impl<'a> Activity for FishingActivity {
     fn on_completion(
         &self,
         player: &mut Player,
-        _facility: &mut Facility,
+        facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
         rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let fish_type = FishingSpotProperties::fish_type(
-            self.product_1,
-            self.product_2,
-            self.product_chance,
+        for (class, description) in FishingSkill::produce_results_for(
+            FishingType::Rod,
+            player,
+            facility,
             rng,
-        );
-
-        Command::send(
-            Some(command_sender),
-            Command::SpawnItem(
-                player.inventory_id(),
-                ItemClass::Ingredient,
-                fish_type.to_string(),
-            ),
-        );
+            Some(update_sender),
+        ) {
+            Command::send(
+                Some(command_sender.clone()),
+                Command::SpawnItem(player.inventory_id(), class, description),
+            );
+        }
 
         RefreshInventoryFlag::RefreshInventory
     }
