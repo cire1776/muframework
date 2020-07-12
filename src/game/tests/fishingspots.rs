@@ -132,6 +132,7 @@ fn it_allows_rod_fishing_with_the_can_fish_endorsement() {
 
     assert!(activity.is_some());
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Fishing, 4, &mut update_rx);
     assert_activity_started(60_000, PaneTitle::Fishing, &mut update_rx);
     assert_is_spawning_item(player.id, Ingredient, "Mackeral", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
@@ -219,6 +220,7 @@ fn it_allows_net_fishing_for_shrimp_with_the_can_net_fish_endorsement() {
 
     assert!(activity.is_some());
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Fishing, 3, &mut update_rx);
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
     assert_is_spawning_item(player.id, Ingredient, "Shrimp", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
@@ -306,6 +308,7 @@ fn it_allows_net_fishing_for_frogs_with_the_can_net_fish_endorsement() {
 
     assert!(activity.is_some());
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Fishing, 3, &mut update_rx);
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
     assert_is_spawning_item(player.id, Ingredient, "Frog", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
@@ -1039,6 +1042,7 @@ fn net_fishing_above_level_produces_seaweed() {
 
     assert!(activity.is_some());
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Fishing, 1, &mut update_rx);
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
     assert_is_spawning_item(player.id, Ingredient, "Seaweed", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
@@ -1127,6 +1131,7 @@ fn net_fishing_above_level_produces_driftwood() {
 
     assert!(activity.is_some());
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Fishing, 1, &mut update_rx);
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
     assert_is_spawning_item(player.id, Material, "Driftwood", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
@@ -1215,6 +1220,7 @@ fn rod_fishing_above_level_produces_seaweed() {
 
     assert!(activity.is_some());
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Fishing, 1, &mut update_rx);
     assert_activity_started(60_000, PaneTitle::Fishing, &mut update_rx);
     assert_is_spawning_item(player.id, Ingredient, "Seaweed", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
@@ -1303,9 +1309,306 @@ fn rod_fishing_above_level_produces_driftwood() {
 
     assert!(activity.is_some());
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Fishing, 1, &mut update_rx);
     assert_activity_started(60_000, PaneTitle::Fishing, &mut update_rx);
     assert_is_spawning_item(player.id, Material, "Driftwood", &mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
+fn rod_fishing_fails_give_1_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(15, 2);
+    rng.set_fail("fish_type");
+    rng.set_fail("flotsam_type");
+
+    player.facing = Direction::Right;
+
+    let exp_xp = player.get_xp(Fishing) + 1;
+
+    player.endorse_with(":can_fish");
+    give_player_level(Fishing, 1, &mut player);
+
+    equip_player_with_spawned_item(
+        Tool,
+        "Simple Fishing Rod",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Right, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    let _activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert_eq!(player.get_xp(Fishing), exp_xp);
+}
+
+#[test]
+fn net_fishing_fails_give_1_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(15, 2);
+    rng.set_fail("fish_type");
+    rng.set_fail("flotsam_type");
+
+    player.facing = Direction::Right;
+
+    let exp_xp = player.get_xp(Fishing) + 1;
+
+    player.endorse_with(":can_net_fish");
+    give_player_level(Fishing, 1, &mut player);
+
+    equip_player_with_spawned_item(
+        Tool,
+        "Simple Fishing Rod",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Right, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    let _activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert_eq!(player.get_xp(Fishing), exp_xp);
+}
+
+#[test]
+fn rod_fishing_mackeral_give_4_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(14, 1);
+    rng.set_fail("fish_type");
+    rng.set_fail("flotsam_type");
+
+    player.facing = Direction::Right;
+
+    let exp_xp = player.get_xp(Fishing) + 4;
+
+    player.endorse_with(":can_fish");
+    give_player_level(Fishing, 1, &mut player);
+
+    equip_player_with_spawned_item(
+        Tool,
+        "Simple Fishing Rod",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Right, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    let _activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert_eq!(player.get_xp(Fishing), exp_xp);
+}
+
+#[test]
+fn rod_fishing_salmon_give_5_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(15, 2);
+    rng.set_succeed("fish_type");
+    rng.set_fail("flotsam_type");
+
+    player.facing = Direction::Right;
+
+    let exp_xp = player.get_xp(Fishing) + 5;
+
+    player.endorse_with(":can_fish");
+    give_player_level(Fishing, 5, &mut player);
+
+    equip_player_with_spawned_item(
+        Tool,
+        "Simple Fishing Rod",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Right, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    let _activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert_eq!(player.get_xp(Fishing), exp_xp);
 }

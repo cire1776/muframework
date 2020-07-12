@@ -168,7 +168,7 @@ impl FishingSkill {
         player: &mut Player,
         facility: &mut Facility,
         rng: &mut Rng,
-        _update_tx: Option<&GameUpdateSender>,
+        update_tx: Option<&GameUpdateSender>,
     ) -> Vec<(ItemClass, String)> {
         let properties = FishingSpotProperties::new(facility.clone());
         let spawns = if fishing_type == FishingType::TrapCollection {
@@ -196,12 +196,17 @@ impl FishingSkill {
         };
 
         let mut result = vec![];
+        let mut xp_gain: u64 = 0;
+
         for _ in 0..spawns {
             let fish_type =
                 FishingSpotProperties::fish_type(product_1, product_2, product_chance, rng);
             let product = if Self::can_produce(fish_type, player) {
+                xp_gain += FISHING_SPECIFICATIONS[&fish_type].xp_gain as u64;
                 (Ingredient, fish_type.to_string())
             } else {
+                xp_gain += 1;
+
                 if rng.percentile(50, "flotsam_type") {
                     (Ingredient, "Seaweed".to_string())
                 } else {
@@ -209,6 +214,10 @@ impl FishingSkill {
                 }
             };
             result.push(product);
+        }
+
+        if xp_gain > 0 {
+            player.increment_xp(Fishing, xp_gain, rng, update_tx);
         }
 
         result
