@@ -156,7 +156,7 @@ impl ScreenObject for Pane {
         self.width
     }
     fn height(&self) -> i32 {
-        self.width
+        self.height
     }
 
     fn is_within_frame(&self, point: Point) -> bool {
