@@ -132,17 +132,6 @@ impl Activity for LumbermillActivity {
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let level = player.get_level_for(Construction);
-
-        {
-            let inventory = inventories
-                .get_mut(&player.inventory_id())
-                .expect("unable to find inventory");
-
-            if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
-                Command::send(Some(command_sender.clone()), Command::ActivityAbort);
-            }
-        }
-
         {
             ConstructionSkill::consume_from_inventory_for(
                 self.log_type,
@@ -168,18 +157,15 @@ impl Activity for LumbermillActivity {
             Command::send(Some(command_sender), Command::ActivityAbort);
             return RefreshInventoryFlag::RefreshInventory;
         }
-
         {
             let inventory = inventories
                 .get_mut(&player.inventory_id())
                 .expect("unable to find inventory");
 
-            let level = player.get_level_for(Construction);
             if !ConstructionSkill::can_produce(self.log_type, level, inventory) {
-                Command::send(Some(command_sender), Command::ActivityAbort);
+                Command::send(Some(command_sender.clone()), Command::ActivityAbort);
             }
         }
-
         RefreshInventoryFlag::RefreshInventory
     }
 
