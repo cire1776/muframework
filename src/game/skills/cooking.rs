@@ -7,7 +7,7 @@ lazy_static! {
     static ref COOKING_RECIPES: HashMap<FishType, Recipe> = {
         let mut m = HashMap::new();
         m.insert(Shrimp, Recipe::new("Grilled Shrimp", 1, 65, 9, 3, 1));
-        m.insert(Frog, Recipe::new("Fried Frog Legs", 2, 75, 9, 3, 2));
+        m.insert(Frog, Recipe::new("Fried Frog Leg", 2, 75, 9, 3, 2));
         m.insert(Mackeral, Recipe::new("Cooked Mackeral", 3, 75, 14, 4, 2));
         m.insert(Crab, Recipe::new("Crab Legs", 5, 45, 23, 8, 3));
         m.insert(Catfish, Recipe::new("Grilled Catfish", 7, 75, 8, 5, 2));
@@ -18,10 +18,10 @@ lazy_static! {
         m.insert(Swordfish, Recipe::new("Swordfish Steak", 19, 80, 16, 12, 5));
         m.insert(Eel, Recipe::new("Cooked Eel", 21, 20, 5, 20, 5));
         m.insert(Sardine, Recipe::new("Canned Sardines", 23, 100, 0, 10, 0));
-        m.insert(SandbarShark, Recipe::new("Shark Steaks", 25, 20, 20, 15, 6));
+        m.insert(SandbarShark, Recipe::new("Shark Steak", 25, 20, 20, 15, 6));
         m.insert(Pike, Recipe::new("Cooked Pike", 27, 10, 13, 20, 7));
         m.insert(Lobster, Recipe::new("Steamed Lobster", 29, 90, 5, 17, 5));
-        m.insert(Tuna, Recipe::new("Tuna Steaks", 31, 30, 11, 22, 8));
+        m.insert(Tuna, Recipe::new("Tuna Steak", 31, 30, 11, 22, 8));
         m.insert(
             StripedMarlin,
             Recipe::new("Grilled Marlin", 33, 50, 6, 20, 8),
@@ -38,7 +38,7 @@ lazy_static! {
         m.insert(Grouper, Recipe::new("Cooked Grouper", 45, 90, 1, 25, 10));
         m.insert(
             BlackSeaBass,
-            Recipe::new("Grilled Black Seabass", 45, 80, 1, 26, 10),
+            Recipe::new("Grilled Black Sea Bass", 45, 80, 1, 26, 10),
         );
 
         m
