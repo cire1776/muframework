@@ -343,6 +343,14 @@ fn consumes_supplies_from_inventory() {
         &mut items,
     );
 
+    consume_all_supplies_from_inventory(
+        Material,
+        "Softwood Log",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
     give_player_spawned_items(
         Material,
         "Softwood Log",
@@ -446,10 +454,93 @@ fn stops_when_supplies_run_out() {
         &mut items,
     );
 
-    give_player_spawned_items(
+    // set facing to avoid change facing update
+    player.facing = Direction::Down;
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Down, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Construction, 5, &mut update_rx);
+    assert_activity_started(40000, Sawing, &mut update_rx);
+    assert_updates_are_empty(&mut update_rx);
+    assert_is_activity_abort(&mut command_rx);
+    assert_is_spawning_item(
+        player.inventory_id(),
+        Material,
+        "Softwood Plank",
+        &mut command_rx,
+    );
+    assert_is_refresh_inventory(&mut command_rx);
+    assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
+fn regressionit_wont_restart_after_supplies_run_out() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(12, 10);
+
+    rng.set_succeed("lumbermill_breaks");
+
+    player.endorse_component_with(":wants_to_mill", "softwood");
+
+    consume_all_supplies_from_inventory(
         Material,
         "Softwood Log",
-        1,
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    equip_player_with_spawned_item(
+        Material,
+        "Softwood Log",
         &mut player,
         &mut inventories,
         &mut items,
@@ -492,17 +583,5 @@ fn stops_when_supplies_run_out() {
         Some(command_tx),
     );
 
-    assert_activity_expired(&mut update_rx);
-    assert_xp_is_updated(player.id, Construction, 5, &mut update_rx);
-    assert_activity_started(40000, Sawing, &mut update_rx);
-    assert_updates_are_empty(&mut update_rx);
-    assert_is_spawning_item(
-        player.inventory_id(),
-        Material,
-        "Softwood Plank",
-        &mut command_rx,
-    );
-    assert_is_activity_abort(&mut command_rx);
-    assert_is_refresh_inventory(&mut command_rx);
-    assert_commands_are_empty(&mut command_rx);
+    assert!(!player.is_endorsed_with(":wants_to_mill"))
 }

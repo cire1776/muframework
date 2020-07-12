@@ -122,9 +122,13 @@ impl CookingSkill {
             .expect("unable to find inventory");
 
         if !inventory.has_sufficient(Ingredient, product.to_string(), 1) {
-            player
-                .mounting_points
-                .unmount(&vec![&MountingPoint::AtReady], inventory, items);
+            let item =
+                player
+                    .mounting_points
+                    .unmount(&vec![&MountingPoint::AtReady], inventory, items);
+            if let Some(item) = item {
+                item.has_been_unequipped(player);
+            }
         }
 
         inventory.consume(Ingredient, product.to_string(), 1, items);

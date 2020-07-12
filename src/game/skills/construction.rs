@@ -19,7 +19,7 @@ impl ConstructionSkill {
 
     pub fn consume_from_inventory_for(
         product: LogType,
-        player: &Player,
+        player: &mut Player,
         inventories: &mut InventoryList,
         items: &mut ItemList,
     ) {
@@ -28,6 +28,16 @@ impl ConstructionSkill {
             .expect("unable to get player's inventory.");
 
         let wood_type = Self::wood(product);
+
+        if !inventory.has_sufficient(Material, format!("{} Log", wood_type), 1) {
+            let item =
+                player
+                    .mounting_points
+                    .unmount(&vec![&MountingPoint::AtReady], inventory, items);
+            if let Some(item) = item {
+                item.has_been_unequipped(player);
+            }
+        }
         inventory.consume(Material, format!("{} Log", wood_type), 1, items);
     }
 

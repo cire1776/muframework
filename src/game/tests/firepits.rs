@@ -600,3 +600,82 @@ fn regression_divide_by_zero_crash_when_cooking_at_required_level() {
         Some(command_tx),
     );
 }
+
+#[test]
+fn regression_endorsement_left_on_after_unequip() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(11, 6);
+
+    rng.set_succeed("cooking_success");
+
+    player.endorse_component_with(":wants_to_cook", "shrimp");
+    give_player_level(Cooking, 1, &mut player);
+
+    equip_player_with_spawned_item(
+        Ingredient,
+        "Shrimp",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    give_player_spawned_items(
+        Material,
+        "Softwood Log",
+        1,
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        Some(&update_tx),
+        None,
+    );
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert!(!player.is_endorsed_with(":wants_to_cook"))
+}
