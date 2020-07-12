@@ -68,7 +68,9 @@ olive food "Olive"
 apple_juice food "Apple Juice"
 olive_oil ingredient "Olive Oil"
 bottle_of_water ingredient "Bottle of Water"
+seaweed ingredient "Seaweed"
 
+driftwood material "Driftwood"
 softwood_log material "Softwood Log" {
     endorsement: :wants_to_mill(softwood)
 }
