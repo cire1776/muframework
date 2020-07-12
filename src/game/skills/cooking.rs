@@ -17,7 +17,7 @@ lazy_static! {
         m.insert(Haddock, Recipe::new("Cooked Haddock", 17, 50, 13, 13, 5));
         m.insert(Swordfish, Recipe::new("Swordfish Steak", 19, 80, 16, 12, 5));
         m.insert(Eel, Recipe::new("Cooked Eel", 21, 20, 5, 20, 5));
-        m.insert(Sardines, Recipe::new("Canned Sardines", 23, 100, 0, 10, 0));
+        m.insert(Sardine, Recipe::new("Canned Sardines", 23, 100, 0, 10, 0));
         m.insert(SandbarShark, Recipe::new("Shark Steaks", 25, 20, 20, 15, 6));
         m.insert(Pike, Recipe::new("Cooked Pike", 27, 10, 13, 20, 7));
         m.insert(Lobster, Recipe::new("Steamed Lobster", 29, 90, 5, 17, 5));
