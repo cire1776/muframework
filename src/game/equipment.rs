@@ -208,15 +208,17 @@ impl MountingPointMap {
         mounting_points: &Vec<&MountingPoint>,
         inventory: &mut Inventory,
         items: &mut ItemList,
-    ) {
+    ) -> Option<Item> {
+        let mut possible_item = None;
         for mounting_point in mounting_points {
             let mounted_item = self.mounts.insert(**mounting_point, None);
             if let Some(Some(item_id)) = mounted_item {
-                println!("unmounted: {:?}", item_id);
                 let mut item = items.get_as_item(item_id).unwrap();
                 inventory.accept_stack(&mut item, items);
+                possible_item = Some(item);
             }
         }
+        possible_item
     }
 }
 
