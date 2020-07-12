@@ -820,7 +820,7 @@ impl ItemList {
             match item_state {
                 ItemState::Bundle(_i, x, y) => self.bundle(item, x, y),
                 ItemState::Stored(_i, inventory_id) => self.store(item, inventory_id),
-                ItemState::Equipped(_, _) => panic!("can't update equipment"),
+                ItemState::Equipped(_, inventory_id) => self.equip(item, inventory_id),
             };
         } else {
             // do nothing if the item is not in the item list
