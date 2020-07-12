@@ -98,6 +98,10 @@ S 28,23 // spider at 28,23
     property: logs => 200
     property: age => 48     // in months
 }
+▲pine 7,8 "A Pine Tree" {
+    property: logs => 200
+    property: age => 48     // in months
+}
 ▲oak 9,11 "A Young Oak Tree" {
     property: logs => 50
     property: age => 36     // in months
@@ -167,6 +171,19 @@ S 28,23 // spider at 28,23
     property: rod_1_product => 3
     property: rod_timer => 60
     property: trap_1_product => 4
+    property: trap_spawn => 5
+    property: trap_timer => 30
+    property: trap_cooldown => 180
+}
+~fishing_spot 16, 2 "A quiet coastline" {
+    property: body_of_water => 1
+    property: net_1_product => 1
+    property: net_2_product => 5
+    property: net_2_chance => 25
+    property: net_timer => 45
+    property: rod_1_product => 6
+    property: rod_timer => 60
+    property: trap_1_product => 8
     property: trap_spawn => 5
     property: trap_timer => 30
     property: trap_cooldown => 180
