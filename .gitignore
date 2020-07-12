@@ -5,3 +5,4 @@ kcov-*
 .vscode
 testbed/
 saves/
+notes/
