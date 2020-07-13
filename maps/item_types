@@ -172,8 +172,8 @@ swordfish ingredient "Swordfish" {
 eel ingredient "Eel" { 
     endorsement: :wants_to_cook(eel)
 }
-sardines ingredient "Sardine" { 
-    endorsement: :wants_to_cook(sardines)
+sardine ingredient "Sardine" { 
+    endorsement: :wants_to_cook(sardine)
 }
 sandbar_shark ingredient "Sandbar Shark" { 
     endorsement: :wants_to_cook(sandbar_shark)
@@ -250,9 +250,9 @@ burnt_grouper material "Burnt Grouper"
 burnt_black_see_bass material "Burnt Black Sea Bass"
 
 grilled_shrimp food "Grilled Shrimp"
-fried_frog_legs food "Fried Frog Legs"
+fried_frog_legs food "Fried Frog Leg"
 cooked_mackeral food "Cooked Mackeral"
-crab_legs food "Crab Legs"
+crab_legs food "Crab Leg"
 grilled_catfish food "Grilled Catfish"
 grilled_salmon food "Grilled Salmon"
 cooked_bass food "Cooked Bass"
