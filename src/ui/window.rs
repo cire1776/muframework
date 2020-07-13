@@ -841,7 +841,7 @@ impl BasicWindow for MessageWindow {
     fn draw_frame(&self, context: &mut BTerm, message: &str) {
         self.internal_draw_frame(context, message);
 
-        let y = if self.messages.len() < 20 {
+        let mut y = if self.messages.len() < 20 {
             self.messages.len()
         } else {
             20
@@ -849,6 +849,7 @@ impl BasicWindow for MessageWindow {
 
         for (message, _message_type, timestamp) in self.messages.iter().rev().take(20) {
             self.draw_text(&format!("{}: {}", timestamp, message), 1, y, context);
+            y -= 1;
         }
     }
 }
