@@ -48,6 +48,8 @@ pub use saving::{GameLoader, GameSaver};
 pub mod levelling;
 pub use levelling::*;
 
+use chrono::Local;
+
 use std::sync::atomic::{AtomicU64, Ordering};
 
 // starts at two to reserve one for the player.
@@ -124,7 +126,7 @@ impl GameState {
             GameUpdate::Message {
                 message: "Welcome to the World of Mufra!".to_string(),
                 message_type: MessageType::System,
-                timestamp: "07:12:45".to_string(),
+                timestamp: Local::now().format("%T").to_string(),
             },
         );
 
