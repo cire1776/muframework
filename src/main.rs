@@ -3,6 +3,7 @@ rltk::add_wasm_support!();
 extern crate muframework;
 use bracket_lib::prelude::*;
 use muframework::*;
+use std::env;
 use std::sync::mpsc;
 use std::thread;
 use ui::window::BasicWindow;
@@ -12,11 +13,29 @@ fn main() -> BError {
     let (update_tx, update_rx) = mpsc::channel();
     let (command_tx, command_rx) = mpsc::channel();
 
+    let args: Vec<String> = env::args().collect();
+    let auto_save_enabled = args.iter().find(|a| &a[..] == "--no-save").is_none();
     let cloned_command_tx = command_tx.clone();
+    let cloned_update_tx = update_tx.clone();
+    let _game_handle = thread::spawn(move || {
+        game::GameState::game_loop(
+            auto_save_enabled,
+            cloned_update_tx,
+            command_rx,
+            cloned_command_tx,
+        );
+    });
 
-    let _game_handle =
-        thread::spawn(move || game::GameState::game_loop(update_tx, command_rx, cloned_command_tx));
-
+    if !auto_save_enabled {
+        GameUpdate::send(
+            Some(&update_tx),
+            GameUpdate::Message {
+                message: "Autosave disabled".to_string(),
+                message_type: MessageType::System,
+                timestamp: "".to_string(),
+            },
+        );
+    }
     let width = 84;
     let height = 60;
 

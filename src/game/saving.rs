@@ -97,7 +97,7 @@ impl GameSaver {
     }
 
     pub fn save_file_name<S: ToString>(level: S) -> String {
-        use chrono::{Datelike, Local, Timelike};
+        use chrono::{Datelike, Timelike};
 
         let now = Local::now();
 

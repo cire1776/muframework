@@ -17,6 +17,7 @@ pub fn initialize_game_system() -> (
     ItemList,
     FacilityList,
     InventoryList,
+    GameData,
     Rng,
     Timer,
     Sender<GameUpdate>,
@@ -50,6 +51,9 @@ pub fn initialize_game_system() -> (
 
     timer.set_test_mode();
 
+    let mut game_data = GameData::new();
+    game_data.auto_save_enabled = false;
+
     (
         player,
         map,
@@ -59,6 +63,7 @@ pub fn initialize_game_system() -> (
         items,
         facilities,
         inventories,
+        game_data,
         rng,
         timer,
         update_tx,
@@ -81,6 +86,7 @@ pub fn initialize_game_system_with_player_at(
     ItemList,
     FacilityList,
     InventoryList,
+    GameData,
     Rng,
     Timer,
     Sender<GameUpdate>,
@@ -98,6 +104,7 @@ pub fn initialize_game_system_with_player_at(
         items,
         facilities,
         mut inventories,
+        game_data,
         rng,
         timer,
         update_tx,
@@ -125,6 +132,7 @@ pub fn initialize_game_system_with_player_at(
         items,
         facilities,
         inventories,
+        game_data,
         rng,
         timer,
         update_tx,

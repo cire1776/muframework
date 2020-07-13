@@ -67,6 +67,18 @@ pub fn NEXT_ITEM_ID() -> u64 {
     GLOBAL_NEXT_ITEM_ID.fetch_add(1, Ordering::SeqCst)
 }
 
+pub struct GameData {
+    pub auto_save_enabled: bool,
+}
+
+impl GameData {
+    pub fn new() -> Self {
+        Self {
+            auto_save_enabled: true,
+        }
+    }
+}
+
 pub struct GameState {
     ticks: u128,
 }
@@ -77,6 +89,7 @@ impl GameState {
     }
 
     pub fn game_loop(
+        auto_save_enabled: bool,
         update_tx: GameUpdateSender,
         command_rx: std::sync::mpsc::Receiver<Command>,
         command_tx: CommandSender,
@@ -132,6 +145,9 @@ impl GameState {
 
         let mut alarms_set = false;
 
+        let mut game_data = GameData::new();
+        game_data.auto_save_enabled = auto_save_enabled;
+
         loop {
             if timer.current_tick() != 0 && !alarms_set {
                 Self::setup_alarms(&mut timer);
@@ -167,6 +183,7 @@ impl GameState {
                     &mut items,
                     &mut facilities,
                     &mut inventories,
+                    &mut game_data,
                     &mut rng,
                     &mut timer,
                     activity,
@@ -314,6 +331,7 @@ impl GameState {
         items: &mut ItemList,
         facilities: &mut FacilityList,
         inventories: &mut InventoryList,
+        game_data: &mut GameData,
         rng: &mut Rng,
         timer: &mut Timer,
         activity: Option<Box<dyn Activity>>,
@@ -327,6 +345,9 @@ impl GameState {
         match command {
             Command::LoadGame => activity,
             Command::SaveGame => {
+                if !game_data.auto_save_enabled {
+                    return activity;
+                }
                 let save_data = GameSaver::save_game_to_string(
                     player,
                     characters,

@@ -7,7 +7,7 @@ lazy_static! {
     static ref COOKING_RECIPES: HashMap<FishType, Recipe> = {
         let mut m = HashMap::new();
         m.insert(Shrimp, Recipe::new("Grilled Shrimp", 1, 65, 9, 3, 1));
-        m.insert(Frog, Recipe::new("Fried Frog Leg", 2, 75, 9, 3, 2));
+        m.insert(Frog, Recipe::new("Fried Frog Arm", 2, 75, 9, 3, 2));
         m.insert(Mackeral, Recipe::new("Cooked Mackeral", 3, 75, 14, 4, 2));
         m.insert(Crab, Recipe::new("Crab Legs", 5, 45, 23, 8, 3));
         m.insert(Catfish, Recipe::new("Grilled Catfish", 7, 75, 8, 5, 2));

@@ -115,6 +115,8 @@ fn opening_external_inventory() {
     let mut game_state = GameState::new();
     game_state.teleport_player(8, 7, &mut player, &mut obstacles, &inventories, None, None);
 
+    let mut game_data = GameData::new();
+
     // set facing to avoid change facing update
     player.facing = Direction::Left;
 
@@ -127,6 +129,7 @@ fn opening_external_inventory() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -195,6 +198,7 @@ fn game_state_closing_external_inventory() {
         mut inventories,
         mut timer,
     ) = game::GameState::initialize_game("maps/test.map", None, None);
+    let mut game_data = GameData::new();
 
     let mut rng = Rng::new();
 
@@ -207,6 +211,7 @@ fn game_state_closing_external_inventory() {
         &mut items,
         &mut facilities,
         &mut inventories,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
