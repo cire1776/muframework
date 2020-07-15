@@ -794,6 +794,100 @@ fn filling_from_oil_well_gains_10_xp() {
 }
 
 #[test]
+fn filling_from_oil_well_aborts_when_last_bottle_used() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut game_data,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        command_tx,
+        mut command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(15, 12);
+
+    player.endorse_with(":can_fill");
+
+    consume_all_supplies_from_inventory(
+        Material,
+        "Glass Bottle",
+        &player,
+        &mut inventories,
+        &mut items,
+    );
+
+    equip_player_with_spawned_item(
+        Material,
+        "Glass Bottle",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let mut activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    assert!(activity.is_some());
+
+    activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert!(activity.is_some());
+
+    assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Alchemy, 10, &mut update_rx);
+    assert_activity_started(45000, ui::PaneTitle::Filling, &mut update_rx);
+    assert_updates_are_empty(&mut update_rx);
+    assert_is_spawning_item(
+        player.inventory_id(),
+        Material,
+        "Bottle of Oil",
+        &mut command_rx,
+    );
+    assert_is_activity_abort(&mut command_rx);
+    assert_is_refresh_inventory(&mut command_rx);
+    assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
 fn level_1_cannot_dig_a_level_2_well() {
     let (
         mut player,

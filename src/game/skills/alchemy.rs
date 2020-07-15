@@ -5,8 +5,8 @@ use ItemClass::*;
 pub struct AlchemyFillingSkill {}
 
 impl AlchemyFillingSkill {
-    pub fn can_produce(_player: &Player, facility: &Facility) -> bool {
-        facility.get_property("fluid") == Oil as i128
+    pub fn can_produce(player: &Player, facility: &Facility) -> bool {
+        facility.get_property("fluid") == Oil as i128 && player.is_endorsed_with(":can_fill")
     }
 
     pub fn expiration(player: &Player) -> u32 {
