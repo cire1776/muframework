@@ -1,39 +1,6 @@
 use super::*;
 use WellType::*;
 
-#[allow(dead_code)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum WellType {
-    Dry = 0,
-    Water,
-    Oil,
-    Bedrock = 255,
-}
-
-impl ToString for WellType {
-    fn to_string(&self) -> String {
-        match self {
-            Dry => "Dry",
-            Water => "Water",
-            Oil => "Oil",
-            Bedrock => "Bedrock",
-        }
-        .to_string()
-    }
-}
-
-impl WellType {
-    pub fn from(value: i128) -> WellType {
-        match value {
-            0 => Dry,
-            1 => Water,
-            2 => Oil,
-            255 => Bedrock,
-            _ => panic!("unknown well type"),
-        }
-    }
-}
-
 pub struct ActivateWellFillCommand<'a> {
     player: &'a mut Player,
     facility_id: u64,
@@ -49,13 +16,11 @@ impl<'a> ActivateWellFillCommand<'a> {
         }
     }
 
-    pub fn has_fluid(facility: &Facility) -> bool {
-        facility.get_property("fluid") == Water as i128
-            || facility.get_property("fluid") == Oil as i128
-    }
-
     pub fn can_perform(player: &Player, facility: &Facility) -> bool {
-        !facility.is_in_use() && Self::has_fluid(&facility) && player.is_endorsed_with(":can_fill")
+        !facility.is_in_use()
+            && (CookingFillingSkill::can_produce(player, facility)
+                || AlchemyFillingSkill::can_produce(player, facility))
+            && player.is_endorsed_with(":can_fill")
     }
 }
 
@@ -65,9 +30,7 @@ impl<'a> CommandHandler<'a> for ActivateWellFillCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        (30 + self
-            .player
-            .get_attribute(Attribute::SkillTime(Engineering), 0)) as u32
+        CookingFillingSkill::expiration(self.player)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
@@ -135,32 +98,28 @@ impl Activity for WellFillActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _game_data: &mut GameData,
-        _rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        rng: &mut Rng,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        let inventory = inventories
-            .get_mut(&player.inventory_id())
-            .expect("unable to find inventory");
-
-        if !inventory.any_left_after_consuming(ItemClass::Material, "Glass Bottle", 1, items) {
-            Command::send(Some(command_sender.clone()), Command::ActivityAbort);
-        }
-
-        let fluid = WellType::from(facility.get_property("fluid")).to_string();
+        let (class, description) = if CookingFillingSkill::can_produce(player, facility) {
+            CookingFillingSkill::consume_from_inventory_for(player, inventories, items);
+            CookingFillingSkill::produce_results_for(player, facility, rng, Some(&update_sender))
+        } else {
+            AlchemyFillingSkill::consume_from_inventory_for(player, inventories, items);
+            AlchemyFillingSkill::produce_results_for(player, facility, rng, Some(&update_sender))
+        };
 
         Command::send(
-            Some(command_sender),
-            Command::SpawnItem(
-                player.inventory_id(),
-                if fluid == "Water" {
-                    ItemClass::Ingredient
-                } else {
-                    ItemClass::Material
-                },
-                format!("Bottle of {}", fluid),
-            ),
+            Some(command_sender.clone()),
+            Command::SpawnItem(player.inventory_id(), class, description),
         );
+
+        if !CookingFillingSkill::can_produce(player, facility)
+            && !AlchemyFillingSkill::can_produce(player, facility)
+        {
+            Command::send(Some(command_sender), Command::ActivityAbort);
+        }
 
         RefreshInventoryFlag::RefreshInventory
     }

@@ -1,5 +1,5 @@
 use super::*;
-use game::command::facility_commands::well_commands::WellType;
+use game::skills::WellType;
 pub enum EngineeringSkill {}
 
 impl EngineeringSkill {

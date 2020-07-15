@@ -487,6 +487,7 @@ fn can_fill_from_water_well() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ingredient, "Bottle of Water", &mut command_rx);
+    assert_is_activity_abort(&mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
@@ -575,6 +576,7 @@ fn can_fill_from_oil_well() {
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Material, "Bottle of Oil", &mut command_rx);
+    assert_is_activity_abort(&mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }

@@ -2,6 +2,7 @@ use super::*;
 use game::command::facility_commands::fishing_spot_commands::FishType;
 use FishType::*;
 use ItemClass::*;
+use WellType::*;
 
 lazy_static! {
     static ref COOKING_RECIPES: HashMap<FishType, Recipe> = {
@@ -176,5 +177,81 @@ impl CookingFishSkill {
             player.increment_xp(Cooking, recipe.xp_on_failure as u64, rng, update_tx);
             (Material, format!("Burnt {}", product.to_string()))
         }
+    }
+}
+#[allow(dead_code)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum WellType {
+    Dry = 0,
+    Water,
+    Oil,
+    Bedrock = 255,
+}
+
+impl ToString for WellType {
+    fn to_string(&self) -> String {
+        match self {
+            Dry => "Dry",
+            Water => "Water",
+            Oil => "Oil",
+            Bedrock => "Bedrock",
+        }
+        .to_string()
+    }
+}
+
+impl WellType {
+    pub fn from(value: i128) -> WellType {
+        match value {
+            0 => Dry,
+            1 => Water,
+            2 => Oil,
+            255 => Bedrock,
+            _ => panic!("unknown well type"),
+        }
+    }
+}
+
+pub struct CookingFillingSkill {}
+
+impl CookingFillingSkill {
+    pub fn can_produce(_player: &Player, facility: &Facility) -> bool {
+        let fluid = facility.get_property("fluid");
+        fluid == Water as i128
+    }
+
+    pub fn expiration(player: &Player) -> u32 {
+        (30 + player.get_attribute(Attribute::SkillTime(Cooking), 0)) as u32
+    }
+
+    pub fn consume_from_inventory_for(
+        player: &mut Player,
+        inventories: &mut InventoryList,
+        items: &mut ItemList,
+    ) {
+        let inventory = inventories
+            .get_mut(&player.inventory_id())
+            .expect("unable to find inventory");
+
+        if !inventory.has_sufficient(Material, "Glass Bottle", 1) {
+            let item =
+                player
+                    .mounting_points
+                    .unmount(&vec![&MountingPoint::AtReady], inventory, items);
+            if let Some(item) = item {
+                item.has_been_unequipped(player);
+            }
+        }
+
+        inventory.consume(Material, "Glass Bottle", 1, items);
+    }
+
+    pub fn produce_results_for(
+        _player: &mut Player,
+        _facility: &mut Facility,
+        _rng: &mut Rng,
+        _update_tx: Option<&GameUpdateSender>,
+    ) -> (ItemClass, String) {
+        (Ingredient, "Bottle of Water".into())
     }
 }
