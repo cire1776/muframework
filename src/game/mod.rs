@@ -69,12 +69,14 @@ pub fn NEXT_ITEM_ID() -> u64 {
 
 pub struct GameData {
     pub auto_save_enabled: bool,
+    pub current_tick: u128,
 }
 
 impl GameData {
     pub fn new() -> Self {
         Self {
             auto_save_enabled: true,
+            current_tick: 0,
         }
     }
 }
@@ -153,6 +155,8 @@ impl GameState {
                 Self::setup_alarms(&mut timer);
                 alarms_set = true;
             }
+
+            game_data.current_tick = game_state.ticks;
 
             let command = command_rx.recv();
             let mut rng = random::Rng::new();
