@@ -508,6 +508,60 @@ fn can_pick_olive_tree() {
 }
 
 #[test]
+fn cannot_chop_an_empty_tree() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut game_data,
+        mut rng,
+        mut timer,
+        update_tx,
+        mut update_rx,
+        _command_tx,
+        mut command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(10, 8);
+
+    player.endorse_with(":can_chop");
+
+    // set facing to avoid change facing update
+    player.facing = Direction::Left;
+
+    let tree = get_facility_at(9, 8, &map, &mut facilities);
+
+    tree.set_property("logs", 0);
+
+    let activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Left, MoveCommandMode::Use),
+        Some(&update_tx),
+        None,
+    );
+
+    assert!(activity.is_none());
+
+    assert_updates_are_empty(&mut update_rx);
+    assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
 fn player_earns_10_xp_harvesting_for_picking_an_apple() {
     let (
         mut player,

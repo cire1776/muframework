@@ -5,6 +5,10 @@ use ItemClass::*;
 pub struct LoggingSkill {}
 
 impl LoggingSkill {
+    pub fn can_produce(player: &Player, facility: &Facility) -> bool {
+        player.is_endorsed_with(":can_chop") && facility.get_property("logs") > 0
+    }
+
     pub fn expiration(_product: TreeType, player: &Player) -> u32 {
         (60 + player.get_attribute(Attribute::SkillTime(Logging), 0)) as u32
     }

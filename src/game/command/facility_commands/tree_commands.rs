@@ -208,7 +208,7 @@ impl<'a> ActivateTreeLoggingCommand<'a> {
     }
 
     pub fn can_perform(player: &Player, facility: &Facility) -> bool {
-        !facility.is_in_use() && player.is_endorsed_with(":can_chop")
+        !facility.is_in_use() && LoggingSkill::can_produce(player, facility)
     }
 }
 
