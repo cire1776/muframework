@@ -2,14 +2,29 @@ use super::*;
 use WellType::*;
 
 pub struct ActivateWellFillCommand<'a> {
+    product: WellType,
     player: &'a mut Player,
     facility_id: u64,
     timer: &'a mut Timer,
 }
 
 impl<'a> ActivateWellFillCommand<'a> {
-    pub fn new(player: &'a mut Player, facility_id: u64, timer: &'a mut Timer) -> Self {
+    pub fn new(
+        player: &'a mut Player,
+        facility_id: u64,
+        facilities: &FacilityList,
+        timer: &'a mut Timer,
+    ) -> Self {
+        let facility = facilities.get(facility_id).expect("unable to get well");
+
+        let well_type = if CookingFillingSkill::can_produce(player, facility) {
+            Water
+        } else {
+            Oil
+        };
+
         Self {
+            product: well_type,
             player,
             facility_id,
             timer,
@@ -30,7 +45,11 @@ impl<'a> CommandHandler<'a> for ActivateWellFillCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        CookingFillingSkill::expiration(self.player)
+        if self.product == Water {
+            CookingFillingSkill::expiration(self.player)
+        } else {
+            AlchemyFillingSkill::expiration(self.player)
+        }
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {

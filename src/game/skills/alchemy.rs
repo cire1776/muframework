@@ -10,7 +10,7 @@ impl AlchemyFillingSkill {
     }
 
     pub fn expiration(player: &Player) -> u32 {
-        (30 + player.get_attribute(Attribute::SkillTime(Cooking), 0)) as u32
+        (45 + player.get_attribute(Attribute::SkillTime(Cooking), 0)) as u32
     }
 
     pub fn consume_from_inventory_for(

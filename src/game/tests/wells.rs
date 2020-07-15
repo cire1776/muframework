@@ -543,11 +543,11 @@ fn can_fill_from_oil_well() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
+        TagType::Duration(chrono::Duration::seconds(45))
     );
     assert!(activity.is_some());
 
-    assert_activity_started(30000, Filling, &mut update_rx);
+    assert_activity_started(45000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
 
@@ -573,7 +573,7 @@ fn can_fill_from_oil_well() {
 
     assert_activity_expired(&mut update_rx);
     assert_xp_is_updated(player.id, Alchemy, 10, &mut update_rx);
-    assert_activity_started(30000, Filling, &mut update_rx);
+    assert_activity_started(45000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Material, "Bottle of Oil", &mut command_rx);
@@ -768,10 +768,6 @@ fn filling_from_oil_well_gains_10_xp() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
-    );
     assert!(activity.is_some());
 
     activity = game_state.game_loop_iteration(

@@ -585,6 +585,7 @@ fn use_at<'a>(
                         Some(Box::new(ActivateWellFillCommand::new(
                             player,
                             facility_id,
+                            facilities,
                             timer,
                         )))
                     }
