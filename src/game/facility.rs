@@ -178,14 +178,16 @@ impl<'a> Facility {
 
     pub fn increment_property<S: ToString>(&mut self, property_name: S) -> i128 {
         let value = self.get_property(property_name.to_string());
-        self.set_property(property_name, value + 1);
-        value + 1
+        let new_value = value + 1;
+        self.set_property(property_name, new_value);
+        new_value
     }
 
     pub fn decrement_property<S: ToString>(&mut self, property_name: S) -> i128 {
         let value = self.get_property(property_name.to_string());
-        self.set_property(property_name, value - 1);
-        value - 1
+        let new_value = value - 1;
+        self.set_property(property_name, new_value);
+        new_value
     }
 
     pub fn setup_timers(&self, timer: &mut Timer) {
