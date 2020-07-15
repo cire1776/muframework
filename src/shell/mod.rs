@@ -1,0 +1,129 @@
+use muframework::Command;
+use std::io::prelude::*;
+use std::net::{SocketAddr, TcpListener, TcpStream};
+use std::sync::mpsc::*;
+
+pub fn shell_loop(command_tx: Sender<Command>) {
+    loop {
+        let addrs = [
+            SocketAddr::from(([192, 168, 1, 134], 7878)),
+            SocketAddr::from(([192, 168, 1, 134], 7879)),
+        ];
+        let listener = TcpListener::bind(&addrs[..]).unwrap();
+
+        println!(
+            "listening for telnet on: {:?}",
+            listener.local_addr().unwrap()
+        );
+        for stream in listener.incoming() {
+            let mut stream = stream.unwrap();
+
+            stream.write(&[0xff, 0xfd, 3]).unwrap();
+            let mut input = read_to_vector(&mut stream);
+
+            input.reverse();
+            while !input.is_empty() {
+                let char = input.pop().unwrap();
+                print!("{} ", char);
+                if char == 0 {
+                    break;
+                }
+            }
+            println!("");
+
+            stream
+                .write("Welcome to the Mufra Shell\r\nAuthorized Users Only!\r\n".as_bytes())
+                .unwrap();
+
+            loop {
+                if !handle_connection(&mut stream, command_tx.clone()) {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> bool {
+    let result = stream.write("\r\n> ".as_bytes());
+    if result.is_err() {
+        return false;
+    }
+    stream.flush().unwrap();
+
+    let mut input: String = "".to_string();
+    loop {
+        let char = read_from_stream(stream);
+        input += &char;
+        if char.len() != 1 || char == "\n" || char == "\r\n" {
+            break;
+        }
+        println!("{}", char);
+    }
+
+    let mut args: Vec<&str> = input.split_ascii_whitespace().rev().collect();
+    let command = args.pop();
+    if command.is_none() {
+        return true;
+    }
+
+    let mut response = "".to_string();
+
+    match command.unwrap() {
+        "exit" => return false,
+        "quit_game" => {
+            stream.write("Are you sure Y/n: ".as_bytes()).unwrap();
+
+            let reply = read_from_stream(stream);
+            if reply == "Y" {
+                Command::send(Some(command_tx), Command::QuitGame);
+            }
+        }
+        "save" => Command::send(Some(command_tx), Command::SaveGame),
+        "spawn_item" => {
+            response = "help: spawn_item inventory_id item_class \"description\"".to_string();
+            let inventory_id = args.pop();
+            if let Some(inventory_id) = inventory_id {
+                if let Some(inventory_id) = inventory_id.parse::<u64>().ok() {
+                    if let Some(class_name) = args.pop() {
+                        if let Ok(item_class) =
+                            muframework::game::items::ItemClass::from_name(class_name)
+                        {
+                            args.reverse();
+                            let description = args.join(" ").trim_matches('"').to_string();
+
+                            Command::send(
+                                Some(command_tx.clone()),
+                                Command::SpawnItem(inventory_id, item_class, description),
+                            );
+                            Command::send(Some(command_tx), Command::RefreshInventory);
+                            response = "Ok.".into();
+                        }
+                    }
+                }
+            };
+        }
+        _ => {
+            args.reverse();
+            response = format!("{} {:?}", command.unwrap(), args);
+        }
+    }
+
+    stream.write(response.as_bytes()).unwrap();
+
+    true
+}
+
+fn read_from_stream<'a>(stream: &mut TcpStream) -> String {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+
+    let input = String::from_utf8_lossy(&buffer[..]);
+    input.trim_matches('\0').trim().to_string()
+}
+
+fn read_to_vector(stream: &mut TcpStream) -> Vec<u8> {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+    buffer.to_vec()
+}

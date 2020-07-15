@@ -9,6 +9,8 @@ use std::thread;
 use ui::window::BasicWindow;
 use ui::UIState;
 
+mod shell;
+
 fn main() -> BError {
     let (update_tx, update_rx) = mpsc::channel();
     let (command_tx, command_rx) = mpsc::channel();
@@ -24,6 +26,19 @@ fn main() -> BError {
             command_rx,
             cloned_command_tx,
         );
+    });
+
+    let cloned_command_tx = command_tx.clone();
+
+    let _shell_handle = thread::spawn(move || loop {
+        let cloned_command_tx = cloned_command_tx.clone();
+        let handle = thread::spawn(move || {
+            shell::shell_loop(cloned_command_tx);
+        });
+
+        if handle.join().is_ok() {
+            break;
+        }
     });
 
     if !auto_save_enabled {
