@@ -66,6 +66,7 @@ pub enum Command {
     ChangeFacing(Direction),
     Teleport(u64, i32, i32),
     SpawnItem(u64, ItemClass, String), // (inventory_id, ItemClass, Description)
+    SpawnItems(u64, u8, ItemClass, String), // (inventory_id, quantity, ItemClass, Description)
     TakeItem(u64),                     // (item_index[not id])
     DropItem(u64),
     EquipItem(u64),

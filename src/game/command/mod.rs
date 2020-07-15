@@ -93,8 +93,9 @@ impl Command {
         }
     }
 
-    pub fn spawn_item(
+    pub fn spawn_items(
         inventory_id: u64,
+        quantity: u8,
         class: ItemClass,
         description: &String,
         inventories: &mut InventoryList,
@@ -106,7 +107,7 @@ impl Command {
             .get_mut(&inventory_id)
             .expect("unable to find inventory");
 
-        inventory.spawn_item(class, description, 1, items);
+        inventory.spawn_item(class, description, quantity, items);
     }
 
     pub fn pickup_item(

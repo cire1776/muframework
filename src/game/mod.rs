@@ -403,8 +403,22 @@ impl GameState {
                 // Command::teleport_character(*id, *new_x, *new_y, self, &update_tx);
             }
             Command::SpawnItem(inventory_id, class, description) => {
-                Command::spawn_item(
+                Command::spawn_items(
                     *inventory_id,
+                    1,
+                    *class,
+                    description,
+                    inventories,
+                    items,
+                    update_tx,
+                    command_tx,
+                );
+                activity
+            }
+            Command::SpawnItems(inventory_id, quantity, class, description) => {
+                Command::spawn_items(
+                    *inventory_id,
+                    *quantity,
                     *class,
                     description,
                     inventories,
