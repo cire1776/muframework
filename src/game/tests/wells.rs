@@ -483,11 +483,11 @@ fn can_fill_from_water_well() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Cooking, 5, &mut update_rx);
     assert_activity_started(30000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Ingredient, "Bottle of Water", &mut command_rx);
-    assert_is_activity_abort(&mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
@@ -572,11 +572,11 @@ fn can_fill_from_oil_well() {
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Alchemy, 10, &mut update_rx);
     assert_activity_started(30000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
     assert_is_spawning_item(player.id, Material, "Bottle of Oil", &mut command_rx);
-    assert_is_activity_abort(&mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
@@ -635,6 +635,166 @@ fn cannot_fill_from_dry_well() {
 
     assert_updates_are_empty(&mut update_rx);
     assert_commands_are_empty(&mut command_rx);
+}
+
+#[test]
+fn filling_from_water_well_gains_5_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut game_data,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(14, 12);
+
+    player.endorse_with(":can_fill");
+
+    let exp_xp = player.get_xp(Cooking) + 5;
+
+    equip_player_with_spawned_item(
+        Material,
+        "Glass Bottle",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let mut activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    assert_eq!(
+        timer.tags["ActivityComplete"],
+        TagType::Duration(chrono::Duration::seconds(30))
+    );
+    assert!(activity.is_some());
+
+    activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert!(activity.is_some());
+
+    assert_eq!(player.get_xp(Cooking), exp_xp)
+}
+
+#[test]
+fn filling_from_oil_well_gains_10_xp() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut game_data,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(15, 12);
+
+    player.endorse_with(":can_fill");
+
+    let exp_xp = player.get_xp(Alchemy) + 10;
+
+    equip_player_with_spawned_item(
+        Material,
+        "Glass Bottle",
+        &mut player,
+        &mut inventories,
+        &mut items,
+    );
+
+    let mut activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Up, MoveCommandMode::Use),
+        None,
+        None,
+    );
+
+    assert_eq!(
+        timer.tags["ActivityComplete"],
+        TagType::Duration(chrono::Duration::seconds(30))
+    );
+    assert!(activity.is_some());
+
+    activity = game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        activity,
+        &Command::ActivityComplete,
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    assert!(activity.is_some());
+
+    assert_eq!(player.get_xp(Alchemy), exp_xp)
 }
 
 #[test]

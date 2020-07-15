@@ -247,11 +247,12 @@ impl CookingFillingSkill {
     }
 
     pub fn produce_results_for(
-        _player: &mut Player,
+        player: &mut Player,
         _facility: &mut Facility,
-        _rng: &mut Rng,
-        _update_tx: Option<&GameUpdateSender>,
+        rng: &mut Rng,
+        update_tx: Option<&GameUpdateSender>,
     ) -> (ItemClass, String) {
+        player.increment_xp(Cooking, 5, rng, update_tx);
         (Ingredient, "Bottle of Water".into())
     }
 }
