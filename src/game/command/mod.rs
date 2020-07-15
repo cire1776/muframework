@@ -43,6 +43,7 @@ impl Command {
         item_types: &'a ItemTypeList,
         items: &'a mut ItemList,
         inventories: &'a mut InventoryList,
+        game_data: &'a mut GameData,
         timer: &'a mut Timer,
         activity: Option<Box<dyn Activity>>,
         update_tx: Option<&GameUpdateSender>,
@@ -67,6 +68,7 @@ impl Command {
                 item_types,
                 items,
                 inventories,
+                game_data,
                 timer,
                 activity,
             )
@@ -375,6 +377,7 @@ fn attempt_to_use<'a>(
     item_types: &'a ItemTypeList,
     items: &'a mut ItemList,
     inventories: &'a mut InventoryList,
+    game_data: &mut GameData,
     timer: &'a mut Timer,
     activity: Option<Box<dyn Activity>>,
 ) -> Option<Box<dyn CommandHandler<'a> + 'a>> {
@@ -392,6 +395,7 @@ fn attempt_to_use<'a>(
         facilities,
         items,
         inventories,
+        game_data,
     ) {
         use_at(
             mode,
@@ -424,6 +428,7 @@ fn can_use_at(
     facilities: &FacilityList,
     _items: &ItemList,
     inventories: &mut InventoryList,
+    game_data: &mut GameData,
 ) -> bool {
     match map.at(x, y) {
         tile_map::Tile::ClosedDoor | tile_map::Tile::OpenDoor => true,
@@ -463,7 +468,9 @@ fn can_use_at(
                     ActivateNetFishingCommand::can_perform(player, facility)
                         || ActivateFishingCommand::can_perform(player, facility)
                         || ActivatePlaceFishingTrapCommand::can_perform(player, facility)
-                        || ActivateCollectFishingTrapCommand::can_perform(player, facility)
+                        || ActivateCollectFishingTrapCommand::can_perform(
+                            player, facility, game_data,
+                        )
                 }
                 FacilityClass::Smeltery => OpenSmelteryCommand::can_perform(player, facility),
                 FacilityClass::Firepit => ActivateFirepitCommand::can_perform(player, facility),

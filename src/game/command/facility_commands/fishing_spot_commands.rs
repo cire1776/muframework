@@ -512,19 +512,13 @@ impl<'a> Activity for PlacingFishingTrapActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
-        _game_data: &mut GameData,
+        game_data: &mut GameData,
         _rng: &mut Rng,
         _update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        use std::time::{SystemTime, UNIX_EPOCH};
-
         let cooldown = self.fishing_spot_properties.trap_cooldown() as u128;
-        let expiration = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_millis()
-            + (cooldown * 1000);
+        let expiration = game_data.current_tick + (cooldown * 60);
 
         facility.set_property("trap_expiration", expiration as i128);
         facility.set_property("is_in_use", 1);
@@ -569,22 +563,15 @@ impl<'a> ActivateCollectFishingTrapCommand<'a> {
         }
     }
 
-    pub fn can_perform(_player: &Player, facility: &Facility) -> bool {
-        use std::time::{SystemTime, UNIX_EPOCH};
-
-        let expiration = facility.get_property("trap_expiration");
+    pub fn can_perform(_player: &Player, facility: &Facility, game_data: &mut GameData) -> bool {
+        let expiration = facility.get_property("trap_expiration") as u128;
 
         // check to make sure a trap has been placed
         if expiration == 0 {
             return false;
         }
 
-        SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_millis() as i128
-            - expiration
-            >= 0
+        game_data.current_tick >= expiration
     }
 }
 

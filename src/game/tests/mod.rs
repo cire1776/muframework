@@ -53,6 +53,7 @@ pub fn initialize_game_system() -> (
 
     let mut game_data = GameData::new();
     game_data.auto_save_enabled = false;
+    game_data.current_tick = 1776;
 
     (
         player,

@@ -390,6 +390,7 @@ impl GameState {
                 &items.item_types.clone(),
                 items,
                 inventories,
+                game_data,
                 timer,
                 activity,
                 update_tx,
