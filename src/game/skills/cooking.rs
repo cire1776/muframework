@@ -75,9 +75,9 @@ impl Recipe {
     }
 }
 
-pub struct CookingSkill {}
+pub struct CookingFishSkill {}
 
-impl CookingSkill {
+impl CookingFishSkill {
     pub fn can_produce(
         product: FishType,
         player: &Player,

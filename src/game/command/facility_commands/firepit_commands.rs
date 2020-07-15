@@ -44,7 +44,7 @@ impl<'a> CommandHandler<'a> for ActivateFirepitCommand<'a> {
     }
 
     fn expiration(&self) -> u32 {
-        CookingSkill::expiration(self.fish_type, self.player)
+        CookingFishSkill::expiration(self.fish_type, self.player)
     }
 
     fn create_activity(&self, guard: Guard) -> Option<Box<dyn Activity>> {
@@ -64,7 +64,7 @@ impl<'a> CommandHandler<'a> for ActivateFirepitCommand<'a> {
             .get(&self.player.id)
             .expect("unable to get inventory.");
 
-        if CookingSkill::can_produce(self.fish_type, self.player, inventory, self.items) {
+        if CookingFishSkill::can_produce(self.fish_type, self.player, inventory, self.items) {
             Some(Box::new(activity))
         } else {
             None
@@ -136,10 +136,10 @@ impl Activity for FirepitActivity {
         update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
-        CookingSkill::consume_from_inventory_for(self.fish_type, player, inventories, items);
+        CookingFishSkill::consume_from_inventory_for(self.fish_type, player, inventories, items);
 
         let (class, description) =
-            CookingSkill::produce_results_for(self.fish_type, player, rng, Some(update_sender));
+            CookingFishSkill::produce_results_for(self.fish_type, player, rng, Some(update_sender));
 
         Command::send(
             Some(command_sender.clone()),
@@ -149,7 +149,7 @@ impl Activity for FirepitActivity {
             .get(&player.inventory_id())
             .expect("unable to get player inventory.");
 
-        if !CookingSkill::can_produce(self.fish_type, player, inventory, items) {
+        if !CookingFishSkill::can_produce(self.fish_type, player, inventory, items) {
             Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
