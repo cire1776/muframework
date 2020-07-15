@@ -152,7 +152,7 @@ impl GameState {
 
         loop {
             if timer.current_tick() != 0 && !alarms_set {
-                Self::setup_alarms(&mut timer);
+                Self::setup_alarms(&mut timer, auto_save_enabled);
                 alarms_set = true;
             }
 
@@ -218,7 +218,7 @@ impl GameState {
         self.start_heartbeat(timer)
     }
 
-    fn setup_alarms(timer: &mut Timer) {
+    fn setup_alarms(timer: &mut Timer, auto_save_enabled: bool) {
         use chrono::Timelike;
 
         timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
@@ -234,12 +234,14 @@ impl GameState {
 
         println!("offset: {}", offset);
 
-        timer.repeating_by_tick_starting_at(
-            offset * 3600 as u128,
-            10 * 3600,
-            Command::SaveGame,
-            "Autosave",
-        );
+        if auto_save_enabled {
+            timer.repeating_by_tick_starting_at(
+                offset * 3600 as u128,
+                10 * 3600,
+                Command::SaveGame,
+                "Autosave",
+            );
+        }
     }
 
     /// public for testing purposes
@@ -349,9 +351,6 @@ impl GameState {
         match command {
             Command::LoadGame => activity,
             Command::SaveGame => {
-                if !game_data.auto_save_enabled {
-                    return activity;
-                }
                 let save_data = GameSaver::save_game_to_string(
                     player,
                     characters,
