@@ -36,24 +36,24 @@ impl ItemClass {
         }
     }
 
-    pub fn from_name<S: ToString>(name: S) -> ItemClass {
+    pub fn from_name<S: ToString>(name: S) -> Result<ItemClass, String> {
         match &name.to_string()[..] {
-            "bladeweapon" => BladeWeapon,
-            "dagger" => Dagger,
-            "shield" => Shield,
-            "softarmor" => SoftArmor,
-            "pants" => Pants,
-            "gloves" => Gloves,
-            "shoes" => Shoes,
-            "headwear" => Headwear,
-            "tool" => Tool,
-            "potion" => Potion,
-            "food" => Food,
-            "material" => Material,
-            "ingredient" => Ingredient,
-            "ore" => Ore,
-            "book" => Book,
-            _ => panic!("unknown item class"),
+            "bladeweapon" => Ok(BladeWeapon),
+            "dagger" => Ok(Dagger),
+            "shield" => Ok(Shield),
+            "softarmor" => Ok(SoftArmor),
+            "pants" => Ok(Pants),
+            "gloves" => Ok(Gloves),
+            "shoes" => Ok(Shoes),
+            "headwear" => Ok(Headwear),
+            "tool" => Ok(Tool),
+            "potion" => Ok(Potion),
+            "food" => Ok(Food),
+            "material" => Ok(Material),
+            "ingredient" => Ok(Ingredient),
+            "ore" => Ok(Ore),
+            "book" => Ok(Book),
+            _ => Err("Unknown item class".into()),
         }
     }
 
@@ -252,7 +252,7 @@ impl ItemType {
             let description = capture_string(&captures, 3);
             let attributes = capture_optional_string(&captures, 4).trim();
 
-            let class = ItemClass::from_name(class_name);
+            let class = ItemClass::from_name(class_name).expect("unknown item class");
 
             let mut new_type = ItemType::new(class, description);
 
