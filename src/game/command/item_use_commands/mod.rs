@@ -93,6 +93,7 @@ impl Activity for BookReadingActivity {
         _facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        _game_data: &mut GameData,
         rng: &mut Rng,
         update_sender: &GameUpdateSender,
         _command_sender: CommandSender,

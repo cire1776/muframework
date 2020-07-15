@@ -118,6 +118,7 @@ impl Activity for PatchActivity {
         facility: &mut Facility,
         _items: &mut ItemList,
         _inventories: &mut InventoryList,
+        _game_data: &mut GameData,
         rng: &mut Rng,
         update_sender: &GameUpdateSender,
         command_sender: CommandSender,

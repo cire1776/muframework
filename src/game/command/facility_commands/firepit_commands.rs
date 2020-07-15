@@ -131,6 +131,7 @@ impl Activity for FirepitActivity {
         _facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
+        _game_data: &mut GameData,
         rng: &mut Rng,
         update_sender: &GameUpdateSender,
         command_sender: CommandSender,
