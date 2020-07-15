@@ -305,7 +305,7 @@ impl<'a> Activity for TreeLoggingActivity {
             Command::SpawnItem(player.inventory_id(), class, description),
         );
 
-        if facility.decrement_property("logs") == 0 {
+        if facility.decrement_property("logs") <= 0 {
             Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
