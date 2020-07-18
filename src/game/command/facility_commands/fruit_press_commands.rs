@@ -258,13 +258,13 @@ impl Activity for FruitPressActivity {
 
     fn on_completion(
         &self,
-        _player: &mut Player,
+        player: &mut Player,
         facility: &mut Facility,
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _game_data: &mut GameData,
-        _rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        rng: &mut Rng,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         if facility.increment_property("output") == 10 {
@@ -279,6 +279,13 @@ impl Activity for FruitPressActivity {
             FruitType::Apple => "Apple",
             FruitType::Olive => "Olive",
         };
+
+        let xp_gain = match self.fruit_type {
+            FruitType::Apple => 5,
+            FruitType::Olive => 8,
+        };
+
+        player.increment_xp(Cooking, xp_gain, rng, Some(&update_sender));
 
         if !inventory.any_left_after_consuming(ItemClass::Food, fruit, 1, items) {
             Command::send(Some(command_sender), Command::ActivityAbort);
