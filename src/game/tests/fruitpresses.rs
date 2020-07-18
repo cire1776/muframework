@@ -653,6 +653,7 @@ fn can_fill_bottles_when_apple_juice_is_available_aborting_when_empty() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Cooking, 5, &mut update_rx);
     assert_activity_started(30000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -756,6 +757,7 @@ fn can_fill_bottles_when_olive_oil_is_available_aborting_when_empty() {
     );
 
     assert_activity_expired(&mut update_rx);
+    assert_xp_is_updated(player.id, Cooking, 8, &mut update_rx);
     assert_activity_started(30000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 

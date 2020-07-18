@@ -429,8 +429,8 @@ impl Activity for FruitPressFillActivity {
         items: &mut ItemList,
         inventories: &mut InventoryList,
         _game_data: &mut GameData,
-        _rng: &mut Rng,
-        _update_sender: &GameUpdateSender,
+        rng: &mut Rng,
+        update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
         let product = match self.fruit_type {
@@ -449,7 +449,14 @@ impl Activity for FruitPressFillActivity {
             Command::send(Some(command_sender.clone()), Command::ActivityAbort);
         }
 
-        if facility.decrement_property("output") == 0 {
+        let xp_gain = match self.fruit_type {
+            FruitType::Apple => 5,
+            FruitType::Olive => 8,
+        };
+
+        player.increment_xp(Cooking, xp_gain, rng, Some(&update_sender));
+
+        if facility.decrement_property("output") <= 0 {
             Command::send(Some(command_sender), Command::ActivityAbort);
         }
 
