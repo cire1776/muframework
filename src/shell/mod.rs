@@ -118,6 +118,39 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
                 }
             };
         }
+        "spawn_items" => {
+            response =
+                "help: spawn_items inventory_id quantity item_class \"description\"".to_string();
+            let inventory_id = args.pop();
+            if let Some(inventory_id) = inventory_id {
+                if let Some(inventory_id) = inventory_id.parse::<u64>().ok() {
+                    if let Some(quantity_str) = args.pop() {
+                        if let Some(quantity) = quantity_str.parse::<u8>().ok() {
+                            if let Some(class_name) = args.pop() {
+                                if let Ok(item_class) =
+                                    muframework::game::items::ItemClass::from_name(class_name)
+                                {
+                                    args.reverse();
+                                    let description = args.join(" ").trim_matches('"').to_string();
+
+                                    Command::send(
+                                        Some(command_tx.clone()),
+                                        Command::SpawnItems(
+                                            inventory_id,
+                                            quantity,
+                                            item_class,
+                                            description,
+                                        ),
+                                    );
+                                    Command::send(Some(command_tx), Command::RefreshInventory);
+                                    response = "Ok.".into();
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
         _ => {
             args.reverse();
             response = format!("{} {:?}", command.unwrap(), args);
