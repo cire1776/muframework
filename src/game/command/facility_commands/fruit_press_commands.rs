@@ -433,6 +433,11 @@ impl Activity for FruitPressFillActivity {
         update_sender: &GameUpdateSender,
         command_sender: CommandSender,
     ) -> RefreshInventoryFlag {
+        let class = match self.fruit_type {
+            FruitType::Apple => ItemClass::Food,
+            FruitType::Olive => ItemClass::Ingredient,
+        };
+
         let product = match self.fruit_type {
             FruitType::Apple => "Apple Juice",
             FruitType::Olive => "Olive Oil",
@@ -441,7 +446,7 @@ impl Activity for FruitPressFillActivity {
 
         Command::send(
             Some(command_sender.clone()),
-            Command::SpawnItem(1, ItemClass::Food, product),
+            Command::SpawnItem(1, class, product),
         );
 
         let inventory = inventories.get_mut(&player.inventory_id()).unwrap();

@@ -761,7 +761,12 @@ fn can_fill_bottles_when_olive_oil_is_available_aborting_when_empty() {
     assert_activity_started(30000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
-    assert_is_spawning_item(player.inventory_id(), Food, "Olive Oil", &mut command_rx);
+    assert_is_spawning_item(
+        player.inventory_id(),
+        Ingredient,
+        "Olive Oil",
+        &mut command_rx,
+    );
     assert_is_activity_abort(&mut command_rx);
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
