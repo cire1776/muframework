@@ -166,6 +166,7 @@ impl GameLoader {
         filename: S,
         map: &mut TileMap,
         game_state: &mut GameState,
+        timer: &mut Timer,
         update_tx: Option<&GameUpdateSender>,
     ) -> (
         Player,
@@ -181,6 +182,10 @@ impl GameLoader {
 
         let mut obstacles = BlockingMap::new();
         obstacles.refresh(&map);
+
+        for (_, facility) in new_facilities.iter() {
+            facility.reawaken(timer)
+        }
 
         Level::introduce(
             &new_player,

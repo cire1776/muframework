@@ -190,6 +190,9 @@ impl<'a> Facility {
         new_value
     }
 
+    pub fn reawaken(&self, timer: &mut Timer) {
+        self.setup_timers(timer)
+    }
     pub fn setup_timers(&self, timer: &mut Timer) {
         match self.class {
             FacilityClass::AppleTree

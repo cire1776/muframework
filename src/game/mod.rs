@@ -123,7 +123,7 @@ impl GameState {
                 new_items,
                 new_facilities,
                 new_inventories,
-            ) = GameLoader::load_game(filename, &mut map, game_state, Some(&update_tx));
+            ) = GameLoader::load_game(filename, &mut map, game_state, &mut timer, Some(&update_tx));
 
             player = new_player;
             obstacles = new_obstacles;
@@ -169,7 +169,13 @@ impl GameState {
                     new_items,
                     new_facilities,
                     new_inventories,
-                ) = GameLoader::load_game("level1.sav", &mut map, game_state, Some(&update_tx));
+                ) = GameLoader::load_game(
+                    "level1.sav",
+                    &mut map,
+                    game_state,
+                    &mut timer,
+                    Some(&update_tx),
+                );
 
                 player = new_player;
                 obstacles = new_obstacles;
