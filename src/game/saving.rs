@@ -14,7 +14,7 @@ impl GameSaver {
         use ron::ser::*;
 
         let mut save_text = format!(
-            "tick => {}\nNEXT_ITEM_ID => {:?}\nNEXT_ID => {:?}\n===END OF SERVERDATA===\n",
+            "tick => {}\nNEXT_ITEM_ID => {:?}\nNEXT_ID => {:?}\n===END OF SERVERDATA===\r?\n",
             game_state.ticks, GLOBAL_NEXT_ITEM_ID, GLOBAL_NEXT_ID,
         );
 
@@ -25,7 +25,7 @@ impl GameSaver {
             }
             Ok(text) => text,
         };
-        save_text += "\n===END OF PLAYERS===\n";
+        save_text += "\n===END OF PLAYERS===\r?\n";
 
         save_text += &match ron::ser::to_string_pretty(&characters, PrettyConfig::new()) {
             Err(error) => {
@@ -35,7 +35,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF CHARACTERS===\n===END OF ITEM TYPES===\n";
+        save_text += "\n===END OF CHARACTERS===\r?\n===END OF ITEM TYPES===\r?\n";
 
         save_text += &match ron::ser::to_string_pretty(&inventories, PrettyConfig::new()) {
             Err(error) => {
@@ -45,7 +45,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF INVENTORIES===\n";
+        save_text += "\n===END OF INVENTORIES===\r?\n";
 
         let bundled_items = items.bundled_items();
 
@@ -57,7 +57,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF ITEMS===\n";
+        save_text += "\n===END OF ITEMS===\r?\n";
 
         save_text += &match ron::ser::to_string_pretty(&facilities, PrettyConfig::new()) {
             Err(error) => {
@@ -67,7 +67,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF FACILITIES===\n";
+        save_text += "\n===END OF FACILITIES===\r?\n";
 
         let stored_items = items.stored_items();
 
@@ -79,7 +79,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF STORED ITEMS===\n";
+        save_text += "\n===END OF STORED ITEMS===\r?\n";
 
         let equipped_items = items.equipped_items();
 
@@ -91,7 +91,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF EQUIPPED ITEMS===\n";
+        save_text += "\n===END OF EQUIPPED ITEMS===\r?\n";
 
         save_text
     }
@@ -207,7 +207,7 @@ impl GameLoader {
         game_state: &mut GameState,
         save_data: String,
     ) -> (Player, CharacterList, ItemList, FacilityList, InventoryList) {
-        let re = regex::Regex::new("(?sm)(.+)===END OF SERVERDATA===\n(.+)===END OF PLAYERS===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEM TYPES===\n(.+)===END OF INVENTORIES===\n(.+)===END OF ITEMS===\n(.+)===END OF FACILITIES===\n(.+)===END OF STORED ITEMS===\n(.+)===END OF EQUIPPED ITEMS===\n").expect("unable to parse regex.");
+        let re = regex::Regex::new("(?sm)(.+)===END OF SERVERDATA===\r?\n(.+)===END OF PLAYERS===\r?\n(.+)===END OF CHARACTERS===\r?\n(.*)===END OF ITEM TYPES===\r?\n(.+)===END OF INVENTORIES===\r?\n(.+)===END OF ITEMS===\r?\n(.+)===END OF FACILITIES===\r?\n(.+)===END OF STORED ITEMS===\r?\n(.+)===END OF EQUIPPED ITEMS===\r?\n").expect("unable to parse regex.");
 
         let captures = re.captures(&save_data).expect("unable to form captures.");
 
@@ -275,7 +275,7 @@ impl GameLoader {
         use std::path::Path;
 
         // Create a path to the desired file
-        let path = Path::new("saves").join(&filename.to_string());
+        let path = Path::new("saves").join(&(filename.to_string()));
         let display = path.display();
 
         // Open the path in read-only mode, returns `io::Result<File>`
@@ -285,11 +285,11 @@ impl GameLoader {
         };
 
         // Read the file contents into a string, returns `io::Result<usize>`
-        let mut s = String::new();
-        match file.read_to_string(&mut s) {
+        let mut string = String::new();
+        match file.read_to_string(&mut string) {
             Err(why) => panic!("couldn't read {}: {}", display, why),
             Ok(_) => {}
         }
-        s
+        string
     }
 }

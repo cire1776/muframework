@@ -106,10 +106,13 @@ impl TileMap {
         Vec<String>,
         Vec<String>,
     ) {
-        let contents = fs::read_to_string(filename.to_string()).expect("unable to read level file");
+        use std::path::Path;
+        let path = Path::new("").join(filename.to_string());
+        println!("{}",path.to_string_lossy().clone()) ;
+        let contents = fs::read_to_string(path).expect(&format!("unable to read level file"));
 
         let re = Regex::new(
-            r"(?s)(.+)===END OF MAP===\n(.+)===END OF REALMS===\n(.+)===END OF CHARACTERS===\n(.*)===END OF ITEM TYPES===\n(.*)===END OF ITEMS===\n(.*)===END OF FACILITIES===\n(.*)===END OF STORED ITEMS===",
+            r"(?s)(.+)===END OF MAP===\r?\n(.+)===END OF REALMS===\r?\n(.+)===END OF CHARACTERS===\r?\n(.*)===END OF ITEM TYPES===\r?\n(.*)===END OF ITEMS===\r?\n(.*)===END OF FACILITIES===\r?\n(.*)===END OF STORED ITEMS===",
         )
         .expect("unable to initialize regex");
 
