@@ -14,7 +14,7 @@ impl GameSaver {
         use ron::ser::*;
 
         let mut save_text = format!(
-            "tick => {}\nNEXT_ITEM_ID => {:?}\nNEXT_ID => {:?}\n===END OF SERVERDATA===\r?\n",
+            "tick => {}\nNEXT_ITEM_ID => {:?}\nNEXT_ID => {:?}\n===END OF SERVERDATA===\n",
             game_state.ticks, GLOBAL_NEXT_ITEM_ID, GLOBAL_NEXT_ID,
         );
 
@@ -25,7 +25,7 @@ impl GameSaver {
             }
             Ok(text) => text,
         };
-        save_text += "\n===END OF PLAYERS===\r?\n";
+        save_text += "\n===END OF PLAYERS===\n";
 
         save_text += &match ron::ser::to_string_pretty(&characters, PrettyConfig::new()) {
             Err(error) => {
@@ -35,7 +35,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF CHARACTERS===\r?\n===END OF ITEM TYPES===\r?\n";
+        save_text += "\n===END OF CHARACTERS===\n===END OF ITEM TYPES===\n";
 
         save_text += &match ron::ser::to_string_pretty(&inventories, PrettyConfig::new()) {
             Err(error) => {
@@ -45,7 +45,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF INVENTORIES===\r?\n";
+        save_text += "\n===END OF INVENTORIES===\n";
 
         let bundled_items = items.bundled_items();
 
@@ -57,7 +57,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF ITEMS===\r?\n";
+        save_text += "\n===END OF ITEMS===\n";
 
         save_text += &match ron::ser::to_string_pretty(&facilities, PrettyConfig::new()) {
             Err(error) => {
@@ -67,7 +67,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF FACILITIES===\r?\n";
+        save_text += "\n===END OF FACILITIES===\n";
 
         let stored_items = items.stored_items();
 
@@ -79,7 +79,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF STORED ITEMS===\r?\n";
+        save_text += "\n===END OF STORED ITEMS===\n";
 
         let equipped_items = items.equipped_items();
 
@@ -91,7 +91,7 @@ impl GameSaver {
             Ok(text) => text,
         };
 
-        save_text += "\n===END OF EQUIPPED ITEMS===\r?\n";
+        save_text += "\n===END OF EQUIPPED ITEMS===\n";
 
         save_text
     }
