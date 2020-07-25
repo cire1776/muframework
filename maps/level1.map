@@ -111,7 +111,7 @@ S 28,23 // spider at 28,23
     property: output => 0
 }
 *lumbermill 12,11 "A Rickety Lumbermill"{
-    property: chance_of_breakage => 1000
+    property: chance_of_breakage => 10000
 }
 ▼well 13, 11 "A dry well" {
     property: fluid => 0
