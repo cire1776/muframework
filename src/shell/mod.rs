@@ -5,25 +5,22 @@ use std::sync::mpsc::*;
 
 pub fn shell_loop(command_tx: Sender<Command>) {
     loop {
-        #[cfg(target_os="windows")]
+        #[cfg(target_os = "windows")]
         let addrs = [
             SocketAddr::from(([127, 0, 0, 1], 7878)),
             SocketAddr::from(([127, 0, 9, 1], 7879)),
         ];
-        #[cfg(target_os="linux")]
+        #[cfg(target_os = "linux")]
         let addrs = [
             SocketAddr::from(([127, 0, 0, 1], 7878)),
             SocketAddr::from(([127, 0, 9, 1], 7879)),
         ];
-        #[cfg(target_os="macos")]
+        #[cfg(target_os = "macos")]
         let addrs = [
             SocketAddr::from(([192, 168, 1, 134], 7878)),
             SocketAddr::from(([192, 168, 1, 134], 7879)),
         ];
 
-
-
-        
         let listener = TcpListener::bind(&addrs[..]).unwrap();
 
         println!(
