@@ -111,6 +111,42 @@ impl<'a> Facility {
         }
     }
 
+    pub fn new_with_properties<T, U>(
+        id: T,
+        x: U,
+        y: U,
+        class: FacilityClass,
+        description: String,
+        properties: String,
+        inventories: &'a mut InventoryList,
+    ) -> Facility
+    where
+        T: TryInto<u64>,
+        U: TryInto<i32>,
+    {
+        let id = id.try_into().ok().expect("Must be able to convert to u64");
+        let mut inventory_id: Option<u64> = None;
+
+        if Facility::has_inventory(class) {
+            inventory_id = Some(Inventory::new_into_inventory_list(id, inventories).id());
+        }
+
+        let mut facility = Facility {
+            id,
+            x: x.try_into().ok().expect("Must be able to convert to i32"),
+            y: y.try_into().ok().expect("Must be able to convert to i32"),
+            class,
+            description,
+            inventory: inventory_id,
+            properties: None,
+            background_tile: tile_map::Tile::Empty,
+        };
+
+        Facility::read_in_facility_properties(&mut facility, &properties);
+
+        facility
+    }
+
     pub fn variant(&self) -> u8 {
         use FacilityClass::*;
 

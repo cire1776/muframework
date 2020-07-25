@@ -524,9 +524,16 @@ impl GameState {
                 Self::refresh_inventory(player, inventories, update_tx);
                 activity
             }
-            Command::SpawnFacility(x, y, class, description, _properties) => {
-                let mut facility =
-                    Facility::new(NEXT_ID(), *x, *y, *class, description.clone(), inventories);
+            Command::SpawnFacility(x, y, class, description, properties) => {
+                let mut facility = Facility::new_with_properties(
+                    NEXT_ID(),
+                    *x,
+                    *y,
+                    *class,
+                    description.clone(),
+                    properties.clone(),
+                    inventories,
+                );
                 facilities.add(facility.clone());
                 Level::introduce_facility(&mut facility, map, obstacles, update_tx);
                 activity
