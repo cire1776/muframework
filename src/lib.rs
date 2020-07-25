@@ -171,6 +171,17 @@ impl GameUpdate {
     }
 }
 
+pub fn send_system_message<S: ToString>(message: S, update_tx: Option<&GameUpdateSender>) {
+    GameUpdate::send(
+        update_tx,
+        GameUpdate::Message {
+            message: message.to_string(),
+            message_type: MessageType::System,
+            timestamp: chrono::Local::now().format("%T").to_string(),
+        },
+    );
+}
+
 pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
 pub type CommandSender = std::sync::mpsc::Sender<Command>;
 
