@@ -1,7 +1,6 @@
 use super::*;
 use extern_timer::*;
-use game::{command::CommandSender, Rng};
-
+use game::Rng;
 #[derive(Clone)]
 pub struct Guard {
     guard: Option<extern_timer::Guard>,

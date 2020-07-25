@@ -1,4 +1,4 @@
-use super::*;
+pub use super::*;
 use game::blocking_map::*;
 use random::Rng;
 use std::boxed::Box;

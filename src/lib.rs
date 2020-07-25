@@ -17,12 +17,14 @@ pub mod game;
 use game::character::CharacterType;
 use game::tile_map::TileMap;
 
-use game::facility::FacilityClass;
+pub use game::facility::FacilityClass;
 use game::{
     equipment::MountingPoint,
     items::{Item, ItemClass},
 };
 pub mod ui;
+
+use GameUpdate::*;
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone, Deserialize, Serialize)]
 pub enum Direction {
@@ -168,7 +170,9 @@ impl GameUpdate {
             .expect("unable to send update")
     }
 }
-use GameUpdate::*;
+
+pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
+pub type CommandSender = std::sync::mpsc::Sender<Command>;
 
 #[cfg(test)]
 pub mod test_support {

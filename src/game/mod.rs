@@ -10,7 +10,7 @@ pub mod random;
 pub use random::*;
 
 pub mod command;
-pub use command::{Activity, CommandHandler, CommandSender, GameUpdateSender};
+pub use command::{Activity, CommandHandler};
 
 pub mod attributes;
 pub use attributes::*;
