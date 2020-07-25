@@ -589,3 +589,139 @@ fn can_complete_a_large_construction_site() {
     assert_is_refresh_inventory(&mut command_rx);
     assert_commands_are_empty(&mut command_rx);
 }
+
+#[test]
+fn spawn_facility_creates_a_new_construction_site() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut game_data,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(3, 7);
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::SpawnFacility(
+            3,
+            7,
+            FacilityClass::ConstructionSite,
+            "A Small Construction Site".into(),
+            "property: size => 1".into(),
+        ),
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    let new_facility = get_facility_at(3, 7, &map, &mut facilities);
+
+    assert_eq!(new_facility.class, FacilityClass::ConstructionSite);
+    assert_eq!(new_facility.get_property("size"), 1);
+}
+
+#[test]
+fn spawn_facility_properly_blocks_at_new_facility() {
+    let (
+        mut player,
+        mut map,
+        mut obstacles,
+        mut characters,
+        mut item_class_specifiers,
+        mut items,
+        mut facilities,
+        mut inventories,
+        mut game_data,
+        mut rng,
+        mut timer,
+        update_tx,
+        _update_rx,
+        command_tx,
+        _command_rx,
+        mut game_state,
+    ) = initialize_game_system_with_player_at(3, 7);
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::SpawnFacility(
+            3,
+            7,
+            FacilityClass::ConstructionSite,
+            "A Small Construction Site".into(),
+            "property: size => 1".into(),
+        ),
+        Some(&update_tx),
+        Some(command_tx),
+    );
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Right, MoveCommandMode::Normal),
+        None,
+        None,
+    );
+
+    game_state.game_loop_iteration(
+        &mut player,
+        &mut map,
+        &mut obstacles,
+        &mut characters,
+        &mut item_class_specifiers,
+        &mut items,
+        &mut facilities,
+        &mut inventories,
+        &mut game_data,
+        &mut rng,
+        &mut timer,
+        None,
+        &Command::Move(Direction::Left, MoveCommandMode::Normal),
+        None,
+        None,
+    );
+
+    assert_eq!(player.x, 4);
+    assert_eq!(player.y, 7);
+}
