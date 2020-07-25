@@ -18,9 +18,7 @@ pub use facility_commands::*;
 
 pub mod item_use_commands;
 pub use item_use_commands::*;
-
-pub type GameUpdateSender = std::sync::mpsc::Sender<GameUpdate>;
-pub type CommandSender = std::sync::mpsc::Sender<Command>;
+use skills::ConstructionBuildSiteSkill;
 
 impl Command {
     pub fn send(command_tx: Option<CommandSender>, command: Command) {
@@ -288,6 +286,47 @@ impl Command {
     ) -> Option<Box<dyn Activity>> {
         let mut command = ActivateBookReadingCommand::new(player, items, timer);
         command.execute(update_tx, command_tx)
+    }
+
+    pub fn begin_construction_site<'a>(
+        x: i32,
+        y: i32,
+        player: &'a mut Player,
+        _facilities: &'a mut FacilityList,
+        _items: &'a mut ItemList,
+        inventories: &'a mut InventoryList,
+        _timer: &'a mut Timer,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
+        if ConstructionBuildSiteSkill::is_buildable_at(x, y) {
+            let inventory = inventories
+                .get(&player.inventory_id())
+                .expect("unable to get inventory");
+
+            let size = match ConstructionBuildSiteSkill::largest_size_of_construction_site_that_can_be_built(
+                inventory,
+            ) {
+                None => 0,
+                Some(size) => size,
+            };
+            let mut options = vec![
+                "Small Construction Site".to_string(),
+                "Medium Construction Site".to_string(),
+                "Large Construction Site".to_string(),
+            ];
+            options.truncate(size as usize);
+            if options.is_empty() {
+                send_system_message("Insufficient supplies to build any site.", update_tx);
+                return;
+            }
+
+            GameUpdate::send(
+                update_tx,
+                GameUpdate::DisplayOptions(options, ActionContinuation::ConstructionSite, 0),
+            );
+        } else {
+            send_system_message("Too close to another facility or site.", update_tx);
+        }
     }
 }
 

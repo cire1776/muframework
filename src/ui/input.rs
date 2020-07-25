@@ -189,6 +189,8 @@ impl UIState {
                         Command::SaveGame
                     }
                 }
+                VirtualKeyCode::B => Command::ConstructionSiteBegin,
+
                 _ => Command::None,
             },
         }

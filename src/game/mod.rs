@@ -524,6 +524,13 @@ impl GameState {
                 Self::refresh_inventory(player, inventories, update_tx);
                 activity
             }
+            Command::SpawnFacility(x, y, class, description, _properties) => {
+                let mut facility =
+                    Facility::new(NEXT_ID(), *x, *y, *class, description.clone(), inventories);
+                facilities.add(facility.clone());
+                Level::introduce_facility(&mut facility, map, obstacles, update_tx);
+                activity
+            }
             Command::DestroyFacility(facility_id) => {
                 let facility = facilities
                     .get(*facility_id)
@@ -545,6 +552,19 @@ impl GameState {
                 facility.maintenance();
                 activity
             }
+            Command::ConstructionSiteBegin => {
+                Command::begin_construction_site(
+                    player.x,
+                    player.y,
+                    player,
+                    facilities,
+                    items,
+                    inventories,
+                    timer,
+                    update_tx,
+                );
+                None
+            }
             Command::None => activity,
             Command::ActivityComplete => self.complete_activity(
                 player,
@@ -563,6 +583,15 @@ impl GameState {
                     command::facility_commands::smeltery_commands::ActivateSmelteryCommand::new(
                         player,
                         *facility_id,
+                        *selection,
+                        inventories,
+                        timer,
+                    )
+                    .execute(update_tx, command_tx)
+                }
+                ActionContinuation::ConstructionSite => {
+                    command::facility_commands::ActivateConstructionSiteBuildCommand::new(
+                        player,
                         *selection,
                         inventories,
                         timer,

@@ -33,3 +33,6 @@ pub use firepit_commands::*;
 
 pub mod patch_commands;
 pub use patch_commands::*;
+
+pub mod construction_site_commands;
+pub use construction_site_commands::*;

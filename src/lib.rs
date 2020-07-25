@@ -53,6 +53,7 @@ pub enum ActionContinuation {
     Firepit,
     Smithy,
     CraftingStation,
+    ConstructionSite,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -81,9 +82,11 @@ pub enum Command {
     RefreshInventory,
     ActivityAbort,
     ActivityComplete,
-    DestroyFacility(u64), // (facility_id)
+    SpawnFacility(i32, i32, FacilityClass, String, String), // (x, y, facility_class, descripiton, properties)
+    DestroyFacility(u64),                                   // (facility_id)
     FacilityMaintenance(u64),
     ChoiceSelected(u8, ActionContinuation, u64),
+    ConstructionSiteBegin,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -156,6 +159,7 @@ pub enum GameUpdate {
     ActivityExpired(),
     ActivityAborted(),
     DisplayOptions(Vec<String>, ActionContinuation, u64),
+
     Exit,
 }
 impl GameUpdate {

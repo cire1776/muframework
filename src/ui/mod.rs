@@ -61,7 +61,7 @@ impl UIPlayer {
 
 pub struct UIState {
     pub update_rx: std::sync::mpsc::Receiver<GameUpdate>,
-    pub command_tx: game::command::CommandSender,
+    pub command_tx: CommandSender,
 
     pub map_window: MapWindow,
     pub message_window: MessageWindow,

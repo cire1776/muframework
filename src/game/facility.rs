@@ -20,6 +20,7 @@ pub enum FacilityClass {
     Smeltery,
     Firepit,
     Patch,
+    ConstructionSite,
 }
 
 impl FacilityClass {
@@ -38,7 +39,28 @@ impl FacilityClass {
             "+smeltery" => FacilityClass::Smeltery,
             "^firepit" => FacilityClass::Firepit,
             "%patch" => FacilityClass::Patch,
+            "+construction_site" => FacilityClass::ConstructionSite,
             _ => panic!("unknown FacilityClass symbol: {}", symbol),
+        }
+    }
+
+    pub fn from_string<S: ToString>(string: S) -> Option<Self> {
+        match &string.to_string()[..] {
+            "closed_chest" => Some(FacilityClass::ClosedChest),
+            "apple_tree" => Some(FacilityClass::AppleTree),
+            "olive_tree" => Some(FacilityClass::OliveTree),
+            "pine_tree" => Some(FacilityClass::PineTree),
+            "oak_tree" => Some(FacilityClass::OakTree),
+            "fruit_press" => Some(FacilityClass::FruitPress),
+            "lumbermill" => Some(FacilityClass::Lumbermill),
+            "well" => Some(FacilityClass::Well),
+            "vein" => Some(FacilityClass::Vein),
+            "fishing_spot" => Some(FacilityClass::FishingSpot),
+            "smeltery" => Some(FacilityClass::Smeltery),
+            "firepit" => Some(FacilityClass::Firepit),
+            "patch" => Some(FacilityClass::Patch),
+            "construction_site" => Some(FacilityClass::ConstructionSite),
+            _ => None,
         }
     }
 }
@@ -95,6 +117,7 @@ impl<'a> Facility {
         match self.class {
             Well => self.get_property("fluid") as u8,
             Vein => (self.get_property("ore_type") - 1) as u8,
+            ConstructionSite => (self.get_property("size")) as u8,
             _ => 0,
         }
     }

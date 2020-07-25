@@ -88,7 +88,7 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
 
             let reply = read_from_stream(stream);
             if reply == "Y" {
-                Command::send(Some(command_tx), Command::QuitGame);
+                Command::send(Some(command_tx.clone()), Command::QuitGame);
             }
         }
         "save" => Command::send(Some(command_tx), Command::SaveGame),
@@ -139,7 +139,10 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
                                             description,
                                         ),
                                     );
-                                    Command::send(Some(command_tx), Command::RefreshInventory);
+                                    Command::send(
+                                        Some(command_tx.clone()),
+                                        Command::RefreshInventory,
+                                    );
                                     response = "Ok.".into();
                                 }
                             }
@@ -147,6 +150,30 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
                     }
                 }
             };
+        }
+        "spawn_facility" => {
+            response = "spawn_facility x y class \"description\" \"properties\"".into();
+
+            let re = regex::Regex::new(r#"spawn_facility (\d+) (\d+) (\w+) "([^"]+)" "([^"]*)""#)
+                .expect("unable to form Regex");
+
+            if let Some(captures) = re.captures(&input) {
+                if let Some(x) = captures.get(1).unwrap().as_str().parse().ok() {
+                    if let Some(y) = captures.get(1).unwrap().as_str().parse().ok() {
+                        if let Some(class) = muframework::FacilityClass::from_string(
+                            captures.get(3).unwrap().as_str(),
+                        ) {
+                            let description = captures.get(4).unwrap().as_str().to_string();
+                            let properties = captures.get(5).unwrap().as_str().to_string();
+                            Command::send(
+                                Some(command_tx),
+                                Command::SpawnFacility(x, y, class, description, properties),
+                            );
+                            response = "Ok.".into();
+                        }
+                    }
+                }
+            }
         }
         _ => {
             args.reverse();

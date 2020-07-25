@@ -488,6 +488,28 @@ pub fn assert_xp_is_updated(
     }
 }
 
+pub fn assert_is_message<S: ToString>(
+    exp_message: S,
+    exp_type: MessageType,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(Message {
+            message,
+            message_type,
+            timestamp: _,
+        }) => {
+            assert_eq!(message, exp_message.to_string());
+            assert_eq!(message_type, exp_type)
+        }
+
+        Ok(update) => panic!("unexpected update:{:?}", update),
+        Err(_) => {}
+    }
+}
+
 pub fn assert_updates_are_empty(update_rx: &mut Receiver<GameUpdate>) {
     let update = update_rx.try_recv();
 
@@ -526,6 +548,29 @@ pub fn assert_transfer_item(
                 && src_inventory_id == exp_src_inventory_id
                 && dest_inventory_id == exp_dest_inventory_id => {}
         Ok(command) => panic!("unexpected command found: {:?}", command),
+        Err(_) => panic!("command not found"),
+    }
+}
+
+pub fn assert_is_spawn_facility<S: ToString>(
+    exp_x: i32,
+    exp_y: i32,
+    exp_class: FacilityClass,
+    exp_description: S,
+    exp_properties: S,
+    command_rx: &mut Receiver<Command>,
+) {
+    let command = command_rx.try_recv();
+
+    match command {
+        Ok(Command::SpawnFacility(x, y, class, description, properties)) => {
+            assert_eq!(x, exp_x);
+            assert_eq!(y, exp_y);
+            assert_eq!(class, exp_class);
+            assert_eq!(description, exp_description.to_string());
+            assert_eq!(properties, exp_properties.to_string());
+        }
+        Ok(command) => panic!("Expected SpawnFacility.  Command found: {:?}", command),
         Err(_) => panic!("command not found"),
     }
 }
@@ -653,6 +698,9 @@ mod patches;
 
 #[cfg(test)]
 mod fishingspots;
+
+#[cfg(test)]
+mod constructionsites;
 
 #[cfg(test)]
 mod equipment;

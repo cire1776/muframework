@@ -348,6 +348,38 @@ impl SparseMap {
                 y: 0,
                 facing: Direction::Up,
             },
+            FacilityClass::ConstructionSite => [
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '1' as u8, // #
+                        fg: RGB::named(rltk::BLACK),
+                        bg: RGB::named(rltk::LIGHTGRAY),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '2' as u8, // #
+                        fg: RGB::named(rltk::BLACK),
+                        bg: RGB::named(rltk::LIGHTGRAY),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+                ui::Sprite {
+                    style: SpriteStyle {
+                        glyph: '3' as u8, // #
+                        fg: RGB::named(rltk::BLACK),
+                        bg: RGB::named(rltk::LIGHTGRAY),
+                    },
+                    x: 0,
+                    y: 0,
+                    facing: Direction::Up,
+                },
+            ][variant as usize],
             _ => ui::Sprite {
                 style: SpriteStyle {
                     glyph: '?' as u8,
