@@ -105,25 +105,38 @@ impl Level {
         obstacles: &mut BlockingMap,
         update_tx: Option<&GameUpdateSender>,
     ) {
-        for (index, facility) in facilities.iter_mut() {
-            GameUpdate::send(
-                update_tx,
-                FacilityAdded {
-                    id: *index,
-                    x: facility.x,
-                    y: facility.y,
-                    class: facility.class.clone(),
-                    description: facility.description.clone(),
-                    variant: facility.variant(),
-                },
-            );
-            obstacles.block_at(facility.x, facility.y);
+        for (_, facility) in facilities.iter_mut() {
+            Self::introduce_facility(facility, map, obstacles, update_tx)
+        }
+    }
 
-            {
-                // will eventually need to move to facility.
-                facility.background_tile = map.at(facility.x, facility.y);
-                map.set_tile_at(facility.x, facility.y, tile_map::Tile::Facility(*index));
-            }
+    pub fn introduce_facility(
+        facility: &mut Facility,
+        map: &mut TileMap,
+        obstacles: &mut BlockingMap,
+        update_tx: Option<&GameUpdateSender>,
+    ) {
+        GameUpdate::send(
+            update_tx,
+            FacilityAdded {
+                id: facility.id,
+                x: facility.x,
+                y: facility.y,
+                class: facility.class.clone(),
+                description: facility.description.clone(),
+                variant: facility.variant(),
+            },
+        );
+        obstacles.block_at(facility.x, facility.y);
+
+        {
+            // will eventually need to move to facility.
+            facility.background_tile = map.at(facility.x, facility.y);
+            map.set_tile_at(
+                facility.x,
+                facility.y,
+                tile_map::Tile::Facility(facility.id),
+            );
         }
     }
 }
