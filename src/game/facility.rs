@@ -295,6 +295,14 @@ impl<'a> Facility {
         let class = FacilityClass::from_symbol(symbol);
         let mut facility = Facility::new(NEXT_ID(), x, y, class, description.into(), inventories);
 
+        Self::read_in_facility_properties(&mut facility, property_list_string);
+
+        facility.setup_timers(timer);
+
+        (facility, inventory_alias)
+    }
+
+    pub fn read_in_facility_properties(facility: &mut Facility, property_list_string: &str) {
         let re = regex::Regex::new(r#"(?m)^\s*property:\s*(\w+)\s*=>\s*(-?\d+)(?:\s*//.*)?$"#)
             .expect("unable to parse propertylist");
 
@@ -305,10 +313,6 @@ impl<'a> Facility {
             facility.enable_properties();
             facility.set_property(property_name, property_value);
         }
-
-        facility.setup_timers(timer);
-
-        (facility, inventory_alias)
     }
 
     pub fn is_in_use(&self) -> bool {
