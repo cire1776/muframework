@@ -23,7 +23,7 @@ When a facility is removed
 pub struct BlockingMap {
     pub width: usize,
     pub height: usize,
-    pub map: Vec<bool>,
+    pub map: Vec<u8>,
 }
 
 impl fmt::Debug for BlockingMap {
@@ -33,8 +33,8 @@ impl fmt::Debug for BlockingMap {
         for _y in 0..self.height {
             for _x in 0..self.width {
                 let tile_char = match self.map[index] {
-                    false => ".",
-                    true => "+",
+                    0 => ".",
+                    _ => "+",
                 };
                 index += 1;
                 formatter.write_str(tile_char).unwrap();
@@ -55,13 +55,13 @@ impl BlockingMap {
     }
 
     pub fn refresh(&mut self, tiles: &TileMap) {
-        self.map = vec![false; tiles.len()];
+        self.map = vec![0; tiles.len()];
         self.width = tiles.map_width;
         self.height = tiles.map_height;
 
         for (index, tile) in tiles.to_iter().enumerate() {
             match tile {
-                StoneWall | Empty | ClosedDoor | DeepWater | Coastline => self.map[index] = true,
+                StoneWall | Empty | ClosedDoor | DeepWater | Coastline => self.map[index] += 1,
                 _ => {}
             }
         }
@@ -69,16 +69,20 @@ impl BlockingMap {
 
     #[inline]
     pub fn is_blocked_at(&self, x: i32, y: i32) -> bool {
-        self.map[y as usize * self.width + x as usize]
+        self.map[y as usize * self.width + x as usize] > 0
     }
 
     #[inline]
     pub fn block_at(&mut self, x: i32, y: i32) {
-        self.map[y as usize * self.width + x as usize] = true
+        self.map[y as usize * self.width + x as usize] += 1
     }
 
     #[inline]
     pub fn unblock_at(&mut self, x: i32, y: i32) {
-        self.map[y as usize * self.width + x as usize] = false
+        let index = y as usize * self.width + x as usize;
+        if self.map[index] == 0 {
+            return;
+        }
+        self.map[index] -= 1;
     }
 }
