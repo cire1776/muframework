@@ -85,8 +85,9 @@ pub enum Command {
     SpawnFacility(i32, i32, FacilityClass, String, String), // (x, y, facility_class, descripiton, properties)
     DestroyFacility(u64),                                   // (facility_id)
     FacilityMaintenance(u64),
-    ChoiceSelected(u8, ActionContinuation, u64),
+    ChoiceSelected(u8, ActionContinuation, u64), // (choice, continuation, facility_id)
     ConstructionSiteBegin,
+    SetSkillLevel(u64, game::Skill, u8), // (player_id, skill, new_level)
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]

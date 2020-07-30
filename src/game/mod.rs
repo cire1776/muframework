@@ -607,6 +607,15 @@ impl GameState {
                 }
                 _ => panic!("unknown continuation"),
             },
+            Command::SetSkillLevel(player_id, skill, new_level) => {
+                if *player_id != 1 {
+                    return activity;
+                }
+
+                player.set_level_for(*skill, *new_level, update_tx);
+
+                activity
+            }
         }
     }
 

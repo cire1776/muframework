@@ -1,4 +1,4 @@
-use muframework::Command;
+use muframework::{game, Command};
 use std::io::prelude::*;
 use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::mpsc::*;
@@ -98,9 +98,7 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
             if let Some(inventory_id) = inventory_id {
                 if let Some(inventory_id) = inventory_id.parse::<u64>().ok() {
                     if let Some(class_name) = args.pop() {
-                        if let Ok(item_class) =
-                            muframework::game::items::ItemClass::from_name(class_name)
-                        {
+                        if let Ok(item_class) = game::items::ItemClass::from_name(class_name) {
                             args.reverse();
                             let description = args.join(" ").trim_matches('"').to_string();
 
@@ -125,7 +123,7 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
                         if let Some(quantity) = quantity_str.parse::<u8>().ok() {
                             if let Some(class_name) = args.pop() {
                                 if let Ok(item_class) =
-                                    muframework::game::items::ItemClass::from_name(class_name)
+                                    game::items::ItemClass::from_name(class_name)
                                 {
                                     args.reverse();
                                     let description = args.join(" ").trim_matches('"').to_string();
@@ -175,6 +173,30 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
                 }
             }
         }
+        //
+        "give_player_level" => {
+            response = "give_player_level player_id skill level".into();
+
+            let player_id = args.pop();
+            if let Some(player_id) = player_id {
+                if let Some(player_id) = player_id.parse::<u64>().ok() {
+                    if let Some(skill_str) = args.pop() {
+                        let skill = game::Skill::from_string(skill_str.to_lowercase());
+                        let skill_level_str = args.pop();
+                        if let Some(skill_level_str) = skill_level_str {
+                            if let Some(skill_level) = skill_level_str.parse::<u8>().ok() {
+                                Command::send(
+                                    Some(command_tx),
+                                    Command::SetSkillLevel(player_id, skill, skill_level),
+                                );
+                                response = "Ok.".into();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         _ => {
             args.reverse();
             response = format!("{} {:?}", command.unwrap(), args);
