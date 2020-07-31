@@ -243,7 +243,7 @@ impl GameLoader {
             .expect("unable to deserialize characters");
 
         let inventories_data = capture_string(&captures, 5);
-        let inventories: InventoryList = ron::from_str(&inventories_data)
+        let mut inventories: InventoryList = ron::from_str(&inventories_data)
             .ok()
             .expect("unable to deserialize inventories");
 
@@ -251,6 +251,17 @@ impl GameLoader {
         let mut items: ItemList = ron::from_str(&items_data)
             .ok()
             .expect("unable to deserialize items");
+
+        let item_types = &mut items.item_types.clone();
+        {
+            for (_, inventory) in &mut inventories {
+                for (_, mut item) in &mut inventory.items {
+                    let updated_item_type =
+                        item_types.find(item.item_type.class, &item.item_type.description);
+                    item.item_type = updated_item_type.clone();
+                }
+            }
+        }
 
         let facilities_data = capture_string(&captures, 7);
         let facilities: FacilityList = ron::from_str(&facilities_data)
@@ -271,6 +282,13 @@ impl GameLoader {
 
         items.merge(&equipped_items);
 
+        {
+            for (_, item_state) in items.iter_mut() {
+                let item_type = ItemState::extract_item(item_state).item_type;
+                let updated_item_type = item_types.find(item_type.class, item_type.description);
+                item_state.update_item_type(updated_item_type.clone());
+            }
+        }
         (player, characters, items, facilities, inventories)
     }
 

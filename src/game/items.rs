@@ -101,6 +101,13 @@ impl ItemState {
             false
         }
     }
+    pub fn update_item_type(&mut self, item_type: ItemType) {
+        match self {
+            ItemState::Equipped(item, _) => item.item_type = item_type,
+            ItemState::Stored(item, _) => item.item_type = item_type,
+            ItemState::Bundle(item, _, _) => item.item_type = item_type,
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Ord, PartialOrd, Deserialize, Serialize)]
@@ -833,6 +840,10 @@ impl ItemList {
 
     pub fn iter(&self) -> std::collections::hash_map::Iter<'_, u64, ItemState> {
         self.items.iter()
+    }
+
+    pub fn iter_mut(&mut self) -> std::collections::hash_map::IterMut<'_, u64, ItemState> {
+        self.items.iter_mut()
     }
 
     pub fn bundle(&mut self, item: &Item, x: i32, y: i32) {
