@@ -196,6 +196,29 @@ fn handle_connection(stream: &mut TcpStream, command_tx: Sender<Command>) -> boo
                 }
             }
         }
+        "set_facility_property" => {
+            response = r#"set_facility_property facility_id "property_name" new_value"#.into();
+            let re = regex::Regex::new(r#"set_facility_property (\d+) "([^"]+)" (\d+)"#)
+                .expect("unable to form regex");
+
+            let captures = re.captures(&input).expect("unable to capture input");
+
+            if let Some(id_str) = captures.get(1) {
+                if let Some(id) = id_str.as_str().parse().ok() {
+                    if let Some(property_name) = captures.get(2) {
+                        let property_name = property_name.as_str().to_string();
+                        if let Some(new_value_str) = captures.get(3) {
+                            if let Some(new_value) = new_value_str.as_str().parse::<i128>().ok() {
+                                Command::send(
+                                    Some(command_tx),
+                                    Command::SetFacilityProperty(id, property_name, new_value),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         _ => {
             args.reverse();

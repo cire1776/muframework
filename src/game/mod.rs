@@ -559,6 +559,14 @@ impl GameState {
                 facility.maintenance();
                 activity
             }
+            Command::SetFacilityProperty(facility_id, property_name, new_value) => {
+                let facility = facilities
+                    .get_mut(*facility_id)
+                    .expect("Unable to find facility");
+
+                facility.set_property(property_name, *new_value);
+                activity
+            }
             Command::ConstructionSiteBegin => {
                 Command::begin_construction_site(
                     player.x,
