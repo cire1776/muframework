@@ -153,7 +153,7 @@ impl<'a> Facility {
         match self.class {
             Well => self.get_property("fluid") as u8,
             Vein => (self.get_property("ore_type") - 1) as u8,
-            ConstructionSite => (self.get_property("size")) as u8,
+            ConstructionSite => (self.get_property("size") - 1) as u8,
             _ => 0,
         }
     }
