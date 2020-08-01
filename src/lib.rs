@@ -54,6 +54,7 @@ pub enum ActionContinuation {
     Smithy,
     CraftingStation,
     ConstructionSite,
+    SetConstructionSite,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]

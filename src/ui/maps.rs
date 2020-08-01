@@ -435,6 +435,23 @@ impl SparseMap {
         self.sprites.insert(id, sprite);
         self.insert_at(x, y, id)
     }
+
+    pub fn update_facility(
+        &mut self,
+        id: u64,
+        class: FacilityClass,
+        _description: String,
+        variant: u8,
+    ) {
+        let old_sprite = self.sprites[&id];
+
+        let mut sprite = Self::lookup_sprite_for_facility_class(class, variant);
+        sprite.x = old_sprite.x;
+        sprite.y = old_sprite.y;
+
+        self.sprites.insert(id, sprite);
+    }
+
     pub fn lookup(&self, id: u64) -> Option<&Sprite> {
         self.sprites.get(&id)
     }

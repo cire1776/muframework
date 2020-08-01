@@ -514,6 +514,10 @@ fn can_use_at(
                 FacilityClass::Smeltery => OpenSmelteryCommand::can_perform(player, facility),
                 FacilityClass::Firepit => ActivateFirepitCommand::can_perform(player, facility),
                 FacilityClass::Patch => ActivatePatchCommand::can_perform(player, facility),
+                FacilityClass::ConstructionSite => {
+                    ActivateSetConstructionSiteCommand::can_perform(player, facility)
+                        || ActivateConstructionSiteAddCommand::can_perform(player, facility)
+                }
                 _ => false,
             }
         }
@@ -684,6 +688,22 @@ fn use_at<'a>(
                     facilities,
                     timer,
                 ))),
+                FacilityClass::ConstructionSite => {
+                    if ActivateConstructionSiteAddCommand::can_perform(player, facility) {
+                        Some(Box::new(ActivateConstructionSiteAddCommand::new(
+                            player,
+                            facility_id,
+                            facilities,
+                            timer,
+                        )))
+                    } else {
+                        Some(Box::new(ActivateSetConstructionSiteCommand::new(
+                            player,
+                            facility_id,
+                            facilities,
+                        )))
+                    }
+                }
                 _ => None,
             }
         }

@@ -506,7 +506,37 @@ pub fn assert_is_message<S: ToString>(
         }
 
         Ok(update) => panic!("unexpected update:{:?}", update),
-        Err(_) => {}
+        Err(_) => panic!(
+            "No update found.  Expected message: {}",
+            exp_message.to_string()
+        ),
+    }
+}
+
+pub fn assert_is_facility_updated(
+    exp_id: u64,
+    exp_description: String,
+    exp_facility_class: FacilityClass,
+    exp_variant: u8,
+    update_rx: &mut Receiver<GameUpdate>,
+) {
+    let update = update_rx.try_recv();
+
+    match update {
+        Ok(FacilityUpdated {
+            id,
+            description,
+            class,
+            variant,
+        }) => {
+            assert_eq!(id, exp_id);
+            assert_eq!(description, exp_description);
+            assert_eq!(class, exp_facility_class);
+            assert_eq!(variant, exp_variant);
+        }
+
+        Ok(update) => panic!("unexpected update:{:?}", update),
+        Err(_) => panic!("No update found.  Expected FacilityUpdated"),
     }
 }
 

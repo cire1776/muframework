@@ -613,6 +613,18 @@ impl GameState {
                     )
                     .execute(update_tx, command_tx)
                 }
+                ActionContinuation::SetConstructionSite => {
+                    let mut facility = facilities
+                        .get_mut(*facility_id)
+                        .expect("Unable to find facility");
+
+                    ConstructionBuildSiteSkill::set_blueprint_for(
+                        *selection,
+                        &player,
+                        &mut facility,
+                    );
+                    None
+                }
                 _ => panic!("unknown continuation"),
             },
             Command::SetSkillLevel(player_id, skill, new_level) => {

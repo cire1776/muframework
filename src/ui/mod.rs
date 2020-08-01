@@ -188,11 +188,13 @@ impl UIState {
                 .facilities
                 .add_facility(id, x, y, class, description, variant),
             FacilityUpdated {
-                id: _,
-                description: _,
-                class: _,
-                variant: _,
-            } => {}
+                id,
+                description,
+                class,
+                variant,
+            } => self
+                .facilities
+                .update_facility(id, class, description, variant),
             FacilityRemoved { id: facility_id } => self.facilities.remove(facility_id),
             PlayerXPUpdated(player_id, skill, xp_value) => {
                 if player_id == 1 {
