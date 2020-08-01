@@ -101,7 +101,7 @@ impl Blueprint {
     }
 }
 
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum ConstructionSiteType {
     SmallSite = 0,
     MediumSite,
