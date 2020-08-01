@@ -306,6 +306,12 @@ impl ItemClassSpecifier {
             },
         );
         item_class_specifiers.insert(
+            ItemClass::Ore,
+            ItemClassSpecifier {
+                mounting_points: [MountingPoint::AtReady].iter().cloned().collect(),
+            },
+        );
+        item_class_specifiers.insert(
             ItemClass::Ingredient,
             ItemClassSpecifier {
                 mounting_points: [MountingPoint::AtReady].iter().cloned().collect(),
