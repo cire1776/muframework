@@ -98,7 +98,9 @@ simple_fishing_trap tool "Simple Fishing Trap" {
 }
 dirt ore "Dirt"
 sand ore "Sand"
-stone ore "Stone"
+stone ore "Stone" {
+    endorsement: :wants_to_add(stone)
+}
 coal ore "Coal"
 tin_ore ore "Tin Ore"
 copper_ore ore "Copper Ore"
