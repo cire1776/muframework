@@ -77,8 +77,12 @@ softwood_log material "Softwood Log" {
 hardwood_log material "Hardwood Log" {
     endorsement: :wants_to_mill(hardwood)
 }
-hardwood_plank material "Hardwood Plank"
-softwood_plank material "Softwood Plank"
+hardwood_plank material "Hardwood Plank" {
+    endorsement: :wants_to_add(hardwood)
+}
+softwood_plank material "Softwood Plank" {
+    endorsement: :wants_to_add(softwood)
+}
 bottle_of_oil material "Bottle of Oil"
 
 bronze_shovel tool "Bronze Shovel" {
@@ -302,4 +306,6 @@ turnip food "Turnip"
 watermelon food "Watermelon"
 wheat food "Wheat"
 
-rope material "Rope"
+rope material "Rope" {
+    endorsement: :wants_to_add(rope)
+}
