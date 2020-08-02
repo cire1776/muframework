@@ -436,12 +436,11 @@ impl ConstructionAddSkill {
 
         player.increment_xp(Construction, xp_gain as u64, rng, update_tx);
 
-        let hardwood_left = facility.get_property("hardwood") != 0;
-        let softwood_left = facility.get_property("softwood") != 0;
-        let stone_left = facility.get_property("stone") != 0;
-        let rope_left = facility.get_property("rope") != 0;
+        let material_left = ["hardwood", "softwood", "stone", "rope"]
+            .iter()
+            .any(|material| facility.get_property(material) != 0);
 
-        if hardwood_left || softwood_left || stone_left || rope_left {
+        if material_left {
             return;
         }
 
