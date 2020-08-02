@@ -181,25 +181,33 @@ impl<'a> Facility {
         U: TryInto<i32>,
     {
         let id = id.try_into().ok().expect("Must be able to convert to u64");
-        let inventory_id = id;
 
-        let has_inventory = [FacilityClass::ClosedChest, FacilityClass::OpenChest].contains(&class);
-        if !has_inventory {
-            panic!("inventory assigned to facility without inventory");
-        }
-
-        Inventory::new_into_inventory_list(inventory_id, inventories);
-
-        Facility {
+        let mut facility = Facility {
             id,
             x: x.try_into().ok().expect("Must be able to convert to i32"),
             y: y.try_into().ok().expect("Must be able to convert to i32"),
             class,
             description,
-            inventory: Some(inventory_id),
+            inventory: None,
             properties: None,
             background_tile: tile_map::Tile::Empty,
+        };
+
+        facility.setup_inventory(inventories);
+        facility
+    }
+
+    pub fn setup_inventory(&mut self, inventories: &mut InventoryList) {
+        let inventory_id = self.id;
+
+        let has_inventory =
+            [FacilityClass::ClosedChest, FacilityClass::OpenChest].contains(&self.class);
+        if !has_inventory {
+            return;
         }
+
+        Inventory::new_into_inventory_list(inventory_id, inventories);
+        self.inventory = Some(inventory_id);
     }
 
     pub fn enable_properties(&mut self) {
