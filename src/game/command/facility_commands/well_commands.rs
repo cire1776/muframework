@@ -275,6 +275,15 @@ impl Activity for WellDigActivity {
         if result != Dry {
             facility.set_property("fluid", result as u128);
             Command::send(Some(command_sender.clone()), Command::ActivityAbort);
+            GameUpdate::send(
+                Some(&update_sender),
+                FacilityUpdated {
+                    id: facility.id,
+                    description: facility.description.clone(),
+                    class: facility.class,
+                    variant: facility.variant(),
+                },
+            )
         }
 
         let level = player.get_level_for(Engineering);

@@ -180,12 +180,21 @@ fn can_dig_striking_water() {
         Some(command_tx),
     );
 
+    let well_id = get_facility_id_at(13, 11, &map);
+
     assert!(activity.is_some());
 
     assert_activity_expired(&mut update_rx);
     assert_xp_is_updated(player.id, Engineering, 10, &mut update_rx);
     assert_xp_is_updated(player.id, Engineering, 110, &mut update_rx);
 
+    assert_is_facility_updated(
+        well_id,
+        "A dry well".into(),
+        FacilityClass::Well,
+        1,
+        &mut update_rx,
+    );
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -259,6 +268,7 @@ fn can_dig_striking_oil() {
         TagType::Duration(chrono::Duration::seconds(60))
     );
     assert!(activity.is_some());
+    let well_id = get_facility_id_at(13, 11, &map);
 
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -287,6 +297,14 @@ fn can_dig_striking_oil() {
     assert_activity_expired(&mut update_rx);
     assert_xp_is_updated(player.id, Engineering, 10, &mut update_rx);
     assert_xp_is_updated(player.id, Engineering, 1010, &mut update_rx);
+
+    assert_is_facility_updated(
+        well_id,
+        "A dry well".into(),
+        FacilityClass::Well,
+        2,
+        &mut update_rx,
+    );
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
@@ -385,9 +403,18 @@ fn can_dig_striking_bedrock() {
 
     assert!(activity.is_some());
 
+    let well_id = get_facility_id_at(13, 11, &map);
+
     assert_activity_expired(&mut update_rx);
     assert_xp_is_updated(player.id, Engineering, 10, &mut update_rx);
     assert_xp_is_updated(player.id, Engineering, 15010, &mut update_rx);
+    assert_is_facility_updated(
+        well_id,
+        "A dry well".into(),
+        FacilityClass::Well,
+        255,
+        &mut update_rx,
+    );
     assert_activity_started(60000, Digging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
 
