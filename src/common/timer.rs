@@ -206,18 +206,19 @@ impl Timer {
                 .collect::<Vec<Alarm>>()
         };
 
-        for alarm in alarms {
-            self.trigger_alarm(&alarm)
-        }
-
         self.cancel(tag);
+
+        for alarm in alarms {
+            self.trigger_alarm(&alarm);
+        }
     }
 
     pub fn cancel<S: ToString>(&mut self, tag: S) {
         let tag = tag.to_string();
         for (_, alarm_set) in &mut self.alarms {
-            alarm_set.retain(|a| a.tag != tag)
+            alarm_set.retain(|a| a.tag != tag);
         }
+        self.tags.remove(&tag);
     }
 
     fn trigger_alarm(&mut self, alarm: &Alarm) {

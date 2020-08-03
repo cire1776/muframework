@@ -83,6 +83,7 @@ pub enum Command {
     RefreshInventory,
     ActivityAbort,
     ActivityComplete,
+    ActivityShortCircuit,
     SpawnFacility(i32, i32, FacilityClass, String, String), // (x, y, facility_class, descripiton, properties)
     DestroyFacility(u64),                                   // (facility_id)
     FacilityMaintenance(u64),

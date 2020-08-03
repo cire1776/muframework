@@ -593,6 +593,11 @@ impl GameState {
                 command_tx,
             ),
             Command::ActivityAbort => None,
+            Command::ActivityShortCircuit => {
+                println!("triggering activity complete");
+                timer.trigger("ActivityComplete");
+                activity
+            }
             Command::ChoiceSelected(selection, continuation, facility_id) => match continuation {
                 ActionContinuation::Smeltery => {
                     command::facility_commands::smeltery_commands::ActivateSmelteryCommand::new(
@@ -700,7 +705,8 @@ impl GameState {
                 | Command::TakeItem(_)
                 | Command::DropItem(_)
                 | Command::FacilityMaintenance(_)
-                | Command::ActivityComplete => {}
+                | Command::ActivityComplete
+                | Command::ActivityShortCircuit => {}
 
                 _ => {
                     activity.clear_guard();
