@@ -1,27 +1,40 @@
 use super::*;
 use extern_timer::*;
 use game::Rng;
+
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::sync::Arc;
+
 #[derive(Clone)]
 pub struct Guard {
     guard: Option<extern_timer::Guard>,
+    execute_flag: Option<Arc<AtomicBool>>,
 }
 
 impl Guard {
-    pub fn new(guard: Option<extern_timer::Guard>) -> Self {
-        Self { guard }
+    pub fn new(guard: Option<extern_timer::Guard>, execute_flag: Option<Arc<AtomicBool>>) -> Self {
+        Self {
+            guard,
+            execute_flag,
+        }
     }
 }
 
 impl Drop for Guard {
     fn drop(&mut self) {
+        if let Some(execute_flag) = self.execute_flag.clone() {
+            execute_flag.store(false, Ordering::Relaxed);
+        }
         println!("dropping");
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Alarm {
     duration_in_ticks: u128,
     command: Command,
+    execute_flag: Arc<AtomicBool>,
     tag: String,
 }
 
@@ -30,8 +43,13 @@ impl Alarm {
         Self {
             duration_in_ticks,
             command,
+            execute_flag: Arc::new(AtomicBool::new(true)),
             tag: tag.to_string(),
         }
+    }
+
+    pub fn execute_flag(&self) -> Arc<AtomicBool> {
+        self.execute_flag.clone()
     }
 }
 
@@ -93,10 +111,10 @@ impl Timer {
             .insert(tag.to_string(), TagType::Duration(duration));
 
         if self.test_mode {
-            Guard::new(None)
+            Guard::new(None, None)
         } else {
             let guard = self.timer.schedule_repeating(duration, command);
-            Guard::new(Some(guard))
+            Guard::new(Some(guard), None)
         }
     }
 
@@ -105,13 +123,17 @@ impl Timer {
         duration_in_ticks: u128,
         command: Command,
         tag: S,
-    ) {
+    ) -> Guard {
         self.tags
             .insert(tag.to_string(), TagType::Ticks(duration_in_ticks));
 
         let alarm = Alarm::new(duration_in_ticks, command, tag);
 
+        let execute_flag = alarm.clone().execute_flag();
+
         self.schedule_next(alarm, None, None);
+
+        Guard::new(None, Some(execute_flag))
     }
 
     pub fn repeating_by_tick_starting_at<S: ToString>(
@@ -120,13 +142,17 @@ impl Timer {
         duration_in_ticks: u128,
         command: Command,
         tag: S,
-    ) {
+    ) -> Guard {
         self.tags
             .insert(tag.to_string(), TagType::Ticks(duration_in_ticks));
 
         let alarm = Alarm::new(duration_in_ticks, command, tag);
 
+        let execute_flag = alarm.clone().execute_flag();
+
         self.schedule_next(alarm, Some(first), None);
+
+        Guard::new(None, Some(execute_flag))
     }
 
     pub fn stagger_repeating_by_tick<S: ToString>(
@@ -195,6 +221,10 @@ impl Timer {
     }
 
     fn trigger_alarm(&mut self, alarm: &Alarm) {
+        if !alarm.execute_flag.load(Ordering::Relaxed) {
+            return;
+        }
+
         self.schedule_next(alarm.clone(), None, None);
         Command::send(self.command_tx.clone(), alarm.command.clone())
     }
