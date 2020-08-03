@@ -91,7 +91,7 @@ fn picking_can_done_with_can_pick_endorsement() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
+        TagType::Ticks(60 * 60)
     );
 
     assert_activity_started(60_000, ui::PaneTitle::Harvesting, &mut update_rx);
@@ -177,7 +177,7 @@ fn can_produce_multiple_types_of_produce() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
+        TagType::Ticks(60 * 60)
     );
 
     assert_activity_started(60_000, ui::PaneTitle::Harvesting, &mut update_rx);
@@ -263,7 +263,7 @@ fn takes_skilltime_into_account() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(51))
+        TagType::Ticks(51 * 60)
     );
 
     assert_activity_started(51_000, ui::PaneTitle::Harvesting, &mut update_rx);

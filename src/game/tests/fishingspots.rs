@@ -107,10 +107,7 @@ fn it_allows_rod_fishing_with_the_can_fish_endorsement() {
 
     assert_player_is_at(14, 1, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(60_000, PaneTitle::Fishing, &mut update_rx);
@@ -198,10 +195,7 @@ fn it_allows_net_fishing_for_shrimp_with_the_can_net_fish_endorsement() {
 
     assert_player_is_at(14, 1, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(45))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(45 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
@@ -289,10 +283,7 @@ fn it_allows_net_fishing_for_frogs_with_the_can_net_fish_endorsement() {
 
     assert_player_is_at(14, 1, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(45))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(45 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
@@ -380,10 +371,7 @@ fn it_allows_placing_a_trap_with_endorsement_can_place_fishing_trap() {
 
     assert_player_is_at(14, 1, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(30 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(30_000, PaneTitle::PlacingTrap, &mut update_rx);
@@ -674,10 +662,7 @@ fn it_allows_retreiving_a_trap_after_the_expiration() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(30 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(30_000, PaneTitle::CollectingTrap, &mut update_rx);
@@ -1051,10 +1036,7 @@ fn net_fishing_above_level_produces_seaweed() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(45))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(45 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
@@ -1143,10 +1125,7 @@ fn net_fishing_above_level_produces_driftwood() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(45))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(45 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(45_000, PaneTitle::NetFishing, &mut update_rx);
@@ -1235,10 +1214,7 @@ fn rod_fishing_above_level_produces_seaweed() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(60_000, PaneTitle::Fishing, &mut update_rx);
@@ -1327,10 +1303,7 @@ fn rod_fishing_above_level_produces_driftwood() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(60_000, PaneTitle::Fishing, &mut update_rx);

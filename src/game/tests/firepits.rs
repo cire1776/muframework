@@ -86,10 +86,7 @@ fn can_cook_fish_successfully() {
 
     assert_player_is_at(11, 6, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(57))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(57 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(57_000, PaneTitle::Cooking, &mut update_rx);
@@ -217,10 +214,7 @@ fn can_burn_fish() {
 
     assert_player_is_at(11, 6, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(60000, PaneTitle::Cooking, &mut update_rx);
@@ -341,10 +335,7 @@ fn can_cook_item_at_ready() {
 
     assert_player_is_at(11, 6, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(57))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(57 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(57_000, PaneTitle::Cooking, &mut update_rx);
@@ -477,10 +468,7 @@ fn timer_is_reduced_by_skill_time() {
 
     assert_player_is_at(11, 6, &player);
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(51))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(51 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(51_000, PaneTitle::Cooking, &mut update_rx);

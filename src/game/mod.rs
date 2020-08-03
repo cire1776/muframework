@@ -211,8 +211,8 @@ impl GameState {
     }
 
     fn start_heartbeat(&self, timer: &mut Timer) -> Guard {
-        let duration = chrono::Duration::microseconds(1_000_000 / 60);
-        timer.repeating(duration, Command::NextTick, "Heartbeat")
+        let duration = chrono::Duration::nanoseconds(1_000_000_000 / 60);
+        timer.repeating_by_time(duration, Command::NextTick, "Heartbeat")
     }
 
     pub fn current_tick(&self) -> u128 {

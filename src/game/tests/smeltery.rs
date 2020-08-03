@@ -46,7 +46,7 @@ fn can_open_a_smeltery_at_level_10() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -109,7 +109,7 @@ fn can_open_a_smeltery_at_level_45() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -189,7 +189,7 @@ fn can_smelt_tin_with_excess_quantities() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -200,10 +200,7 @@ fn can_smelt_tin_with_excess_quantities() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(16))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(16 * 60));
 
     assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
 
@@ -216,7 +213,7 @@ fn can_smelt_tin_with_excess_quantities() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,
@@ -286,7 +283,7 @@ fn can_smelt_cinnabar_to_mercury() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -297,10 +294,7 @@ fn can_smelt_cinnabar_to_mercury() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(52))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(52 * 60));
 
     assert_activity_started(52_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
 
@@ -313,7 +307,7 @@ fn can_smelt_cinnabar_to_mercury() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,
@@ -384,7 +378,7 @@ fn stops_when_supplies_run_out() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -395,10 +389,7 @@ fn stops_when_supplies_run_out() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(16))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(16 * 60));
 
     assert_activity_started(16_000, ui::pane::PaneTitle::Smelting, &mut update_rx);
 
@@ -411,7 +402,7 @@ fn stops_when_supplies_run_out() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,
@@ -475,7 +466,7 @@ fn player_earns_5_xp_by_smelting_tin() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -493,7 +484,7 @@ fn player_earns_5_xp_by_smelting_tin() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,
@@ -556,7 +547,7 @@ fn player_earns_6_xp_by_smelting_copper() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -576,7 +567,7 @@ fn player_earns_6_xp_by_smelting_copper() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,
@@ -640,7 +631,7 @@ fn player_earns_7_xp_by_smelting_bronze() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -660,7 +651,7 @@ fn player_earns_7_xp_by_smelting_bronze() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,
@@ -723,7 +714,7 @@ fn player_earns_10_xp_by_smelting_cinnabar() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -743,7 +734,7 @@ fn player_earns_10_xp_by_smelting_cinnabar() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,
@@ -799,7 +790,7 @@ fn player_earns_75_xp_by_smelting_mythral() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         None,
@@ -819,7 +810,7 @@ fn player_earns_75_xp_by_smelting_mythral() {
         &mut items,
         &mut facilities,
         &mut inventories,
-       &mut game_data,
+        &mut game_data,
         &mut rng,
         &mut timer,
         activity,

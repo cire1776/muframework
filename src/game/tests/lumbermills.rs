@@ -68,10 +68,7 @@ fn can_saw_softwood_without_breaking_mill() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(40))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(40 * 60));
 
     assert_activity_started(40000, Sawing, &mut update_rx);
 
@@ -175,10 +172,7 @@ fn can_saw_hardwood_without_breaking_mill() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60000, Sawing, &mut update_rx);
 
@@ -280,10 +274,7 @@ fn mills_can_break() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, Sawing, &mut update_rx);
 

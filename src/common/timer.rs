@@ -101,7 +101,7 @@ impl Timer {
         self.current_tick
     }
 
-    pub fn repeating<S: ToString>(
+    pub fn repeating_by_time<S: ToString>(
         &mut self,
         duration: chrono::Duration,
         command: Command,

@@ -416,10 +416,7 @@ fn can_press_when_apples_have_been_added() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60000, Pressing, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -527,10 +524,7 @@ fn can_press_when_olives_have_been_added() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60000, Pressing, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -625,10 +619,7 @@ fn can_fill_bottles_when_apple_juice_is_available_aborting_when_empty() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(30 * 60));
 
     assert_activity_started(30000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -729,10 +720,7 @@ fn can_fill_bottles_when_olive_oil_is_available_aborting_when_empty() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(30 * 60));
 
     assert_activity_started(30000, Filling, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);

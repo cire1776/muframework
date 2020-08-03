@@ -51,7 +51,7 @@ fn can_dig_dirt_without_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(40))
+        TagType::Ticks(40 * 60)
     );
 
     assert_activity_started(40_000, Digging, &mut update_rx);
@@ -134,7 +134,7 @@ fn can_dig_dirt_with_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(40))
+        TagType::Ticks(40 * 60)
     );
 
     assert_activity_started(40_000, Digging, &mut update_rx);
@@ -219,7 +219,7 @@ fn can_dig_sand_without_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(20))
+        TagType::Ticks(20 * 60)
     );
 
     assert_activity_started(20_000, Digging, &mut update_rx);
@@ -301,7 +301,7 @@ fn can_dig_sand_with_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(20))
+        TagType::Ticks(20 * 60)
     );
 
     assert_activity_started(20_000, Digging, &mut update_rx);
@@ -385,7 +385,7 @@ fn can_mine_stone_without_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
+        TagType::Ticks(60 * 60)
     );
 
     assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
@@ -468,7 +468,7 @@ fn can_mine_stone_with_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
+        TagType::Ticks(60 * 60)
     );
 
     assert_activity_started(60_000, PaneTitle::Mining, &mut update_rx);
@@ -553,7 +553,7 @@ fn can_mine_tin_without_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(59))
+        TagType::Ticks(59 * 60)
     );
 
     assert_activity_started(59_000, PaneTitle::Mining, &mut update_rx);
@@ -636,7 +636,7 @@ fn can_mine_tin_with_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(59))
+        TagType::Ticks(59 * 60)
     );
 
     assert_activity_started(59_000, PaneTitle::Mining, &mut update_rx);
@@ -721,7 +721,7 @@ fn can_mine_copper_without_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(58))
+        TagType::Ticks(58 * 60)
     );
 
     assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);
@@ -804,7 +804,7 @@ fn can_mine_copper_with_exhaustion() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(58))
+        TagType::Ticks(58 * 60)
     );
 
     assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);
@@ -891,7 +891,7 @@ fn tin_provides_5_xp() {
 
     assert_eq!(
         timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(58))
+        TagType::Ticks(58 * 60)
     );
 
     assert_activity_started(58_000, PaneTitle::Mining, &mut update_rx);

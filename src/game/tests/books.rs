@@ -161,10 +161,7 @@ fn can_read_a_book() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(56))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(56 * 60));
 
     assert_activity_started(56_000, Reading, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -251,10 +248,7 @@ fn reading_a_book_earns_10_intellectual_xp() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(56))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(56 * 60));
 
     assert_activity_started(56_000, Reading, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -330,10 +324,7 @@ fn reading_a_book_with_an_associated_skill_earns_10_points_for_that_skill() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, Reading, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -406,10 +397,7 @@ fn skilltime_is_taken_into_account() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(51))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(51 * 60));
 
     assert_activity_started(51_000, Reading, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -598,10 +586,7 @@ fn a_player_must_have_the_minimum_associated_skill_to_earn_xp_for_that_skill() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, Reading, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -684,10 +669,7 @@ fn if_player_has_too_high_topic_skill_they_earn_no_topic_xp() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, Reading, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);

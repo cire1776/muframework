@@ -329,10 +329,7 @@ fn can_complete_a_small_construction_site() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(291))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(291 * 60));
 
     assert_activity_started(291000, PaneTitle::Building, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -437,10 +434,7 @@ fn can_complete_a_medium_construction_site() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(583))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(583 * 60));
 
     assert_activity_started(583000, PaneTitle::Building, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -545,10 +539,7 @@ fn can_complete_a_large_construction_site() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(1169))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(1169 * 60));
 
     assert_activity_started(1169000, PaneTitle::Building, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -1809,10 +1800,7 @@ fn small_construction_site_starts_timer_to_add_stones_to_build_firepit() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(47))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(47 * 60));
 
     assert_activity_started(47000, ui::pane::PaneTitle::Building, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -2165,10 +2153,7 @@ fn small_construction_site_starts_timer_to_add_stones_to_build_lumbermill() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(49))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(49 * 60));
 
     assert_activity_started(49000, ui::pane::PaneTitle::Building, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -2669,10 +2654,7 @@ fn small_construction_site_starts_timer_to_add_hardwood_to_build_chest() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(48))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(48 * 60));
 
     assert_activity_started(48000, ui::pane::PaneTitle::Building, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -3064,10 +3046,7 @@ fn small_construction_site_starts_timer_to_add_stones_to_build_chest() {
 
     assert!(activity.is_some());
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(47))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(47 * 60));
 
     assert_activity_started(47000, ui::pane::PaneTitle::Building, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);

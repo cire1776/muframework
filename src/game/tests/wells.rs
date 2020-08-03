@@ -55,10 +55,7 @@ fn can_dig_without_success() {
         Some(command_tx.clone()),
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(60000, Digging, &mut update_rx);
@@ -152,10 +149,7 @@ fn can_dig_striking_water() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(60000, Digging, &mut update_rx);
@@ -263,10 +257,7 @@ fn can_dig_striking_oil() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
     let well_id = get_facility_id_at(13, 11, &map);
 
@@ -373,10 +364,7 @@ fn can_dig_striking_bedrock() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(60000, Digging, &mut update_rx);
@@ -479,10 +467,7 @@ fn can_fill_from_water_well() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(30 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(30000, Filling, &mut update_rx);
@@ -568,10 +553,7 @@ fn can_fill_from_oil_well() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(45))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(45 * 60));
     assert!(activity.is_some());
 
     assert_activity_started(45000, Filling, &mut update_rx);
@@ -715,10 +697,7 @@ fn filling_from_water_well_gains_5_xp() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(30))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(30 * 60));
     assert!(activity.is_some());
 
     activity = game_state.game_loop_iteration(

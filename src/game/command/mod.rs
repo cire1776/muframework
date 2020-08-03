@@ -757,8 +757,8 @@ pub trait CommandHandler<'a> {
         // let update_sender = update_tx.unwrap().clone();
 
         let timer = { self.timer().unwrap() };
-        let guard = timer.repeating(
-            chrono::Duration::seconds(expiration as i64),
+        let guard = timer.repeating_by_tick(
+            (expiration * 60) as u128,
             Command::ActivityComplete,
             "ActivityComplete",
         );

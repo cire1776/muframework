@@ -47,10 +47,7 @@ fn can_chop_pine_tree() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
     assert_updates_are_empty(&mut update_rx);
@@ -134,10 +131,7 @@ fn can_chop_apple_tree() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
 
@@ -219,10 +213,7 @@ fn can_chop_olive_tree() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
 
@@ -305,10 +296,7 @@ fn can_chop_oak_tree() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, ui::pane::PaneTitle::Logging, &mut update_rx);
 
@@ -389,10 +377,7 @@ fn can_pick_apple_tree() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, ui::pane::PaneTitle::PickingApples, &mut update_rx);
 
@@ -471,10 +456,7 @@ fn can_pick_olive_tree() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(90))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(90 * 60));
 
     assert_activity_started(90_000, ui::pane::PaneTitle::PickingOlives, &mut update_rx);
 
@@ -608,10 +590,7 @@ fn player_earns_10_xp_harvesting_for_picking_an_apple() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(60))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(60 * 60));
 
     assert_activity_started(60_000, ui::pane::PaneTitle::PickingApples, &mut update_rx);
 
@@ -750,10 +729,7 @@ fn skilltime_is_accounted_for_while_picking_apples() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(49))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(49 * 60));
 
     assert_activity_started(49_000, ui::pane::PaneTitle::PickingApples, &mut update_rx);
 
@@ -833,10 +809,7 @@ fn skilltime_is_accounted_for_while_picking_olives() {
         None,
     );
 
-    assert_eq!(
-        timer.tags["ActivityComplete"],
-        TagType::Duration(chrono::Duration::seconds(71))
-    );
+    assert_eq!(timer.tags["ActivityComplete"], TagType::Ticks(71 * 60));
 
     assert_activity_started(71_000, ui::pane::PaneTitle::PickingOlives, &mut update_rx);
 
