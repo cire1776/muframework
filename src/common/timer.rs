@@ -10,6 +10,7 @@ use std::sync::Arc;
 pub struct Guard {
     guard: Option<extern_timer::Guard>,
     execute_flag: Option<Arc<AtomicBool>>,
+    ignore_drop: bool,
 }
 
 impl Guard {
@@ -17,16 +18,24 @@ impl Guard {
         Self {
             guard,
             execute_flag,
+            ignore_drop: false,
         }
+    }
+
+    pub fn ignore(&mut self) {
+        self.ignore_drop = true;
     }
 }
 
 impl Drop for Guard {
     fn drop(&mut self) {
         if let Some(execute_flag) = self.execute_flag.clone() {
+            if self.ignore_drop {
+                return;
+            }
             execute_flag.store(false, Ordering::Relaxed);
+            println!("dropping");
         }
-        println!("dropping");
     }
 }
 

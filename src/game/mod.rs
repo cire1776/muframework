@@ -227,7 +227,8 @@ impl GameState {
     fn setup_alarms(timer: &mut Timer, auto_save_enabled: bool) {
         use chrono::Timelike;
 
-        timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
+        let mut guard = timer.repeating_by_tick(3600, Command::DisplayTick, "DisplayTick");
+        guard.ignore();
 
         let minute = chrono::Local::now().minute();
         let mut offset: u128 = (10 - minute % 10) as u128;
@@ -241,12 +242,13 @@ impl GameState {
         println!("offset: {}", offset);
 
         if auto_save_enabled {
-            timer.repeating_by_tick_starting_at(
+            let mut guard = timer.repeating_by_tick_starting_at(
                 offset * 3600 as u128,
                 10 * 3600,
                 Command::SaveGame,
                 "Autosave",
             );
+            guard.ignore();
         }
     }
 

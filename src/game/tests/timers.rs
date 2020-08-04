@@ -143,3 +143,18 @@ fn dropping_guard_disable_alarm() {
 
     assert_commands_are_empty(&mut command_receiver);
 }
+
+#[test]
+fn dropping_ignored_guard_does_not_disable_alarm() {
+    let (command_sender, mut command_receiver) = channel();
+    let mut subject = Timer::new(Some(command_sender));
+
+    // dropping guard
+    let mut guard = subject.repeating_by_tick(100_000, Command::NextTick, "a tag");
+    guard.ignore();
+
+    subject.tick(100_000);
+
+    assert_is_next_tick(&mut command_receiver);
+    assert_commands_are_empty(&mut command_receiver);
+}

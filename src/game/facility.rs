@@ -266,11 +266,12 @@ impl<'a> Facility {
             | FacilityClass::PineTree
             | FacilityClass::OliveTree
             | FacilityClass::OakTree => {
-                timer.repeating_by_tick(
+                let mut guard = timer.repeating_by_tick(
                     15 * 3600,
                     Command::FacilityMaintenance(self.id),
                     format!("regeneration for {:?}", self.id),
                 );
+                guard.ignore();
             }
             _ => {}
         }
