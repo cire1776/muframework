@@ -594,7 +594,6 @@ impl GameState {
             ),
             Command::ActivityAbort => None,
             Command::ActivityShortCircuit => {
-                println!("triggering activity complete");
                 timer.trigger("ActivityComplete");
                 activity
             }
